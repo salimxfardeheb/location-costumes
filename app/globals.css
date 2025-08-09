@@ -1,7 +1,7 @@
 @import "tailwindcss";
 
     body {
-        @apply bg-gradient-to-b from-[#B6FFF6] to-[#06B9AE] min-h-screen flex justify-center items-center;
+        @apply bg-gradient-to-b from-white to-[#06B9AE] min-h-screen flex justify-center items-center;
     }
 
     @layer base {
