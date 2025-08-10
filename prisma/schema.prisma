@@ -1,0 +1,74 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../app/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model accessory {
+  id          Int        @id @default(autoincrement())
+  boutique_id Int
+  size        String?
+  boutique    boutique   @relation(fields: [boutique_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  location    location[]
+}
+
+model boutique {
+  id           Int         @id @default(autoincrement())
+  nom_boutique String      @unique @db.VarChar(255)
+  admin        String      @db.VarChar(255)
+  password     String      @db.VarChar(500)
+  accessory    accessory[]
+  costume      costume[]
+  location     location[]
+  shirt        shirt[]
+  shoe         shoe[]
+}
+
+model costume {
+  id          Int        @id @default(autoincrement())
+  boutique_id Int
+  model       Int?
+  blazer      String[]   @default([])
+  pants       String[]   @default([])
+  boutique    boutique   @relation(fields: [boutique_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  location    location[]
+}
+
+model location {
+  id            Int        @id @default(autoincrement())
+  boutique_id   Int
+  costume_id    Int?
+  shirt_id      Int?
+  shoe_id       Int?
+  accessory_id  Int?
+  location_date DateTime?  @db.Date
+  accessory     accessory? @relation(fields: [accessory_id], references: [id], onUpdate: NoAction)
+  boutique      boutique   @relation(fields: [boutique_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  costume       costume?   @relation(fields: [costume_id], references: [id], onUpdate: NoAction)
+  shirt         shirt?     @relation(fields: [shirt_id], references: [id], onUpdate: NoAction)
+  shoe          shoe?      @relation(fields: [shoe_id], references: [id], onUpdate: NoAction)
+}
+
+model shirt {
+  id          Int        @id @default(autoincrement())
+  boutique_id Int
+  model       String?
+  color       String?
+  size        String?
+  location    location[]
+  boutique    boutique   @relation(fields: [boutique_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+}
+
+model shoe {
+  id          Int        @id @default(autoincrement())
+  boutique_id Int
+  model       String?
+  color       String?
+  size        String?
+  location    location[]
+  boutique    boutique   @relation(fields: [boutique_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+}
