@@ -1,12 +1,15 @@
-import React, { ReactNode } from 'react'
+"use client"
+import React, { ReactNode } from "react";
+import Panel from "./components/panel";
 
-const layout = ({children} : {children : ReactNode}) => {
+const layout = ({ children }: { children: ReactNode }) => {
+
   return (
     <div>
-        <h1>dash</h1>
-      {children}
+      <aside><Panel clientName = "salim"/></aside>
+      <main>{children}</main>
     </div>
-  )
-}
+  );
+};
 
-export default layout
+export default layout;

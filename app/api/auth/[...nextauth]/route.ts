@@ -3,7 +3,6 @@ import CredentialsProvider from "next-auth/providers/credentials";
 import { PrismaClient } from "@/app/generated/prisma";
 import bcrypt from "bcrypt";
 
-
 declare module "next-auth" {
   interface Session {
     user: {
@@ -66,6 +65,8 @@ export const authOptions: NextAuthOptions = {
   ],
   session: {
     strategy: "jwt",
+    maxAge: 30 * 24 * 60 * 60, // 30 jours
+    updateAge: 24 * 60 * 60, // rafraîchit tous les 24h
   },
   pages: {
     signIn: "/",
@@ -75,7 +76,7 @@ export const authOptions: NextAuthOptions = {
       if (user) {
         token.id = user.id;
         token.nom_boutique = user.name;
-        token.admin = user.admin
+        token.admin = user.admin;
       }
       return token;
     },
@@ -89,13 +90,13 @@ export const authOptions: NextAuthOptions = {
       }
       return session;
     },
-  async redirect({ url, baseUrl }) {
-    // Rediriger vers la page d'accueil après déconnexion
-    if (url.includes("/logout")) {
-      return baseUrl;
-    }
-    return url;
-  },
+    async redirect({ url, baseUrl }) {
+      // Rediriger vers la page d'accueil après déconnexion
+      if (url.includes("/logout")) {
+        return baseUrl;
+      }
+      return url;
+    },
   },
 };
 

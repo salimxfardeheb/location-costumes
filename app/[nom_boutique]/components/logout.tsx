@@ -1,14 +1,21 @@
 import { signOut } from "next-auth/react";
+import { LuLogOut } from "react-icons/lu";
 import React from "react";
 
-const Logout = () => {
+interface LogoutProps {
+  text?: boolean; // par défaut true
+  icon?: React.ReactNode; // icône optionnelle
+}
+
+const Logout: React.FC<LogoutProps> = ({ text = true, icon= true }) => {
   return (
     <div>
       <button
         onClick={() => signOut({ callbackUrl: "/" })}
-        className="mt-4 px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600"
+        className="mt-4 px-4 py-2 bg-red-500 text-white hover:bg-red-600 hover:opacity-95 flex items-center gap-2 opacity-70 cursor-pointer min-w-full"
       >
-        Se déconnecter
+        {icon && <span><LuLogOut/></span>}
+        {text && <span>Se déconnecter</span>}
       </button>
     </div>
   );
