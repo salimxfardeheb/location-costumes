@@ -1,6 +1,6 @@
 @import "tailwindcss";
 
-    body {
+    .body_root {
         @apply bg-gradient-to-b from-white to-[#06B9AE] min-h-screen flex justify-center items-center;
     }
 

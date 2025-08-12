@@ -1,7 +1,7 @@
 "use client";
 
 import {  useState } from "react";
-import { createShop } from "../actions/createShop";
+import { createShop } from "../../actions/createShop";
 
 export default function page() {
   const [SHOP_NAME, SET_SHOP_NAME] = useState("");
