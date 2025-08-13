@@ -1,6 +1,7 @@
 "use client";
 import React, { ReactNode, useState } from "react";
 import Panel from "./components/panel";
+import NavBar from "./components/navBar";
 
 const Layout = ({ children }: { children: ReactNode }) => {
   const [panelIsOpen, setPanelIsOpen] = useState(false);
@@ -16,6 +17,7 @@ const Layout = ({ children }: { children: ReactNode }) => {
 
       {/* Contenu principal */}
       <main className="flex-1 p-4 bg-gray-50 transition-all duration-200">
+        <NavBar />
         {children}
       </main>
     </div>

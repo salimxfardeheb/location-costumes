@@ -6,6 +6,7 @@ import { FaCalendarAlt } from "react-icons/fa";
 import Logout from "./logout";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
+import { CgProfile } from "react-icons/cg";
 
 interface PanelProps {
   clientName?: string;
@@ -13,9 +14,12 @@ interface PanelProps {
   setPanelIsOpen: (open: boolean) => void;
 }
 
-const panel: React.FC<PanelProps> = ({ clientName,panelIsOpen, setPanelIsOpen }) => {
+const panel: React.FC<PanelProps> = ({
+  clientName,
+  panelIsOpen,
+  setPanelIsOpen,
+}) => {
   const currentPath = usePathname();
-  const [current, setCurrent] = useState(false);
 
   const menuItems = [
     { label: "Dashboard", path: "dashboard", icon: TbLayoutDashboardFilled },
@@ -37,19 +41,23 @@ const panel: React.FC<PanelProps> = ({ clientName,panelIsOpen, setPanelIsOpen })
     >
       <div className="w-full">
         <div className="w-full">
-          <button
-            className="flex justify-center items-center p-3 w-full"
-            onClick={handlePanel}
-          >
+          <div className="flex justify-center items-center p-3 w-full">
             {panelIsOpen ? (
-              <div className="flex justify-between items-end w-full pr-4">
-                <LuPanelLeftClose className="text-[#B6FFF6] text-3xl hover:text-white" />
-                <div className="text-white">{clientName}</div>
+              <div className="flex justify-between items-center w-full pr-4 space-x-4">
+                <Link className="flex items-center justify-start gap-4 text-[#B6FFF6] hover:bg-[#B6FFF6] hover:text-[#06B9AE] transition-all duration-50 w-full text-2xl px-3 py-0.5 rounded-sm" href={"profile"}>
+                  <CgProfile className="text-3xl" />
+                  {clientName}
+                </Link>
+                <button onClick={handlePanel}>
+                  <LuPanelLeftClose className="text-[#B6FFF6] text-3xl hover:text-white" />
+                </button>
               </div>
             ) : (
-              <LuPanelLeftOpen className="text-[#B6FFF6] text-3xl hover:text-white" />
+              <button onClick={handlePanel}>
+                <LuPanelLeftOpen className="text-[#B6FFF6] text-3xl hover:text-white" />
+              </button>
             )}
-          </button>
+          </div>
         </div>
         <div className="w-full h-[1px] bg-[#B6FFF6]" />
         <div
