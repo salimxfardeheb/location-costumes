@@ -8,11 +8,4 @@
   input.login {
     @apply bg-white py-2 px-3 rounded-md placeholder:text-shadow-gray-600;
   }
-
-  .panelButton {
-    @apply text-[#B6FFF6] text-3xl hover:text-white;
-  }
-  .itemPanel {
-    @apply flex justify-center items-end gap-4 cursor-pointer;
-  }
 }
