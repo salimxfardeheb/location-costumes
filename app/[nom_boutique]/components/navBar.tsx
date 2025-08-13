@@ -1,10 +1,17 @@
 import React from "react";
 
 const navBar = () => {
+  const now: Date = new Date();
+  const formattedDate = now.toLocaleDateString("fr-FR", {
+    weekday: "long",
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+  })
   return (
     <div>
       <div className="flex justify-between items-center p-4">
-        <p className="text-5xl font-black">Vendredi, 1 Aout 2025</p>
+        <p className="text-5xl font-black">{formattedDate}</p>
         <p className="text-3xl font-black text-[#06B9AE] border-4 rounded-3xl px-4 py-2 text-center">
           Nom de la boutique
         </p>
