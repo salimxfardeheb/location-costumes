@@ -10,7 +10,6 @@ const Layout = ({ children }: { children: ReactNode }) => {
     <div className="flex min-h-screen">
       {/* Panneau latéral */}
       <Panel
-        clientName="salim"
         panelIsOpen={panelIsOpen}
         setPanelIsOpen={setPanelIsOpen}
       />

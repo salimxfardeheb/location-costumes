@@ -1,25 +1,24 @@
 import React, { useState } from "react";
+import { usePathname, useParams } from "next/navigation";
+import Link from "next/link";
+
 import { LuPanelLeftOpen, LuPanelLeftClose } from "react-icons/lu";
 import { TbLayoutDashboardFilled } from "react-icons/tb";
 import { IoMdAddCircle } from "react-icons/io";
 import { FaCalendarAlt } from "react-icons/fa";
-import Logout from "./logout";
-import { usePathname } from "next/navigation";
-import Link from "next/link";
 import { CgProfile } from "react-icons/cg";
 
+import Logout from "./logout";
+
 interface PanelProps {
-  clientName?: string;
   panelIsOpen: boolean;
   setPanelIsOpen: (open: boolean) => void;
 }
 
-const panel: React.FC<PanelProps> = ({
-  clientName,
-  panelIsOpen,
-  setPanelIsOpen,
-}) => {
+const panel: React.FC<PanelProps> = ({ panelIsOpen, setPanelIsOpen }) => {
   const currentPath = usePathname();
+  const { nom_boutique } = useParams();
+  const shop_name_upperCase = nom_boutique?.toLocaleString().toWellFormed();
 
   const menuItems = [
     { label: "Dashboard", path: "dashboard", icon: TbLayoutDashboardFilled },
@@ -44,9 +43,12 @@ const panel: React.FC<PanelProps> = ({
           <div className="flex justify-center items-center p-3 w-full">
             {panelIsOpen ? (
               <div className="flex justify-between items-center w-full pr-4 space-x-4">
-                <Link className="flex items-center justify-start gap-4 text-[#B6FFF6] hover:bg-[#B6FFF6] hover:text-[#06B9AE] transition-all duration-50 w-full text-2xl px-3 py-0.5 rounded-sm" href={"profile"}>
+                <Link
+                  className="flex items-center justify-start gap-4 text-[#B6FFF6] hover:bg-[#B6FFF6] hover:text-[#06B9AE] transition-all duration-50 w-full text-2xl px-3 py-0.5 rounded-sm"
+                  href={"profile"}
+                >
                   <CgProfile className="text-3xl" />
-                  {clientName}
+                  {shop_name_upperCase}
                 </Link>
                 <button onClick={handlePanel}>
                   <LuPanelLeftClose className="text-[#B6FFF6] text-3xl hover:text-white" />
