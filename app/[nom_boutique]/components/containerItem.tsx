@@ -1,10 +1,9 @@
 import Link from "next/link";
 import { useParams, usePathname } from "next/navigation";
-import React, { useState } from "react";
+import React from "react";
 
 const containerItem = () => {
-  const links = ["Costumes", "Chemise", "Chaussures", "Accessoires"];
-  const [isOpen, setIsOpen] = useState(false);
+  const links = ["costume", "shirt", "shoe", "accessory"];
     const { nom_boutique } = useParams();
       const currentPath = usePathname();
 

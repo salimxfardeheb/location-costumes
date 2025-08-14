@@ -6,7 +6,7 @@ import bcrypt from "bcrypt";
 declare module "next-auth" {
   interface Session {
     user: {
-      id: string;
+      boutiqueId: string;
       admin: boolean;
       name?: string | null;
     };
@@ -72,24 +72,24 @@ export const authOptions: NextAuthOptions = {
     signIn: "/",
   },
   callbacks: {
-    async jwt({ token, user }) {
-      if (user) {
-        token.id = user.id;
-        token.nom_boutique = user.name;
-        token.admin = user.admin;
-      }
-      return token;
-    },
-    async session({ session, token }) {
-      if (token) {
-        session.user = {
-          id: String(token.id),
-          admin: Boolean(token.admin),
-          name: token.nom_boutique as string | undefined,
-        };
-      }
-      return session;
-    },
+  async jwt({ token, user }) {
+    if (user) {
+      token.boutiqueId = user.id; // id de la boutique
+      token.nom_boutique = user.name;
+      token.admin = user.admin;
+    }
+    return token;
+  },
+  async session({ session, token }) {
+    if (token) {
+      session.user = {
+        boutiqueId: String(token.boutiqueId),
+        admin: Boolean(token.admin),
+        name: token.nom_boutique as string | undefined,
+      };
+    }
+    return session;
+  },
     async redirect({ url, baseUrl }) {
       // Rediriger vers la page d'accueil après déconnexion
       if (url.includes("/logout")) {
