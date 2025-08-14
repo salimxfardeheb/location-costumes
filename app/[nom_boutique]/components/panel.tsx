@@ -45,7 +45,7 @@ const panel: React.FC<PanelProps> = ({ panelIsOpen, setPanelIsOpen }) => {
               <div className="flex justify-between items-center w-full pr-4 space-x-4">
                 <Link
                   className="flex items-center justify-start gap-4 text-[#B6FFF6] hover:bg-[#B6FFF6] hover:text-[#06B9AE] transition-all duration-50 w-full text-2xl px-3 py-0.5 rounded-sm"
-                  href={"profile"}
+                  href={"/"+nom_boutique+"/profile"}
                 >
                   <CgProfile className="text-3xl" />
                   {shop_name_upperCase}
@@ -71,7 +71,7 @@ const panel: React.FC<PanelProps> = ({ panelIsOpen, setPanelIsOpen }) => {
             const isActive = currentPath.includes(path);
             return (
               <Link
-                href={path}
+                href={"/"+nom_boutique +"/"+ path}
                 key={path}
                 className="flex justify-center items-end gap-4 cursor-pointer"
               >
