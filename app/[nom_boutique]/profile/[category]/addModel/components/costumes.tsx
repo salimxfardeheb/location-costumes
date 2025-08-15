@@ -1,50 +1,167 @@
-import React from "react";
+"use client";
+import { addCostume } from "@/app/actions/addcostume";
+import React, { useState } from "react";
 
-const costumes = () => {
+const Costumes = () => {
+  const [model, setModel] = useState("");
+  const [blazer, setBlazer] = useState<string[]>([]);
+  const [pants, setPants] = useState<string[]>([]);
+  const [preview, setPreview] = useState<string | null>(null);
+  const [uploadedUrl, setUploadedUrl] = useState<string | null>(null);
+  const [contentMessage, setContentMessage] = useState("");
+
   const sizes = ["46", "48", "50", "52", "54", "56", "58"];
+
+  const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const url = URL.createObjectURL(file);
+    setPreview(url);
+
+    const formData = new FormData();
+    formData.append("image", file);
+
+    const res = await fetch("/api/upload", {
+      method: "POST",
+      body: formData,
+    });
+
+    const data = await res.json();
+    setUploadedUrl(data.url);
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!uploadedUrl) return;
+
+    await addCostume(model, blazer, pants, uploadedUrl);
+
+    setContentMessage("✅ Modèle créé avec succès !");
+    setModel("");
+    setBlazer([]);
+    setPants([]);
+    setPreview(null);
+    setUploadedUrl(null);
+
+    // Effacer le message après 3 secondes
+    setTimeout(() => setContentMessage(""), 3000);
+  };
+
+  // Sélectionner ou désélectionner toutes les tailles de blazer
+  const toggleSelectAllBlazers = () => {
+    if (blazer.length === sizes.length) {
+      setBlazer([]);
+    } else {
+      setBlazer(sizes);
+    }
+  };
+  const toggleSelectpants = () => {
+    if (pants.length === sizes.length) {
+      setPants([]);
+    } else {
+      setPants(sizes);
+    }
+  };
+
   return (
     <div>
-      <form className="flex flex-col justify-center items-center space-y-8">
-        <label
-          htmlFor="model"
-          className="flex justify-start items-center gap-4"
-        >
+      { contentMessage &&(
+        <span className="text-green-600 font-semibold mt-4 block mx-auto w-fit mb-5">
+          {contentMessage}
+        </span>
+      )}
+      <form
+        onSubmit={handleSubmit}
+        className="flex flex-col justify-center items-center space-y-8"
+      >
+        <label className="flex justify-start items-center gap-4">
           <span className="text-xl">Model :</span>
           <input
             type="text"
             placeholder="N° Model"
             className="bg-[#B6FFF6] px-5 py-2 rounded-xl border-2 border-[#36CBC1] placeholder:text-gray-600 focus-within:placeholder:text-[#36CBC1] focus-within:outline-0"
+            value={model}
+            onChange={(e) => setModel(e.target.value)}
           />
         </label>
-        <label htmlFor="blazer" className="flex gap-10 justify-between w-2/5 ">
-          <span className="text-xl">
-            selectionner les tailles des blazers :
-          </span>
-          <ul className="flex gap-7 ">
+
+        {/* Blazers */}
+        <div className="flex flex-col gap-4 w-2/5">
+          <div className="flex justify-between items-center">
+            <span className="text-xl">Tailles des blazers :</span>
+            <button
+              type="button"
+              onClick={toggleSelectAllBlazers}
+              className="bg-[#36CBC1] text-white px-3 py-1 rounded-md hover:opacity-85"
+            >
+              {blazer.length === sizes.length
+                ? "Tout désélectionner"
+                : "Tout sélectionner"}
+            </button>
+          </div>
+          <ul className="flex gap-7 flex-wrap">
             {sizes.map((size) => (
               <li key={size}>
-                <input type="checkbox" />
-                {size}
+                <label className="flex items-center gap-1">
+                  <input
+                    type="checkbox"
+                    checked={blazer.includes(size)}
+                    value={size}
+                    onChange={(e) =>
+                      setBlazer((prev) =>
+                        e.target.checked
+                          ? [...prev, size]
+                          : prev.filter((s) => s !== size)
+                      )
+                    }
+                  />
+                  {size}
+                </label>
+              </li>
+            ))}
+          </ul>
+        </div>
+
+        {/* Pantalons */}
+        <label className="flex flex-col gap-10 justify-between w-2/5">
+          <div className="flex justify-between items-center">
+            <span className="text-xl">Tailles des pantallons :</span>
+            <button
+              type="button"
+              onClick={toggleSelectpants}
+              className="bg-[#36CBC1] text-white px-3 py-1 rounded-md hover:opacity-85"
+            >
+              {pants.length === sizes.length
+                ? "Tout désélectionner"
+                : "Tout sélectionner"}
+            </button>
+          </div>
+
+          <ul className="flex gap-7 flex-wrap">
+            {sizes.map((size) => (
+              <li key={size}>
+                <label className="flex items-center gap-1">
+                  <input
+                    type="checkbox"
+                    checked={pants.includes(size)}
+                    value={size}
+                    onChange={(e) =>
+                      setPants((prev) =>
+                        e.target.checked
+                          ? [...prev, size]
+                          : prev.filter((s) => s !== size)
+                      )
+                    }
+                  />
+                  {size}
+                </label>
               </li>
             ))}
           </ul>
         </label>
-        <label
-          htmlFor="pantalon"
-          className="flex gap-10 justify-between w-2/5 "
-        >
-          <span className="text-xl">
-            selectionner les tailles des pantalons :
-          </span>
-          <ul className="flex gap-7">
-            {sizes.map((size) => (
-              <li key={size}>
-                <input type="checkbox" />
-                {size}
-              </li>
-            ))}
-          </ul>
-        </label>
+
+        {/* Image */}
         <label className="flex flex-col items-start gap-2 cursor-pointer">
           <span className="text-gray-700 font-medium">Insérez une image :</span>
           <input
@@ -56,11 +173,20 @@ const costumes = () => {
                file:bg-[#06B9AE] file:text-white
                hover:file:bg-[#059e95]
                cursor-pointer"
+            onChange={handleUpload}
           />
+          {preview && <img src={preview} alt="preview" width={200} />}
         </label>
+
+        <button
+          type="submit"
+          className="bg-[#F39C12] text-white px-8 py-1.5 rounded-lg hover:opacity-85 cursor-pointer"
+        >
+          Ajouter le model
+        </button>
       </form>
     </div>
   );
 };
 
-export default costumes;
+export default Costumes;

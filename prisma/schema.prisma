@@ -11,7 +11,8 @@ datasource db {
 model accessory {
   id          Int        @id @default(autoincrement())
   boutique_id Int
-  size        String?
+  label       String?
+  image       String?
   boutique    boutique   @relation(fields: [boutique_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
   location    location[]
 }
@@ -34,6 +35,7 @@ model costume {
   model       Int?
   blazer      String[]   @default([])
   pants       String[]   @default([])
+  image       String?
   boutique    boutique   @relation(fields: [boutique_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
   location    location[]
 }
@@ -59,6 +61,7 @@ model shirt {
   model       String?
   color       String?
   size        String?
+  image       String?
   location    location[]
   boutique    boutique   @relation(fields: [boutique_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
 }
@@ -69,6 +72,7 @@ model shoe {
   model       String?
   color       String?
   size        String?
+  image       String?
   location    location[]
   boutique    boutique   @relation(fields: [boutique_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
 }
