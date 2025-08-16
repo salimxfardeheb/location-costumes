@@ -60,7 +60,7 @@ model shirt {
   boutique_id Int
   model       String?
   color       String?
-  size        String?
+  size        String[]
   image       String?
   location    location[]
   boutique    boutique   @relation(fields: [boutique_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
@@ -71,7 +71,7 @@ model shoe {
   boutique_id Int
   model       String?
   color       String?
-  size        String?
+  size        String[]
   image       String?
   location    location[]
   boutique    boutique   @relation(fields: [boutique_id], references: [id], onDelete: Cascade, onUpdate: NoAction)

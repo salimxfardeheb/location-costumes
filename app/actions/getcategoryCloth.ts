@@ -14,10 +14,6 @@ export async function getcategoryCloth(
 
   const data = await (prisma as any)[item].findMany({
     where: { boutique_id: id_boutique },
-    select: {
-      model: true,
-      image: true,
-    },
   });
   return data;
 }

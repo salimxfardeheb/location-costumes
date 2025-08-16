@@ -1,67 +1,169 @@
-import React from 'react'
+import { addShirtAndShoe } from "@/app/actions/addShirtAndShoe"
+import React, { useState } from "react";
 
-const shirt = () => {
-  const sizes = ["XS", "S", "M", "L", "XL", "2 XL", "3 XL"];
-  const Colors = ['Black', 'White']
+const Shirt = () => {
+  const [preview, setPreview] = useState<string | null>(null);
+  const [uploadedUrl, setUploadedUrl] = useState<string | null>(null);
+
+  const [model, setModel] = useState("");
+  const [color, setColor] = useState(""); // string car une seule couleur
+  const [sizes, setSizes] = useState<string[]>([]);
+
+  const [contentMessage, setContentMessage] = useState("");
+
+  const availableSizes = ["XS", "S", "M", "L", "XL", "2 XL", "3 XL"];
+  const availableColors = ["Black", "White"];
+
+  const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const url = URL.createObjectURL(file);
+    setPreview(url);
+
+    const formData = new FormData();
+    formData.append("image", file);
+
+    const res = await fetch("/api/upload", {
+      method: "POST",
+      body: formData,
+    });
+
+    const data = await res.json();
+    setUploadedUrl(data.url);
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!uploadedUrl) return;
+
+    await addShirtAndShoe("shirt",model, color, sizes, uploadedUrl);
+    setContentMessage("✅ Modèle créé avec succès !");
+    setModel("");
+    setColor("");
+    setSizes([]);
+    setPreview(null);
+    setUploadedUrl(null);
+    setTimeout(() => setContentMessage(""), 3000);
+  };
+
+    const toggleSelectSizes = () => {
+    if (availableSizes.length === sizes.length) {
+      setSizes([]);
+    } else {
+      setSizes(availableSizes);
+    }
+  };
+
   return (
     <div>
-      <form className="flex flex-col justify-center items-start mx-auto w-fit space-y-8">
-        <label
-          htmlFor="model"
-          className="flex justify-start items-center gap-10"
-        >
+      {contentMessage && (
+        <span className="text-green-600 font-semibold mt-4 block mx-auto w-fit mb-5">
+          {contentMessage}
+        </span>
+      )}
+
+      <form
+        onSubmit={handleSubmit}
+        className="flex flex-col justify-center mx-auto w-1/2 space-y-8"
+      >
+        {/* Model */}
+        <label className="flex justify-start items-center gap-10">
           <span className="text-xl">Model :</span>
           <input
             type="text"
             placeholder="Model"
             className="bg-[#B6FFF6] px-5 py-2 rounded-xl border-2 border-[#36CBC1] placeholder:text-gray-600 focus-within:placeholder:text-[#36CBC1] focus-within:outline-0"
+            value={model}
+            onChange={(e) => setModel(e.target.value)}
           />
         </label>
-        <label htmlFor="color" className="flex gap-10 justify-between w-2/5 ">
-          <span className="text-xl text-nowrap">
-            selectionner les couleurs :
-          </span>
-          <ul className="flex gap-10 ">
-            {Colors.map((color) => (
-              <li key={color} className='flex gap-3'>
-                <input type="checkbox" />
-                {color}
+
+        {/* Colors */}
+        <label className="flex gap-10 justify-between w-2/5">
+          <span className="text-xl text-nowrap">Sélectionner la couleur :</span>
+          <ul className="flex gap-10">
+            {availableColors.map((c) => (
+              <li key={c} className="flex gap-3">
+                <input
+                  type="radio"
+                  name="color"
+                  checked={color === c}
+                  value={c}
+                  onChange={() => setColor(c)}
+                />
+                {c}
               </li>
             ))}
           </ul>
         </label>
-        <label
-          htmlFor="taille"
-          className="flex gap-10 justify-between w-2/5 text-nowrap "
-        >
-          <span className="text-xl">
-            selectionner les tailles disponible :
-          </span>
+
+        {/* Sizes */}
+        <label className="flex flex-col gap-6 w-full text-nowrap">
+          <div className="flex justify-between pr-10"><span className="text-xl">Sélectionner les tailles disponibles :</span>
+                      <button
+              type="button"
+              onClick={toggleSelectSizes}
+              className="bg-[#36CBC1] text-white px-3 py-1 rounded-md hover:opacity-85"
+            >
+              {availableSizes.length === sizes.length
+                ? "Tout désélectionner"
+                : "Tout sélectionner"}
+            </button>
+          </div>
+          
           <ul className="flex gap-7">
-            {sizes.map((size) => (
-              <li key={size}>
-                <input type="checkbox" />
-                <p className='text-nowrap'>{size}</p>
+            {availableSizes.map((s) => (
+              <li key={s} className="flex items-center gap-2">
+                <input
+                  type="checkbox"
+                  checked={sizes.includes(s)}
+                  value={s}
+                  onChange={(e) =>
+                    setSizes((prev) =>
+                      e.target.checked
+                        ? [...prev, s]
+                        : prev.filter((size) => size !== s)
+                    )
+                  }
+                />
+                <p className="text-nowrap">{s}</p>
               </li>
             ))}
           </ul>
         </label>
+
+        {/* Image */}
         <label className="flex items-start gap-10 cursor-pointer">
-          <span className="text-gray-700 font-medium text-nowrap">Insérez une image :</span>
+          <span className="text-gray-700 font-medium text-nowrap">
+            Insérez une image :
+          </span>
           <input
             type="file"
             className="block w-full text-sm text-gray-500 
-               file:mr-4 file:py-2 file:px-4
-               file:rounded-lg file:border-0
-               file:text-sm file:font-semibold
-               file:bg-[#06B9AE] file:text-white
-               hover:file:bg-[#059e95]
-               cursor-pointer"
+              file:mr-4 file:py-2 file:px-4
+              file:rounded-lg file:border-0
+              file:text-sm file:font-semibold
+              file:bg-[#06B9AE] file:text-white
+              hover:file:bg-[#059e95]
+              cursor-pointer"
+            onChange={handleUpload}
           />
+          {preview && <img src={preview} alt="preview" width={200} />}
         </label>
+
+        {/* Submit */}
+<div className="w-full flex justify-center">
+          <button
+          type="submit"
+          className="bg-[#F39C12] text-white px-8 py-1.5 rounded-lg hover:opacity-85 cursor-pointer "
+        >
+          Ajouter le model
+        </button>
+</div>
       </form>
     </div>
-  )
-}
+  );
+};
 
-export default shirt
+export default Shirt;

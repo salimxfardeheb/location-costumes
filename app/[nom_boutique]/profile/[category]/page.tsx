@@ -12,7 +12,7 @@ interface Props {
 }
 
 const page = async ({ params }: Props) => {
-  const { category } = params; // pas besoin de await ici
+  const { category } = params;
   const session = await getServerSession(authOptions);
   const boutiqueIdStr = session?.user?.boutiqueId;
 
@@ -22,7 +22,6 @@ const page = async ({ params }: Props) => {
 
   const boutiqueId = parseInt(boutiqueIdStr, 10);
 
-  // bien attendre la promesse ici
   const result = await getcategoryCloth(category, boutiqueId);
 
   return (
