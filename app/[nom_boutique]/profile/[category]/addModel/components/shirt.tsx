@@ -6,7 +6,7 @@ const Shirt = () => {
   const [uploadedUrl, setUploadedUrl] = useState<string | null>(null);
 
   const [model, setModel] = useState("");
-  const [color, setColor] = useState(""); // string car une seule couleur
+  const [color, setColor] = useState("");
   const [sizes, setSizes] = useState<string[]>([]);
 
   const [contentMessage, setContentMessage] = useState("");

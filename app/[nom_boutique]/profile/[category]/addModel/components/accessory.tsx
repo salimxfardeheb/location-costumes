@@ -1,20 +1,72 @@
-import React from "react";
+import { addAccessory } from "@/app/actions/addAccessory";
+import React, { useState } from "react";
 
 const accessory = () => {
-  const sizes = ["Cravate", "Papillion", "Ceinture", "Montre"];
+  const [preview, setPreview] = useState<string | null>(null);
+  const [uploadedUrl, setUploadedUrl] = useState<string | null>(null);
+
+  const [model, setModel] = useState("");
+  const [text, setText] = useState("");
+
+  const [contentMessage, setContentMessage] = useState("");
+
+  const label = ["Cravate", "Papillion", "Ceinture", "Montre"];
+
+  const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const url = URL.createObjectURL(file);
+    setPreview(url);
+
+    const formData = new FormData();
+    formData.append("image", file);
+
+    const res = await fetch("/api/upload", {
+      method: "POST",
+      body: formData,
+    });
+
+    const data = await res.json();
+    setUploadedUrl(data.url);
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!uploadedUrl) return;
+    await addAccessory(model, text, uploadedUrl);
+    setContentMessage("✅ Modèle créé avec succès !");
+    setModel("");
+    setText("");
+  };
+
   return (
     <div>
-      <form className="flex flex-col justify-center items-start mx-auto w-fit space-y-8">
+      {contentMessage && (
+        <span className="text-green-600 font-semibold mt-4 block mx-auto w-fit mb-5">
+          {contentMessage}
+        </span>
+      )}
+      <form
+        onSubmit={handleSubmit}
+        className="flex flex-col justify-center items-start mx-auto w-fit space-y-8"
+      >
         <label
           htmlFor="taille"
           className="flex gap-10 justify-between w-2/5 text-nowrap "
         >
           <span className="text-xl">selectionner le model :</span>
           <ul className="flex gap-10">
-            {sizes.map((size) => (
-              <li key={size} className="flex gap-2.5">
-                <input type="radio" />
-                <p className="text-nowrap">{size}</p>
+            {label.map((c) => (
+              <li key={c} className="flex gap-2.5">
+                <input
+                  type="radio"
+                  name="model"
+                  checked={model === c}
+                  value={c}
+                  onChange={() => setModel(c)}
+                />
+                <p className="text-nowrap">{c}</p>
               </li>
             ))}
           </ul>
@@ -28,6 +80,8 @@ const accessory = () => {
             type="text"
             placeholder="Description"
             className="bg-[#B6FFF6] px-5 py-2 rounded-xl border-2 border-[#36CBC1] placeholder:text-gray-600 focus-within:placeholder:text-[#36CBC1] focus-within:outline-0 min-w-full"
+            value={text}
+            onChange={(e) => setText(e.target.value)}
           />
         </label>
 
@@ -44,8 +98,18 @@ const accessory = () => {
                file:bg-[#06B9AE] file:text-white
                hover:file:bg-[#059e95]
                cursor-pointer"
+            onChange={handleUpload}
           />
+          {preview && <img src={preview} alt="preview" width={200} />}
         </label>
+        <div className="w-full flex justify-center">
+          <button
+          type="submit"
+          className="bg-[#F39C12] text-white px-8 py-1.5 rounded-lg hover:opacity-85 cursor-pointer "
+        >
+          Ajouter le model
+        </button>
+</div>
       </form>
     </div>
   );
