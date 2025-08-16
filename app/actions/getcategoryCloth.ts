@@ -1,8 +1,11 @@
-'use server'
+"use server";
 
 import prisma from "@/lib/prisma";
 
-export async function getcategoryCloth(item: string , id_boutique : number ) {
+export async function getcategoryCloth(
+  item: string,
+  id_boutique: number
+): Promise<{ model: string; image: string | null }[]> {
   const allowedModels = ["costume", "shirt", "shoe", "accessory"];
 
   if (!allowedModels.includes(item) && id_boutique) {
@@ -10,7 +13,11 @@ export async function getcategoryCloth(item: string , id_boutique : number ) {
   }
 
   const data = await (prisma as any)[item].findMany({
-    where : { boutique_id: id_boutique }
+    where: { boutique_id: id_boutique },
+    select: {
+      model: true,
+      image: true,
+    },
   });
   return data;
 }

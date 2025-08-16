@@ -12,7 +12,7 @@ interface Props {
 }
 
 const page = async ({ params }: Props) => {
-  const { category } = await params;
+  const { category } = params; // pas besoin de await ici
   const session = await getServerSession(authOptions);
   const boutiqueIdStr = session?.user?.boutiqueId;
 
@@ -21,19 +21,35 @@ const page = async ({ params }: Props) => {
   }
 
   const boutiqueId = parseInt(boutiqueIdStr, 10);
-  const result = getcategoryCloth(category, boutiqueId);
+
+  // bien attendre la promesse ici
+  const result = await getcategoryCloth(category, boutiqueId);
 
   return (
     <div className="flex flex-col justify-center items-center gap-9">
       <div className="px-[3.5%] flex flex-wrap gap-32 w-full">
-        <div className="flex flex-col justify-center items-center w-fit">
-          <img src="/moustache.png" alt="" className="max-w-56 h-64" />
-          <p className="text-xl font-mono">
-            model n° : <span>1</span>
-          </p>
-        </div>
+        {result.map((item, index) => (
+          <div
+            key={index}
+            className="flex flex-col justify-center items-center w-fit"
+          >
+            <img
+              src={item.image || "/placeholder.png"}
+              alt={item.model}
+              className="max-w-56 h-64 object-cover rounded-xl shadow"
+            />
+            <p className="text-xl font-mono mt-2">
+              modèle n° : <span>{item.model}</span>
+            </p>
+          </div>
+        ))}
       </div>
-      <Link href={category + "/addModel"} className="bg-[#F39C12] text-white text-lg font-medium px-5 py-2 rounded-2xl hover:opacity-90">Ajouter un model</Link>
+      <Link
+        href={`${category}/addModel`}
+        className="bg-[#F39C12] text-white text-lg font-medium px-5 py-2 rounded-2xl hover:opacity-90"
+      >
+        Ajouter un modèle
+      </Link>
     </div>
   );
 };
