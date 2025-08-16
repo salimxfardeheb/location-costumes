@@ -5,7 +5,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "../api/auth/[...nextauth]/route";
 
 export async function addAccessory(
-  label: string,
+  model: string,
   description: string,
   image: string
 ) {
@@ -16,7 +16,7 @@ export async function addAccessory(
   const data = await prisma.accessory.create({
     data: {
       boutique_id: parseInt(id_boutique),
-      label,
+      model,
       description,
       image,
     },
