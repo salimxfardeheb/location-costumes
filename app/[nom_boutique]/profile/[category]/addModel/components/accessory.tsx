@@ -1,35 +1,15 @@
 import { addAccessory } from "@/app/actions/addAccessory";
+import { handleUpload } from "@/app/functions";
 import React, { useState } from "react";
 
 const accessory = () => {
+  
   const [preview, setPreview] = useState<string | null>(null);
   const [uploadedUrl, setUploadedUrl] = useState<string | null>(null);
-
   const [model, setModel] = useState("");
   const [text, setText] = useState("");
-
   const [contentMessage, setContentMessage] = useState("");
-
   const label = ["Cravate", "Papillion", "Ceinture", "Montre"];
-
-  const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
-    const url = URL.createObjectURL(file);
-    setPreview(url);
-
-    const formData = new FormData();
-    formData.append("image", file);
-
-    const res = await fetch("/api/upload", {
-      method: "POST",
-      body: formData,
-    });
-
-    const data = await res.json();
-    setUploadedUrl(data.url);
-  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -98,7 +78,7 @@ const accessory = () => {
                file:bg-[#06B9AE] file:text-white
                hover:file:bg-[#059e95]
                cursor-pointer"
-            onChange={handleUpload}
+            onChange={(e) => {handleUpload(e, setPreview, setUploadedUrl)}}
           />
           {preview && <img src={preview} alt="preview" width={200} />}
         </label>

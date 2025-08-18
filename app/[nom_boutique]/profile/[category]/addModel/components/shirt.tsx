@@ -1,4 +1,5 @@
-import { addShirtAndShoe } from "@/app/actions/addShirtAndShoe"
+import { addShirtAndShoe } from "@/app/actions/addShirtAndShoe";
+import { handleUpload } from "@/app/functions";
 import React, { useState } from "react";
 
 const Shirt = () => {
@@ -14,30 +15,12 @@ const Shirt = () => {
   const availableSizes = ["XS", "S", "M", "L", "XL", "2 XL", "3 XL"];
   const availableColors = ["Black", "White"];
 
-  const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
-    const url = URL.createObjectURL(file);
-    setPreview(url);
-
-    const formData = new FormData();
-    formData.append("image", file);
-
-    const res = await fetch("/api/upload", {
-      method: "POST",
-      body: formData,
-    });
-
-    const data = await res.json();
-    setUploadedUrl(data.url);
-  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!uploadedUrl) return;
 
-    await addShirtAndShoe("shirt",model, color, sizes, uploadedUrl);
+    await addShirtAndShoe("shirt", model, color, sizes, uploadedUrl);
     setContentMessage("✅ Modèle créé avec succès !");
     setModel("");
     setColor("");
@@ -47,7 +30,7 @@ const Shirt = () => {
     setTimeout(() => setContentMessage(""), 3000);
   };
 
-    const toggleSelectSizes = () => {
+  const toggleSelectSizes = () => {
     if (availableSizes.length === sizes.length) {
       setSizes([]);
     } else {
@@ -67,7 +50,6 @@ const Shirt = () => {
         onSubmit={handleSubmit}
         className="flex flex-col justify-center mx-auto w-1/2 space-y-8"
       >
-        {/* Model */}
         <label className="flex justify-start items-center gap-10">
           <span className="text-xl">Model :</span>
           <input
@@ -79,7 +61,6 @@ const Shirt = () => {
           />
         </label>
 
-        {/* Colors */}
         <label className="flex gap-10 justify-between w-2/5">
           <span className="text-xl text-nowrap">Sélectionner la couleur :</span>
           <ul className="flex gap-10">
@@ -98,10 +79,12 @@ const Shirt = () => {
           </ul>
         </label>
 
-        {/* Sizes */}
         <label className="flex flex-col gap-6 w-full text-nowrap">
-          <div className="flex justify-between pr-10"><span className="text-xl">Sélectionner les tailles disponibles :</span>
-                      <button
+          <div className="flex justify-between pr-10">
+            <span className="text-xl">
+              Sélectionner les tailles disponibles :
+            </span>
+            <button
               type="button"
               onClick={toggleSelectSizes}
               className="bg-[#36CBC1] text-white px-3 py-1 rounded-md hover:opacity-85"
@@ -111,7 +94,7 @@ const Shirt = () => {
                 : "Tout sélectionner"}
             </button>
           </div>
-          
+
           <ul className="flex gap-7">
             {availableSizes.map((s) => (
               <li key={s} className="flex items-center gap-2">
@@ -133,7 +116,6 @@ const Shirt = () => {
           </ul>
         </label>
 
-        {/* Image */}
         <label className="flex items-start gap-10 cursor-pointer">
           <span className="text-gray-700 font-medium text-nowrap">
             Insérez une image :
@@ -147,20 +129,19 @@ const Shirt = () => {
               file:bg-[#06B9AE] file:text-white
               hover:file:bg-[#059e95]
               cursor-pointer"
-            onChange={handleUpload}
+            onChange={(e) => {handleUpload(e, setPreview, setUploadedUrl)}}
           />
           {preview && <img src={preview} alt="preview" width={200} />}
         </label>
 
-        {/* Submit */}
-<div className="w-full flex justify-center">
+        <div className="w-full flex justify-center">
           <button
-          type="submit"
-          className="bg-[#F39C12] text-white px-8 py-1.5 rounded-lg hover:opacity-85 cursor-pointer "
-        >
-          Ajouter le model
-        </button>
-</div>
+            type="submit"
+            className="bg-[#F39C12] text-white px-8 py-1.5 rounded-lg hover:opacity-85 cursor-pointer "
+          >
+            Ajouter le model
+          </button>
+        </div>
       </form>
     </div>
   );

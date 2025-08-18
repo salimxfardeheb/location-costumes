@@ -12,7 +12,7 @@ interface Props {
 }
 
 const page = async ({ params }: Props) => {
-  const { category } = params;
+  const { category } = await params;
   const session = await getServerSession(authOptions);
   const boutiqueIdStr = session?.user?.boutiqueId;
 

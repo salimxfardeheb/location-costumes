@@ -1,5 +1,4 @@
-"use client";
-import React, { ReactNode, useState } from "react";
+import React, { ReactNode } from "react";
 import ContainerItem from "../components/containerItem";
 
 const Layout = ({ children }: { children: ReactNode }) => {

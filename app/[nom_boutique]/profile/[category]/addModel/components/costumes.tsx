@@ -1,5 +1,6 @@
 "use client";
 import { addCostume } from "@/app/actions/addcostume";
+import { handleUpload } from "@/app/functions";
 import React, { useState } from "react";
 
 const Costumes = () => {
@@ -11,25 +12,6 @@ const Costumes = () => {
   const [contentMessage, setContentMessage] = useState("");
 
   const sizes = ["46", "48", "50", "52", "54", "56", "58"];
-
-  const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
-    const url = URL.createObjectURL(file);
-    setPreview(url);
-
-    const formData = new FormData();
-    formData.append("image", file);
-
-    const res = await fetch("/api/upload", {
-      method: "POST",
-      body: formData,
-    });
-
-    const data = await res.json();
-    setUploadedUrl(data.url);
-  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -44,11 +26,9 @@ const Costumes = () => {
     setPreview(null);
     setUploadedUrl(null);
 
-    // Effacer le message après 3 secondes
     setTimeout(() => setContentMessage(""), 3000);
   };
 
-  // Sélectionner ou désélectionner toutes les tailles de blazer
   const toggleSelectAllBlazers = () => {
     if (blazer.length === sizes.length) {
       setBlazer([]);
@@ -86,7 +66,6 @@ const Costumes = () => {
           />
         </label>
 
-        {/* Blazers */}
         <div className="flex flex-col gap-4 w-2/5">
           <div className="flex justify-between items-center">
             <span className="text-xl">Tailles des blazers :</span>
@@ -123,7 +102,6 @@ const Costumes = () => {
           </ul>
         </div>
 
-        {/* Pantalons */}
         <label className="flex flex-col gap-10 justify-between w-2/5">
           <div className="flex justify-between items-center">
             <span className="text-xl">Tailles des pantallons :</span>
@@ -161,7 +139,6 @@ const Costumes = () => {
           </ul>
         </label>
 
-        {/* Image */}
         <label className="flex flex-col items-start gap-2 cursor-pointer">
           <span className="text-gray-700 font-medium">Insérez une image :</span>
           <input
@@ -173,7 +150,7 @@ const Costumes = () => {
                file:bg-[#06B9AE] file:text-white
                hover:file:bg-[#059e95]
                cursor-pointer"
-            onChange={handleUpload}
+            onChange={(e) => {handleUpload(e, setPreview, setUploadedUrl)}}
           />
           {preview && <img src={preview} alt="preview" width={200} />}
         </label>
