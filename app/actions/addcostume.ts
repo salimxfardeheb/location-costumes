@@ -16,7 +16,7 @@ export async function addCostume(
   const data = await prisma.costume.create({
     data: {
       boutique_id: parseInt(id_boutique),
-      model: parseInt(model),
+      model,
       blazer,
       pants,
       image,

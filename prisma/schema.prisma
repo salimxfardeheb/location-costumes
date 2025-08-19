@@ -33,7 +33,7 @@ model boutique {
 model costume {
   id          Int        @id @default(autoincrement())
   boutique_id Int
-  model       Int?
+  model       String?
   blazer      String[]   @default([])
   pants       String[]   @default([])
   image       String?

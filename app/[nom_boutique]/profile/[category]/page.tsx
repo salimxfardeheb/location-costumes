@@ -1,9 +1,8 @@
 "use server";
 import { getcategoryCloth } from "@/app/actions/getcategoryCloth";
-import { authOptions } from "@/app/api/auth/[...nextauth]/route";
-import { getServerSession } from "next-auth";
 import Link from "next/link";
 import React from "react";
+
 
 interface Props {
   params: {
@@ -13,21 +12,15 @@ interface Props {
 
 const page = async ({ params }: Props) => {
   const { category } = await params;
-  const session = await getServerSession(authOptions);
-  const boutiqueIdStr = session?.user?.boutiqueId;
+  
 
-  if (!boutiqueIdStr) {
-    throw new Error("Boutique ID manquant");
-  }
-
-  const boutiqueId = parseInt(boutiqueIdStr, 10);
-
-  const result = await getcategoryCloth(category, boutiqueId);
+  const result = await getcategoryCloth(category);
 
   return (
     <div className="flex flex-col justify-center items-center gap-9">
       <div className="px-[3.5%] flex flex-wrap gap-32 w-full">
         {result.map((item, index) => (
+          
           <div
             key={index}
             className="flex flex-col justify-center items-center w-fit"
@@ -40,7 +33,9 @@ const page = async ({ params }: Props) => {
             <p className="text-xl font-mono mt-2">
               modèle n° : <span>{item.model}</span>
             </p>
+            <Link href={`${category}/${item.model}`}>see details</Link>
           </div>
+          
         ))}
       </div>
       <Link
