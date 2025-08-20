@@ -3,8 +3,8 @@ import { LuLogOut } from "react-icons/lu";
 import React from "react";
 
 interface LogoutProps {
-  text?: boolean; // par défaut true
-  icon?: React.ReactNode; // icône optionnelle
+  text?: boolean;
+  icon?: React.ReactNode;
 }
 
 const Logout: React.FC<LogoutProps> = ({ text = true, icon= true }) => {

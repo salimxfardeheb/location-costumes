@@ -36,8 +36,6 @@ export const authOptions: NextAuthOptions = {
         if (!credentials?.nom_boutique || !credentials?.password) {
           throw new Error("Champs manquants");
         }
-
-        // Chercher la boutique avec admin
         const boutique = await prisma.boutique.findUnique({
           where: { nom_boutique: credentials.nom_boutique },
         });
@@ -46,7 +44,6 @@ export const authOptions: NextAuthOptions = {
           throw new Error("Boutique introuvable");
         }
 
-        // Vérifier le mot de passe hashé
         const isValid = await bcrypt.compare(
           credentials.password,
           boutique.password
@@ -65,33 +62,32 @@ export const authOptions: NextAuthOptions = {
   ],
   session: {
     strategy: "jwt",
-    maxAge: 30 * 24 * 60 * 60, // 30 jours
-    updateAge: 24 * 60 * 60, // rafraîchit tous les 24h
+    maxAge: 30 * 24 * 60 * 60,
+    updateAge: 24 * 60 * 60,
   },
   pages: {
     signIn: "/",
   },
   callbacks: {
-  async jwt({ token, user }) {
-    if (user) {
-      token.boutiqueId = user.id; // id de la boutique
-      token.nom_boutique = user.name;
-      token.admin = user.admin;
-    }
-    return token;
-  },
-  async session({ session, token }) {
-    if (token) {
-      session.user = {
-        boutiqueId: String(token.boutiqueId),
-        admin: Boolean(token.admin),
-        name: token.nom_boutique as string | undefined,
-      };
-    }
-    return session;
-  },
+    async jwt({ token, user }) {
+      if (user) {
+        token.boutiqueId = user.id;
+        token.nom_boutique = user.name;
+        token.admin = user.admin;
+      }
+      return token;
+    },
+    async session({ session, token }) {
+      if (token) {
+        session.user = {
+          boutiqueId: String(token.boutiqueId),
+          admin: Boolean(token.admin),
+          name: token.nom_boutique as string | undefined,
+        };
+      }
+      return session;
+    },
     async redirect({ url, baseUrl }) {
-      // Rediriger vers la page d'accueil après déconnexion
       if (url.includes("/logout")) {
         return baseUrl;
       }

@@ -8,13 +8,10 @@ const Layout = ({ children }: { children: ReactNode }) => {
 
   return (
     <div className="flex min-h-screen">
-      {/* Panneau latéral */}
       <Panel
         panelIsOpen={panelIsOpen}
         setPanelIsOpen={setPanelIsOpen}
       />
-
-      {/* Contenu principal */}
       <main className="flex-1 p-4 bg-gray-50 transition-all duration-200">
         <NavBar />
         {children}

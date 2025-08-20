@@ -22,7 +22,7 @@ const navBar = () => {
         <p className="text-3xl font-black text-[#06B9AE] border-4 rounded-3xl px-4 py-2 text-center tracking-widest">
           {shop_name_upperCase}
         </p>
-        <Link href={"addLocation"} className="bg-[#F39C12] text-white text-lg font-medium px-5 py-2 rounded-2xl hover:opacity-90">
+        <Link href={`/${nom_boutique}/addLocation`} className="bg-[#F39C12] text-white text-lg font-medium px-5 py-2 rounded-2xl hover:opacity-90">
           Ajouter une location
         </Link>
       </div>
