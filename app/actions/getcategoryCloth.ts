@@ -32,6 +32,10 @@ export async function getOneCategoryCloth(
   item: string,
   model: string
 ): Promise<{
+  costume_id : number;
+  shirt_id : number ;
+  shoe_id : number;
+  accessory_id : number;
   description: any;
   size: any;
   pants: any;

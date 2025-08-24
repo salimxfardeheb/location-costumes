@@ -20,7 +20,20 @@ export async function addCostume(
       blazer,
       pants,
       image,
+      variants: {
+        create: [
+          ...blazer.map((size) => ({
+            type: "blazer",
+            size,
+          })),
+          ...pants.map((size) => ({
+            type: "pants",
+            size,
+          })),
+        ],
+      },
     },
+    include: { variants: true },
   });
   return data;
 }

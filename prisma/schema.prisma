@@ -9,13 +9,13 @@ datasource db {
 }
 
 model accessory {
-  id          Int        @id @default(autoincrement())
+  id          Int                 @id @default(autoincrement())
   boutique_id Int
   model       String?
   description String?
   image       String?
-  boutique    boutique   @relation(fields: [boutique_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
-  location    location[]
+  boutique    boutique            @relation(fields: [boutique_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  locations   LocationAccessory[]
 }
 
 model boutique {
@@ -31,49 +31,91 @@ model boutique {
 }
 
 model costume {
-  id          Int        @id @default(autoincrement())
+  id          Int              @id @default(autoincrement())
   boutique_id Int
   model       String?
-  blazer      String[]   @default([])
-  pants       String[]   @default([])
+  blazer      String[]         @default([])
+  pants       String[]         @default([])
   image       String?
-  boutique    boutique   @relation(fields: [boutique_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
-  location    location[]
+  boutique    boutique         @relation(fields: [boutique_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  variants    CostumeVariant[]
+}
+
+model CostumeVariant {
+  id         Int    @id @default(autoincrement())
+  costume_id Int
+  type       String
+  size       String
+
+  costume         costume    @relation(fields: [costume_id], references: [id], onDelete: Cascade)
+  locationsBlazer location[] @relation("BlazerLocation")
+  locationsPants  location[] @relation("PantLocation")
 }
 
 model location {
-  id            Int        @id @default(autoincrement())
-  boutique_id   Int
-  costume_id    Int?
-  shirt_id      Int?
-  shoe_id       Int?
-  accessory_id  Int?
-  location_date DateTime?  @db.Date
-  accessory     accessory? @relation(fields: [accessory_id], references: [id], onUpdate: NoAction)
-  boutique      boutique   @relation(fields: [boutique_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
-  costume       costume?   @relation(fields: [costume_id], references: [id], onUpdate: NoAction)
-  shirt         shirt?     @relation(fields: [shirt_id], references: [id], onUpdate: NoAction)
-  shoe          shoe?      @relation(fields: [shoe_id], references: [id], onUpdate: NoAction)
+  id              Int       @id @default(autoincrement())
+  boutique_id     Int
+  blazerVariantId Int?
+  pantVariantId   Int?
+  shirtVariantId  Int?
+  shoeVariantId   Int?
+  location_date   DateTime? @db.Date
+
+  boutique boutique @relation(fields: [boutique_id], references: [id], onDelete: Cascade)
+
+  blazer CostumeVariant? @relation("BlazerLocation", fields: [blazerVariantId], references: [id])
+  pant   CostumeVariant? @relation("PantLocation", fields: [pantVariantId], references: [id])
+  shirt  ShirtVariant?   @relation(fields: [shirtVariantId], references: [id])
+  shoe   ShoeVariant?    @relation(fields: [shoeVariantId], references: [id])
+
+  accessories LocationAccessory[]
+}
+
+model LocationAccessory {
+  id           Int @id @default(autoincrement())
+  location_id  Int
+  accessory_id Int
+
+  location  location  @relation(fields: [location_id], references: [id], onDelete: Cascade)
+  accessory accessory @relation(fields: [accessory_id], references: [id], onDelete: Cascade)
 }
 
 model shirt {
-  id          Int        @id @default(autoincrement())
+  id          Int            @id @default(autoincrement())
   boutique_id Int
   model       String?
   color       String?
   size        String[]
   image       String?
-  location    location[]
-  boutique    boutique   @relation(fields: [boutique_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  boutique    boutique       @relation(fields: [boutique_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  variants    ShirtVariant[]
+}
+
+model ShirtVariant {
+  id       Int    @id @default(autoincrement())
+  shirt_id Int
+  size     String
+
+  shirt     shirt      @relation(fields: [shirt_id], references: [id], onDelete: Cascade)
+  locations location[]
 }
 
 model shoe {
-  id          Int        @id @default(autoincrement())
+  id          Int           @id @default(autoincrement())
   boutique_id Int
   model       String?
   color       String?
   size        String[]
   image       String?
-  location    location[]
-  boutique    boutique   @relation(fields: [boutique_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  boutique    boutique      @relation(fields: [boutique_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  variants    ShoeVariant[]
+}
+
+model ShoeVariant {
+  id      Int    @id @default(autoincrement())
+  shoe_id Int
+  size    String
+
+  shoe      shoe       @relation(fields: [shoe_id], references: [id], onDelete: Cascade)
+  locations location[]
 }

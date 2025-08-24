@@ -12,7 +12,7 @@ const Layout = ({ children }: { children: ReactNode }) => {
         panelIsOpen={panelIsOpen}
         setPanelIsOpen={setPanelIsOpen}
       />
-      <main className="flex-1 p-4 bg-gray-50 transition-all duration-200">
+      <main className="flex-1 p-4 bg-gray-50">
         <NavBar />
         {children}
       </main>
