@@ -2,7 +2,8 @@
 CREATE TABLE "public"."accessory" (
     "id" SERIAL NOT NULL,
     "boutique_id" INTEGER NOT NULL,
-    "label" TEXT,
+    "model" TEXT,
+    "description" TEXT,
     "image" TEXT,
 
     CONSTRAINT "accessory_pkey" PRIMARY KEY ("id")
@@ -22,7 +23,7 @@ CREATE TABLE "public"."boutique" (
 CREATE TABLE "public"."costume" (
     "id" SERIAL NOT NULL,
     "boutique_id" INTEGER NOT NULL,
-    "model" INTEGER,
+    "model" TEXT,
     "blazer" TEXT[] DEFAULT ARRAY[]::TEXT[],
     "pants" TEXT[] DEFAULT ARRAY[]::TEXT[],
     "image" TEXT,
@@ -49,7 +50,7 @@ CREATE TABLE "public"."shirt" (
     "boutique_id" INTEGER NOT NULL,
     "model" TEXT,
     "color" TEXT,
-    "size" TEXT,
+    "size" TEXT[],
     "image" TEXT,
 
     CONSTRAINT "shirt_pkey" PRIMARY KEY ("id")
@@ -61,7 +62,7 @@ CREATE TABLE "public"."shoe" (
     "boutique_id" INTEGER NOT NULL,
     "model" TEXT,
     "color" TEXT,
-    "size" TEXT,
+    "size" TEXT[],
     "image" TEXT,
 
     CONSTRAINT "shoe_pkey" PRIMARY KEY ("id")
