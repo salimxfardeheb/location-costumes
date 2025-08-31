@@ -1,6 +1,6 @@
 "use client";
 import React, { useState } from "react";
-import { createLocation } from "@/app/actions/createLocation";
+import { createLocation } from "@/app/actions/prisma/createLocation";
 
 const Page = () => {
   const [locationDate, setLocationDate] = useState("");
