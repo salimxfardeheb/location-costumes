@@ -1,6 +1,8 @@
 import NextAuth, { NextAuthOptions, Session } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
-import { PrismaClient } from "@/app/generated/prisma";
+//import { PrismaClient } from "@/app/generated/prisma";
+import { db } from "@/firebase/connect";
+import { collection, query, where, getDocs } from "firebase/firestore";
 import bcrypt from "bcrypt";
 
 declare module "next-auth" {
@@ -18,7 +20,7 @@ declare module "next-auth" {
   }
 }
 
-const prisma = new PrismaClient();
+//const prisma = new PrismaClient();
 
 export const authOptions: NextAuthOptions = {
   providers: [
@@ -36,13 +38,22 @@ export const authOptions: NextAuthOptions = {
         if (!credentials?.nom_boutique || !credentials?.password) {
           throw new Error("Champs manquants");
         }
-        const boutique = await prisma.boutique.findUnique({
+        /**const boutique = await prisma.boutique.findUnique({
           where: { nom_boutique: credentials.nom_boutique },
-        });
+        });*/
 
-        if (!boutique) {
+        const boutiqueRef = query(
+          collection(db, "shop"),
+          where("nom_boutique", "==", credentials.nom_boutique)
+        );
+        const snapshot = await getDocs(boutiqueRef);
+
+        if (snapshot.empty) {
           throw new Error("Boutique introuvable");
         }
+
+        const doc = snapshot.docs[0];
+        const boutique = doc.data();
 
         const isValid = await bcrypt.compare(
           credentials.password,
@@ -53,7 +64,7 @@ export const authOptions: NextAuthOptions = {
         }
 
         return {
-          id: boutique.id.toString(),
+          id: doc.id,
           name: boutique.nom_boutique,
           admin: Boolean(boutique.admin),
         };

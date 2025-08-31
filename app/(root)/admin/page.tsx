@@ -1,7 +1,7 @@
 "use client";
 
 import {  useState } from "react";
-import { createShop } from "../../actions/createShop";
+import { create_boutique } from "@/app/actions/firebase/createBoutique"
 
 export default function page() {
   const [SHOP_NAME, SET_SHOP_NAME] = useState("");
@@ -11,9 +11,9 @@ export default function page() {
   const [contentMessage, setContentMessage] = useState("");
 
   const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
     if(SHOP_NAME && ADMIN && PASSWORD) {
-        e.preventDefault();
-        await createShop(SHOP_NAME,ADMIN,PASSWORD)
+        await create_boutique(SHOP_NAME,ADMIN,PASSWORD)
         setContentMessage("Boutique crée avec succées !")
         SET_SHOP_NAME("")
         SET_ADMIN("")

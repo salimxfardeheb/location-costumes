@@ -12,9 +12,9 @@ export async function create_boutique(
   const hashedPassword = await bcrypt.hash(password, 10);
   try {
     const docRef = await addDoc(collection(db, "shop"), {
-      nom_boutique,
-      admin,
-      hashedPassword,
+      nom_boutique : nom_boutique,
+      admin : admin,
+      password : hashedPassword ,
     });
     console.log("boutique crée avec succée ! ID : ", docRef.id);
   } catch (e) {
