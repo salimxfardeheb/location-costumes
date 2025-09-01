@@ -1,8 +1,7 @@
 "use server";
-import { get_category_cloth } from "@/app/actions/firebase/getCategoryCloth";
+import { get_all_category_cloth } from "@/app/actions/firebase/getCategoryCloth";
 import Link from "next/link";
 import React from "react";
-
 
 interface Props {
   params: {
@@ -12,22 +11,19 @@ interface Props {
 
 const page = async ({ params }: Props) => {
   const { category } = await params;
-  console.log("result" , category)
 
-  const result = await get_category_cloth(category);
-  console.log("result" , result)
+  const result = await get_all_category_cloth(category);
 
   return (
     <div className="flex flex-col justify-center items-center gap-9">
       <div className="px-[3.5%] flex flex-wrap gap-32 w-full">
         {result.map((item, index) => (
-          
           <div
             key={index}
             className="flex flex-col justify-center items-center w-fit"
           >
             <img
-              src="/uploads/1756045677862-1.jpg" 
+              src={item.image || "/placeholder.png"}
               alt={item.model}
               className="max-w-56 h-64 object-cover rounded-xl shadow"
             />
@@ -36,7 +32,6 @@ const page = async ({ params }: Props) => {
             </p>
             <Link href={`${category}/${item.model}`}>see details</Link>
           </div>
-          
         ))}
       </div>
       <Link

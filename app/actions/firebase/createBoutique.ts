@@ -1,7 +1,7 @@
 "use server";
 
 import bcrypt from "bcrypt";
-import { db } from "@/firebase/connect";
+import { db } from "@/lib/firebase/connect";
 import { collection, addDoc } from "firebase/firestore";
 
 export async function create_boutique(

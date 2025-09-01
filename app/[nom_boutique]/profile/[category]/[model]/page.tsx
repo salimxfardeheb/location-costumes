@@ -1,6 +1,5 @@
 import React from "react";
-import { getOneCategoryCloth } from "@/app/actions/getcategoryCloth";
-import { DeleteModel } from "@/app/actions/deleteCategoryModel";
+import { get_one_category_cloth } from "@/app/actions/firebase/getCategoryCloth"
 import Link from "next/link";
 import { redirect } from "next/navigation";
 
@@ -13,15 +12,15 @@ interface Props {
 const Page = async ({ params }: Props) => {
   const { category, model } = await params;
   const decodedModel = decodeURIComponent(model);
-  const result = await getOneCategoryCloth(category, decodedModel);
+  const result = await get_one_category_cloth(category, decodedModel);
 
   if (!result) return;
 
-  const handleDelete = async () => {
+  /*const handleDelete = async () => {
     "use server";
     await DeleteModel(category, decodedModel);
     redirect(`/${params.nom_boutique}/profile/${params.category}`)
-  };
+  };*/
 
   return (
     <>
@@ -76,7 +75,7 @@ const Page = async ({ params }: Props) => {
               {result.description}
             </div>
           )}
-          <form onSubmit={handleDelete}>
+          <form>
             <button
               type="submit"
               className="bg-red-600 text-white px-5 py-2 rounded-lg hover:opacity-85 mt-5 cursor-pointer"

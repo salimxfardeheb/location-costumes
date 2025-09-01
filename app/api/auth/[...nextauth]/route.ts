@@ -1,7 +1,7 @@
 import NextAuth, { NextAuthOptions, Session } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 //import { PrismaClient } from "@/app/generated/prisma";
-import { db } from "@/firebase/connect";
+import { db } from "@/lib/firebase/connect";
 import { collection, query, where, getDocs } from "firebase/firestore";
 import bcrypt from "bcrypt";
 
