@@ -1,4 +1,4 @@
-import { addShirtAndShoe } from "@/app/actions/addShirtAndShoe";
+import { create_item_cloth } from "@/app/actions/firebase/createCategoryCloth";
 import { handleUpload } from "@/app/functions";
 import React, { useState } from "react";
 
@@ -19,7 +19,7 @@ const shoe = () => {
     e.preventDefault();
     if (!uploadedUrl) return;
 
-    await addShirtAndShoe("shoe", model, color, sizes, uploadedUrl);
+    // await create_item_cloth("shoe", model, color, sizes, uploadedUrl);
     setContentMessage("✅ Modèle créé avec succès !");
     setModel("");
     setColor("");

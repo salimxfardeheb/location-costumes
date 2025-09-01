@@ -1,4 +1,4 @@
-import { addAccessory } from "@/app/actions/addAccessory";
+import { create_item_cloth } from "@/app/actions/firebase/createCategoryCloth";
 import { handleUpload } from "@/app/functions";
 import React, { useState } from "react";
 
@@ -14,7 +14,7 @@ const accessory = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!uploadedUrl) return;
-    await addAccessory(model, text, uploadedUrl);
+    // await create_item_cloth(model, text, uploadedUrl);
     setContentMessage("✅ Modèle créé avec succès !");
     setModel("");
     setText("");

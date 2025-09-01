@@ -1,5 +1,5 @@
 "use client";
-import { addCostume } from "@/app/actions/addcostume";
+import { create_item_cloth } from "@/app/actions/firebase/createCategoryCloth";
 import { handleUpload } from "@/app/functions";
 import React, { useState } from "react";
 
@@ -17,7 +17,15 @@ const Costumes = () => {
     e.preventDefault();
     if (!uploadedUrl) return;
 
-    await addCostume(model, blazer, pants, uploadedUrl);
+    const item = {
+      type_collection: "costume",
+      model : model,
+      blazerSize : blazer,
+      pantSize : pants,
+      image_path : uploadedUrl
+    }
+
+    await create_item_cloth(item);
 
     setContentMessage("✅ Modèle créé avec succès !");
     setModel("");
