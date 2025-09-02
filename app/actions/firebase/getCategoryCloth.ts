@@ -27,7 +27,6 @@ export async function get_all_category_cloth(
     collection(db, item),
     where("id_boutique", "==", boutiqueRef)
   );
-  console.log(boutiqueRef)
   const reqSnapshot = await getDocs(req);
 
   return reqSnapshot.docs.map((doc) => {

@@ -1,5 +1,6 @@
 import React from "react";
 import { get_one_category_cloth } from "@/app/actions/firebase/getCategoryCloth"
+import { deleteModel } from "@/app/actions/firebase/deleteModel";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 
@@ -10,17 +11,17 @@ interface Props {
 }
 
 const Page = async ({ params }: Props) => {
-  const { category, model } = await params;
+  const { category, model, nom_boutique } = await params;
   const decodedModel = decodeURIComponent(model);
   const result = await get_one_category_cloth(category, decodedModel);
 
   if (!result) return;
 
-  /*const handleDelete = async () => {
+  const handleDelete = async () => {
     "use server";
-    await DeleteModel(category, decodedModel);
-    redirect(`/${params.nom_boutique}/profile/${params.category}`)
-  };*/
+    await deleteModel(category, decodedModel);
+    redirect(`/${nom_boutique}/profile/${category}`)
+  };
 
   return (
     <>
@@ -75,7 +76,7 @@ const Page = async ({ params }: Props) => {
               {result.description}
             </div>
           )}
-          <form>
+          <form action={handleDelete}>
             <button
               type="submit"
               className="bg-red-600 text-white px-5 py-2 rounded-lg hover:opacity-85 mt-5 cursor-pointer"
@@ -86,7 +87,7 @@ const Page = async ({ params }: Props) => {
         </div>
       </div>
       <Link
-        href={`/${params.nom_boutique}/profile/${params.category}`}
+        href={`/${nom_boutique}/profile/${category}`}
         className="mt-5 px-4 py-2 h-fit bg-gray-600 text-white rounded-lg hover:opacity-85"
       >
         Retour à la liste
