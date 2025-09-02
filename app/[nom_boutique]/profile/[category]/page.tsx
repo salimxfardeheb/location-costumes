@@ -13,6 +13,7 @@ const page = async ({ params }: Props) => {
   const { category } = await params;
 
   const result = await get_all_category_cloth(category);
+  console.log(result)
 
   return (
     <div className="flex flex-col justify-center items-center gap-9">

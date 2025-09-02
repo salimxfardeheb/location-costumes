@@ -26,7 +26,7 @@ const Page = async ({ params }: Props) => {
     <>
       <div className="flex gap-6 ">
         <img
-          src={result.image || "/placeholder.png"}
+          src={result.image_path || "/placeholder.png"}
           alt={result.model}
           className="max-w-80 object-cover rounded-xl"
         />
@@ -37,7 +37,7 @@ const Page = async ({ params }: Props) => {
           {category === "costume" && (
             <div className="flex justify-between items-center gap-6 font-semibold">
               <p>Taille disponibles des blazers :</p>
-              {result.blazer.map((size: string, i: number) => (
+              {result.blazerSize.map((size: string, i: number) => (
                 <div key={i} className="border-2 p-1 rounded-sm">
                   {size}
                 </div>
@@ -47,7 +47,7 @@ const Page = async ({ params }: Props) => {
           {category === "costume" && (
             <div className="flex justify-between items-center gap-6 font-semibold">
               <p>Taille disponibles des pantallons :</p>
-              {result.pants.map((size: string, i: number) => (
+              {result.pantSize.map((size: string, i: number) => (
                 <div key={i} className="border-2 p-1 rounded-sm">
                   {size}
                 </div>

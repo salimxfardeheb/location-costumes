@@ -21,20 +21,20 @@ export async function get_all_category_cloth(
     throw new Error("Table non valide");
   }
 
-  // Construire la référence vers la boutique
   const boutiqueRef = doc(db, "shop", id_boutique);
-  // Requête avec comparaison par référence
+
   const req = query(
     collection(db, item),
     where("id_boutique", "==", boutiqueRef)
   );
+  console.log(boutiqueRef)
   const reqSnapshot = await getDocs(req);
 
   return reqSnapshot.docs.map((doc) => {
     const data = doc.data();
     return {
       model: data.model ?? "",
-      image: data.image ?? null,
+      image: data.image_path ?? null,
     };
   });
 }
@@ -65,16 +65,3 @@ export async function get_one_category_cloth(item: string, model: string) {
 
   return result_item;
 }
-
-/*: Promise<{
-  costume_id: number;
-  shirt_id: number;
-  shoe_id: number;
-  accessory_id: number;
-  description: any;
-  size: any;
-  pants: any;
-  blazer: any;
-  model: string;
-  image: string | null;
-} | null> */

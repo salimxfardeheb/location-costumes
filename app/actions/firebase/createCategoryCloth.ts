@@ -1,12 +1,11 @@
-"use server"
+"use server";
 
 import { db } from "@/lib/firebase/connect";
-import { collection, addDoc } from "firebase/firestore";
+import { collection, addDoc, doc } from "firebase/firestore";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 
 interface collectio_item {
-  id_boutique?: string; // all
   type_collection: string; // all
   model: string; // all
   image_path: string; // all
@@ -32,9 +31,10 @@ export async function create_item_cloth(item: collectio_item) {
 
   try {
     const { type_collection, ...data } = item;
+    const boutiqueRef = doc(db, "shop", id_boutique);
     const docRef = await addDoc(collection(db, item.type_collection), {
       ...data,
-      id_boutique,
+      id_boutique: boutiqueRef,
     });
     console.log("Model crée avec succée ! ID : ", docRef.id);
   } catch (e) {
