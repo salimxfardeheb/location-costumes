@@ -6,15 +6,15 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 
 interface collectio_item {
-  id_boutique?: string;
-  type_collection: string;
-  model: string;
-  blazerSize?: string[];
-  pantSize?: string[];
-  size?: string[];
-  color?: string;
-  description?: string;
-  image_path: string;
+  id_boutique?: string; // all
+  type_collection: string; // all
+  model: string; // all
+  image_path: string; // all
+  blazerSize?: string[]; // costume
+  pantSize?: string[]; // costume
+  size?: string[]; // shirt & shoe
+  color?: string; // shirt & shoe
+  description?: string; // accessoire
 }
 
 const allowedModels = ["costume", "shirt", "shoe", "accessory"];

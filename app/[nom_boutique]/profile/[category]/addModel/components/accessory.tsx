@@ -3,7 +3,6 @@ import { handleUpload } from "@/app/functions";
 import React, { useState } from "react";
 
 const accessory = () => {
-  
   const [preview, setPreview] = useState<string | null>(null);
   const [uploadedUrl, setUploadedUrl] = useState<string | null>(null);
   const [model, setModel] = useState("");
@@ -14,7 +13,14 @@ const accessory = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!uploadedUrl) return;
-    // await create_item_cloth(model, text, uploadedUrl);
+    const item = {
+      type_collection: "accessory",
+      model: model,
+      image_path: uploadedUrl,
+      description: text,
+    };
+
+    await create_item_cloth(item);
     setContentMessage("✅ Modèle créé avec succès !");
     setModel("");
     setText("");
@@ -78,18 +84,20 @@ const accessory = () => {
                file:bg-[#06B9AE] file:text-white
                hover:file:bg-[#059e95]
                cursor-pointer"
-            onChange={(e) => {handleUpload(e, setPreview, setUploadedUrl)}}
+            onChange={(e) => {
+              handleUpload(e, setPreview, setUploadedUrl);
+            }}
           />
           {preview && <img src={preview} alt="preview" width={200} />}
         </label>
         <div className="w-full flex justify-center">
           <button
-          type="submit"
-          className="bg-[#F39C12] text-white px-8 py-1.5 rounded-lg hover:opacity-85 cursor-pointer "
-        >
-          Ajouter le model
-        </button>
-</div>
+            type="submit"
+            className="bg-[#F39C12] text-white px-8 py-1.5 rounded-lg hover:opacity-85 cursor-pointer "
+          >
+            Ajouter le model
+          </button>
+        </div>
       </form>
     </div>
   );

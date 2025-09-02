@@ -15,12 +15,19 @@ const Shirt = () => {
   const availableSizes = ["XS", "S", "M", "L", "XL", "2 XL", "3 XL"];
   const availableColors = ["Black", "White"];
 
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!uploadedUrl) return;
 
-    // await addShirtAndShoe("shirt", model, color, sizes, uploadedUrl);
+    const item = {
+      type_collection: "shirt",
+      model: model,
+      image_path: uploadedUrl,
+      size: sizes,
+      color: color,
+    };
+
+    await create_item_cloth(item);
     setContentMessage("✅ Modèle créé avec succès !");
     setModel("");
     setColor("");
@@ -129,7 +136,9 @@ const Shirt = () => {
               file:bg-[#06B9AE] file:text-white
               hover:file:bg-[#059e95]
               cursor-pointer"
-            onChange={(e) => {handleUpload(e, setPreview, setUploadedUrl)}}
+            onChange={(e) => {
+              handleUpload(e, setPreview, setUploadedUrl);
+            }}
           />
           {preview && <img src={preview} alt="preview" width={200} />}
         </label>

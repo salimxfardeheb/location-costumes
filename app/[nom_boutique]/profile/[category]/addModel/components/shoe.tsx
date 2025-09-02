@@ -19,7 +19,15 @@ const shoe = () => {
     e.preventDefault();
     if (!uploadedUrl) return;
 
-    // await create_item_cloth("shoe", model, color, sizes, uploadedUrl);
+    const item = {
+      type_collection: "shoe",
+      model: model,
+      image_path: uploadedUrl,
+      size: sizes,
+      color: color,
+    };
+
+    await create_item_cloth(item);
     setContentMessage("✅ Modèle créé avec succès !");
     setModel("");
     setColor("");
