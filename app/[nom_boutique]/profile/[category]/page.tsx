@@ -13,7 +13,6 @@ const page = async ({ params }: Props) => {
   const { category } = await params;
 
   const result = await get_all_category_cloth(category);
-  console.log(result)
 
   return (
     <div className="flex flex-col justify-center items-center gap-9">
@@ -23,6 +22,7 @@ const page = async ({ params }: Props) => {
             key={index}
             className="flex flex-col justify-center items-center w-fit"
           >
+          <Link href={`${category}/${item.model}`} className="hover:scale-105 duration-100">
             <img
               src={item.image || "/placeholder.png"}
               alt={item.model}
@@ -31,7 +31,8 @@ const page = async ({ params }: Props) => {
             <p className="text-xl font-mono mt-2">
               modèle n° : <span>{item.model}</span>
             </p>
-            <Link href={`${category}/${item.model}`}>see details</Link>
+            
+          </Link>
           </div>
         ))}
       </div>

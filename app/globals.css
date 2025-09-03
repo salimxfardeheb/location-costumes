@@ -8,4 +8,15 @@
   input.login {
     @apply bg-white py-2 px-3 rounded-md placeholder:text-shadow-gray-600;
   }
+
+  .sizes-big-container {
+    @apply flex justify-between items-center gap-6 font-semibold;
+  }
+
+  .sizes-container {
+    @apply flex gap-2;
+  }
+  .sizes-details {
+    @apply border-2 p-1 rounded-sm;
+  }
 }
