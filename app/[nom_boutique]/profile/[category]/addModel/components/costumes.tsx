@@ -3,15 +3,24 @@ import { create_item_cloth } from "@/app/actions/firebase/createCategoryCloth";
 import { handleUpload } from "@/app/functions";
 import React, { useState } from "react";
 
+import { size } from "@/app/actions/firebase/createCategoryCloth";
+
 const Costumes = () => {
   const [model, setModel] = useState("");
-  const [blazer, setBlazer] = useState<string[]>([]);
-  const [pants, setPants] = useState<string[]>([]);
+  const [blazer, setBlazer] = useState<size[]>([]);
+  const [pants, setPants] = useState<size[]>([]);
   const [preview, setPreview] = useState<string | null>(null);
   const [uploadedUrl, setUploadedUrl] = useState<string | null>(null);
   const [contentMessage, setContentMessage] = useState("");
 
-  const sizes = ["46", "48", "50", "52", "54", "56", "58"];
+  const sizes: size[] = [
+    { size: "48", locate: false },
+    { size: "50", locate: false },
+    { size: "52", locate: false },
+    { size: "54", locate: false },
+    { size: "56", locate: false },
+    { size: "58", locate: false },
+  ];
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -19,11 +28,11 @@ const Costumes = () => {
 
     const item = {
       type_collection: "costume",
-      model : model,
-      blazerSize : blazer,
-      pantSize : pants,
-      image_path : uploadedUrl
-    }
+      model: model,
+      blazerSize: blazer,
+      pantSize: pants,
+      image_path: uploadedUrl,
+    };
 
     await create_item_cloth(item);
 
@@ -54,7 +63,7 @@ const Costumes = () => {
 
   return (
     <div>
-      { contentMessage &&(
+      {contentMessage && (
         <span className="text-green-600 font-semibold mt-4 block mx-auto w-fit mb-5">
           {contentMessage}
         </span>
@@ -89,21 +98,21 @@ const Costumes = () => {
           </div>
           <ul className="flex gap-7 flex-wrap">
             {sizes.map((size) => (
-              <li key={size}>
+              <li key={size.size}>
                 <label className="flex items-center gap-1">
                   <input
                     type="checkbox"
-                    checked={blazer.includes(size)}
-                    value={size}
+                    checked={blazer.some((s) => s.size === size.size)}
+                    value={size.size}
                     onChange={(e) =>
                       setBlazer((prev) =>
                         e.target.checked
                           ? [...prev, size]
-                          : prev.filter((s) => s !== size)
+                          : prev.filter((s) => s.size !== size.size)
                       )
                     }
                   />
-                  {size}
+                  {size.size}
                 </label>
               </li>
             ))}
@@ -126,21 +135,21 @@ const Costumes = () => {
 
           <ul className="flex gap-7 flex-wrap">
             {sizes.map((size) => (
-              <li key={size}>
+              <li key={size.size}>
                 <label className="flex items-center gap-1">
                   <input
                     type="checkbox"
-                    checked={pants.includes(size)}
-                    value={size}
+                    checked={pants.some((s) => s.size === size.size)}
+                    value={size.size}
                     onChange={(e) =>
                       setPants((prev) =>
                         e.target.checked
                           ? [...prev, size]
-                          : prev.filter((s) => s !== size)
+                          : prev.filter((s) => s.size !== size.size)
                       )
                     }
                   />
-                  {size}
+                  {size.size}
                 </label>
               </li>
             ))}
@@ -158,7 +167,9 @@ const Costumes = () => {
                file:bg-[#06B9AE] file:text-white
                hover:file:bg-[#059e95]
                cursor-pointer"
-            onChange={(e) => {handleUpload(e, setPreview, setUploadedUrl)}}
+            onChange={(e) => {
+              handleUpload(e, setPreview, setUploadedUrl);
+            }}
           />
           {preview && <img src={preview} alt="preview" width={200} />}
         </label>

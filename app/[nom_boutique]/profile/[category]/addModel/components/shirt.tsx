@@ -1,4 +1,4 @@
-import { create_item_cloth } from "@/app/actions/firebase/createCategoryCloth";
+import { create_item_cloth, size } from "@/app/actions/firebase/createCategoryCloth";
 import { handleUpload } from "@/app/functions";
 import React, { useState } from "react";
 
@@ -8,11 +8,18 @@ const Shirt = () => {
 
   const [model, setModel] = useState("");
   const [color, setColor] = useState("");
-  const [sizes, setSizes] = useState<string[]>([]);
+  const [sizes, setSizes] = useState<size[]>([]);
 
   const [contentMessage, setContentMessage] = useState("");
 
-  const availableSizes = ["XS", "S", "M", "L", "XL", "2 XL", "3 XL"];
+  const availableSizes = [
+    {size: "XS" , locate: false},
+    {size: "S" , locate: false},
+    {size: "M" , locate: false},
+    {size: "L" , locate: false},
+    {size: "XL" , locate: false},
+    {size: "2XL" , locate: false},
+  ];
   const availableColors = ["Black", "White"];
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -104,20 +111,20 @@ const Shirt = () => {
 
           <ul className="flex gap-7">
             {availableSizes.map((s) => (
-              <li key={s} className="flex items-center gap-2">
+              <li key={s.size} className="flex items-center gap-2">
                 <input
                   type="checkbox"
-                  checked={sizes.includes(s)}
-                  value={s}
+                  checked={sizes.some((ss)=> ss.size === s.size)}
+                  value={s.size}
                   onChange={(e) =>
                     setSizes((prev) =>
                       e.target.checked
                         ? [...prev, s]
-                        : prev.filter((size) => size !== s)
+                        : prev.filter((size) => size.size !== s.size)
                     )
                   }
                 />
-                <p className="text-nowrap">{s}</p>
+                <p className="text-nowrap">{s.size}</p>
               </li>
             ))}
           </ul>

@@ -1,4 +1,7 @@
-import { create_item_cloth } from "@/app/actions/firebase/createCategoryCloth";
+import {
+  create_item_cloth,
+  size,
+} from "@/app/actions/firebase/createCategoryCloth";
 import { handleUpload } from "@/app/functions";
 import React, { useState } from "react";
 
@@ -8,11 +11,18 @@ const shoe = () => {
 
   const [model, setModel] = useState("");
   const [color, setColor] = useState("");
-  const [sizes, setSizes] = useState<string[]>([]);
+  const [sizes, setSizes] = useState<size[]>([]);
 
   const [contentMessage, setContentMessage] = useState("");
 
-  const Allsizes = ["39", "40", "41", "42", "43", "44", "45"];
+  const Allsizes = [
+    { size: "39", locate: false },
+    { size: "40", locate: false },
+    { size: "41", locate: false },
+    { size: "42", locate: false },
+    { size: "43", locate: false },
+    { size: "44", locate: false },
+  ];
   const Colors = ["Black", "Brown"];
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -107,20 +117,20 @@ const shoe = () => {
           </div>
           <ul className="flex gap-7">
             {Allsizes.map((s) => (
-              <li key={s}>
+              <li key={s.size}>
                 <input
                   type="checkbox"
-                  checked={sizes.includes(s)}
-                  value={s}
+                  checked={sizes.some((ss) => ss.size === s.size)}
+                  value={s.size}
                   onChange={(e) =>
                     setSizes((prev) =>
                       e.target.checked
                         ? [...prev, s]
-                        : prev.filter((size) => size !== s)
+                        : prev.filter((size) => size.size !== s.size)
                     )
                   }
                 />
-                <p className="text-nowrap">{s}</p>
+                <p className="text-nowrap">{s.size}</p>
               </li>
             ))}
           </ul>
@@ -138,7 +148,9 @@ const shoe = () => {
                file:bg-[#06B9AE] file:text-white
                hover:file:bg-[#059e95]
                cursor-pointer"
-            onChange={(e) => {handleUpload(e, setPreview, setUploadedUrl)}}
+            onChange={(e) => {
+              handleUpload(e, setPreview, setUploadedUrl);
+            }}
           />
           {preview && <img src={preview} alt="preview" width={200} />}
         </label>

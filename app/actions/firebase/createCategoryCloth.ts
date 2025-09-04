@@ -5,20 +5,25 @@ import { collection, addDoc, doc } from "firebase/firestore";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 
-interface collectio_item {
+export interface size {
+  size : string,
+  locate : boolean
+}
+
+interface collection_item {
   type_collection: string; // all
   model: string; // all
   image_path: string; // all
-  blazerSize?: string[]; // costume
-  pantSize?: string[]; // costume
-  size?: string[]; // shirt & shoe
+  blazer?: size[]; // costume
+  pant?: size[]; // costume
+  size?: size[]; // shirt & shoe
   color?: string; // shirt & shoe
   description?: string; // accessoire
 }
 
 const allowedModels = ["costume", "shirt", "shoe", "accessory"];
 
-export async function create_item_cloth(item: collectio_item) {
+export async function create_item_cloth(item: collection_item) {
   const session = await getServerSession(authOptions);
   const id_boutique = session?.user?.boutiqueId;
 
