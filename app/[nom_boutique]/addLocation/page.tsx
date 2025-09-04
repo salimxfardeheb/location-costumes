@@ -1,5 +1,8 @@
 "use client";
-import { ItemCloth, location } from "@/app/actions/firebase/createLocation";
+import {
+  ItemCloth,
+  LocationInput,
+} from "@/app/actions/firebase/createLocation";
 import React, { useState } from "react";
 import { MdOutlineCancel } from "react-icons/md";
 
@@ -10,7 +13,7 @@ const Page = () => {
   ]);
   const [shirt, setShirt] = useState<ItemCloth>({ model: "", size: "" });
   const [shoe, setShoe] = useState<ItemCloth>({ model: "", size: "" });
-  const [accessories, setAccessories] = useState<string[]>([]);
+  const [accessories, setAccessories] = useState<string[]>([]); // ✅ string[]
 
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState<string | null>(null);
@@ -18,9 +21,9 @@ const Page = () => {
 
   const accessory = [
     "Cravate",
-    "Papillion",
+    "Papillon",
     "Ceinture",
-    "Bouttons manchettes",
+    "Boutons manchettes",
     "Montre",
   ];
 
@@ -31,15 +34,23 @@ const Page = () => {
     setSuccess(null);
 
     try {
-      const newLocation: location = {
-        location_date: new Date(locationDate),
+      const newLocation: LocationInput = {
+        location_date: locationDate,
         costume: costumes,
         shirt,
         shoe,
-        accessory: accessories,
+        accessory: accessories.map((a) => ({ model: a })),
       };
 
-      console.log("✅ Location à enregistrer :", newLocation);
+      const res = await fetch("/api/location", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(newLocation),
+    });
+
+    const data = await res.json();
+
+    if (!res.ok) throw new Error(data.error || "Erreur API");
 
       setSuccess("✅ Location ajoutée avec succès !");
       setLocationDate("");
