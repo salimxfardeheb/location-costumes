@@ -1,7 +1,6 @@
 "use server";
 
 import { get_locations } from "@/app/actions/firebase/getLocations";
-import { div, span } from "framer-motion/client";
 import Link from "next/link";
 import { IoInformationCircleOutline } from "react-icons/io5";
 
@@ -65,8 +64,12 @@ export default async function Dashboard() {
                   </td>
                   <td className="px-6 py-4">{data.shirt?.model}</td>
                   <td className="px-6 py-4">{data.shoe?.model}</td>
-                  <td className="px-6 py-4">{data.accessories.map((model,i) => (<span key={i}>{model.model},</span>))}</td>
-                  <td className="px-6 py-4 flex justify-center">
+                  <td className="px-6 py-4">
+                    {data.accessories.map((model, i) => (
+                      <span key={i}>{model.model},</span>
+                    ))}
+                  </td>
+                  <td className="px-6 py-4 flex justify-end">
                     <Link href={""}>
                       <IoInformationCircleOutline className="text-2xl text-[#06B9AE] hover:text-[#0A7871] transition" />
                     </Link>

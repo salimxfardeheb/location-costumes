@@ -72,6 +72,7 @@ export async function create_location(location: LocationInput) {
         const id_shirt = reqShirtSnapshot.docs[0].id;
         shirtData = {
           ref: doc(db, "shirt", id_shirt),
+          model : location.shirt?.model,
           size: location.shirt.size,
         };
       }
@@ -90,7 +91,7 @@ export async function create_location(location: LocationInput) {
         const id_shoe = reqShoeSnapshot.docs[0].id;
         shoeData = {
           ref: doc(db, "shoe", id_shoe),
-          model: location.shirt?.model,
+          model: location.shoe?.model,
           size: location.shoe.size,
         };
       }
