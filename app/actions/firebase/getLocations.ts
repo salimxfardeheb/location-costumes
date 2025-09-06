@@ -30,7 +30,7 @@ type Accessory = {
 };
 
 type LocationItem = {
-  date_sortie: string;
+  date_sortie: Date;
   costumes: Costume[];
   shirt: Shirt | null;
   shoe: Shoe | null;
@@ -57,7 +57,7 @@ export async function get_locations(): Promise<LocationItem[]> {
     const data = snap.data();
 
     return {
-      date_sortie: data.location_date,
+      date_sortie: new Date(data.location_date),
       costumes: Array.isArray(data.costume)
         ? data.costume.map((c: any) => ({
             ref: c.ref,

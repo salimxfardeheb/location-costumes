@@ -14,6 +14,9 @@ export default async function Dashboard() {
   ];
 
   const result = await get_locations();
+  const sortLocationsByDate = result.sort(
+    (a, b) => a.date_sortie.getTime() - b.date_sortie.getTime()
+  );
 
   return (
     <div className="w-full">
@@ -46,12 +49,16 @@ export default async function Dashboard() {
               </tr>
             </thead>
             <tbody>
-              {result.map((data, i) => (
+              {sortLocationsByDate.map((data, i) => (
                 <tr
                   key={i}
                   className="text-center h-16 font-medium text-gray-800 hover:bg-[#E6FFFA] transition"
                 >
-                  <td className="px-6 py-4">{data.date_sortie}</td>
+                  <td className="px-6 py-4">
+                    {data.date_sortie instanceof Date
+                      ? data.date_sortie.toLocaleDateString()
+                      : data.date_sortie}
+                  </td>
                   <td className="px-6 py-4">
                     {data.costumes.map((model, i) => (
                       <span
