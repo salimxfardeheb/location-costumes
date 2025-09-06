@@ -1,10 +1,20 @@
-"use client";
+"use server";
 
+import { get_locations } from "@/app/actions/firebase/getLocations";
+import { div, span } from "framer-motion/client";
 import Link from "next/link";
 import { IoInformationCircleOutline } from "react-icons/io5";
 
-export default function Dashboard() {
-  const rows = ["Date Sortie", "Costume", "Chemise", "Chaussure", "Accessoires"];
+export default async function Dashboard() {
+  const rows = [
+    "Date Sortie",
+    "Costume",
+    "Chemise",
+    "Chaussure",
+    "Accessoires",
+  ];
+
+  const result = await get_locations();
 
   return (
     <div className="w-full">
@@ -24,9 +34,12 @@ export default function Dashboard() {
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
-              <tr className="bg-gray-100 text-gray-700 text-left">
+              <tr className="bg-gray-100 text-gray-700">
                 {rows.map((col, i) => (
-                  <th key={i} className="px-6 py-4 font-semibold uppercase tracking-wide">
+                  <th
+                    key={i}
+                    className="px-6 py-4 font-semibold uppercase tracking-wide"
+                  >
                     {col}
                   </th>
                 ))}
@@ -34,16 +47,25 @@ export default function Dashboard() {
               </tr>
             </thead>
             <tbody>
-              {[1, 2, 3, 4].map((_, i) => (
+              {result.map((data, i) => (
                 <tr
                   key={i}
                   className="text-center h-16 font-medium text-gray-800 hover:bg-[#E6FFFA] transition"
                 >
-                  <td className="px-6 py-4">11/11/1111</td>
-                  <td className="px-6 py-4">1, 2</td>
-                  <td className="px-6 py-4">Simple</td>
-                  <td className="px-6 py-4">Mu</td>
-                  <td className="px-6 py-4">Ceinture, Cravate</td>
+                  <td className="px-6 py-4">{data.date_sortie}</td>
+                  <td className="px-6 py-4">
+                    {data.costumes.map((model, i) => (
+                      <span
+                        key={i}
+                        className="px-2 border rounded-4xl mx-2 bg-gray-300 text-gray-600"
+                      >
+                        {model.model}
+                      </span>
+                    ))}
+                  </td>
+                  <td className="px-6 py-4">{data.shirt?.model}</td>
+                  <td className="px-6 py-4">{data.shoe?.model}</td>
+                  <td className="px-6 py-4">{data.accessories.map((model,i) => (<span key={i}>{model.model},</span>))}</td>
                   <td className="px-6 py-4 flex justify-center">
                     <Link href={""}>
                       <IoInformationCircleOutline className="text-2xl text-[#06B9AE] hover:text-[#0A7871] transition" />
