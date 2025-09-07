@@ -19,4 +19,7 @@
   .sizes-details {
     @apply border-2 p-1 rounded-sm;
   }
+  .details-location {
+    @apply flex gap-2;
+  }
 }

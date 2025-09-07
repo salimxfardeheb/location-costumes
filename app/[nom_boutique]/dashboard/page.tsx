@@ -77,7 +77,7 @@ export default async function Dashboard() {
                     ))}
                   </td>
                   <td className="px-6 py-4 flex justify-end">
-                    <Link href={""}>
+                    <Link href={`dashboard/${data.id}`}>
                       <IoInformationCircleOutline className="text-2xl text-[#06B9AE] hover:text-[#0A7871] transition" />
                     </Link>
                   </td>

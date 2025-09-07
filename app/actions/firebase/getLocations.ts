@@ -1,7 +1,14 @@
 "use server";
 
 import { db } from "@/lib/firebase/connect";
-import { collection, query, where, getDocs, doc } from "firebase/firestore";
+import {
+  collection,
+  query,
+  where,
+  getDocs,
+  doc,
+  getDoc,
+} from "firebase/firestore";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 
@@ -30,6 +37,7 @@ type Accessory = {
 };
 
 type LocationItem = {
+  id: string;
   date_sortie: Date;
   costumes: Costume[];
   shirt: Shirt | null;
@@ -55,8 +63,8 @@ export async function get_locations(): Promise<LocationItem[]> {
 
   return reqSnapshot.docs.map((snap) => {
     const data = snap.data();
-
     return {
+      id: snap.id,
       date_sortie: new Date(data.location_date),
       costumes: Array.isArray(data.costume)
         ? data.costume.map((c: any) => ({
@@ -91,4 +99,47 @@ export async function get_locations(): Promise<LocationItem[]> {
         : [],
     };
   });
+}
+
+export async function get_one_location(
+  id_location: string
+): Promise<LocationItem | null> {
+  const locationRef = doc(db, "location", id_location);
+  const snapshot = await getDoc(locationRef);
+  if (!snapshot.exists()) {
+    return null;
+  }
+  const locationData = snapshot.data();
+  return {
+    id: id_location,
+    date_sortie: new Date(locationData.location_date),
+    costumes: Array.isArray(locationData.costume)
+      ? locationData.costume.map((c: any) => ({
+          ref: c.ref,
+          model: c.model,
+          blazer: c.blazer,
+          pant: c.pant,
+        }))
+      : [],
+    shirt: locationData.shirt
+      ? {
+          ref: locationData.shirt.ref,
+          model: locationData.shirt.model,
+          size: locationData.shirt.size,
+        }
+      : null,
+    shoe: locationData.shoe
+      ? {
+          ref: locationData.shoe.ref,
+          model: locationData.shoe.model,
+          size: locationData.shoe.size,
+        }
+      : null,
+    accessories: Array.isArray(locationData.accessory)
+      ? locationData.accessory.map((a: any) => ({
+          ref: a.ref,
+          model: a.model,
+        }))
+      : [],
+  };
 }
