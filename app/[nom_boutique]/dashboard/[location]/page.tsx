@@ -42,7 +42,7 @@ const page = async ({ params }: Props) => {
               className="pt-10 flex flex-col gap-1 w-fit text-lg font-semibold"
             >
               <img
-                src="/uploads/1756816121463-1.jpg"
+                src={model.image}
                 className="max-w-56 h-64 object-cover rounded-xl shadow"
               />
               <div className="px-4 flex flex-col gap-1">
@@ -65,7 +65,7 @@ const page = async ({ params }: Props) => {
         {/* shirt */}
         <div className="py-10 flex flex-col gap-1 w-fit text-lg font-semibold">
           <img
-            src="/uploads/1756936496984-simple.jpg"
+            src={result?.shirt?.image}
             className="max-w-56 h-64 object-cover rounded-xl shadow"
           />
           <div className="px-4 flex flex-col gap-1">
@@ -82,7 +82,7 @@ const page = async ({ params }: Props) => {
         {/* shoe */}
         <div className="py-10 flex flex-col gap-1 w-fit text-lg font-semibold">
           <img
-            src="/uploads/1756936760657-Mu.jpg"
+            src={result?.shoe?.image}
             className="max-w-56 h-64 object-cover rounded-xl shadow"
           />
           <div className="px-4 flex flex-col gap-1">
@@ -99,9 +99,12 @@ const page = async ({ params }: Props) => {
         {/* accessories */}
         <div className="flex gap-12">
           {result?.accessories.map((model, i) => (
-            <div key={i} className="flex flex-col gap-1 pt-10 w-fit text-lg font-semibold">
+            <div
+              key={i}
+              className="flex flex-col gap-1 pt-10 w-fit text-lg font-semibold"
+            >
               <img
-                src="/uploads/1756816121463-1.jpg"
+                src={model.image}
                 className="max-w-56 h-64 object-cover rounded-xl shadow"
               />
               <div className="px-4 flex flex-col gap-1">

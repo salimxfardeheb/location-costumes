@@ -17,23 +17,27 @@ type Costume = {
   model: string;
   blazer: string;
   pant: string;
+  image?: string;
 };
 
 type Shirt = {
   ref: string;
   model: string;
   size: string;
+  image?: string;
 };
 
 type Shoe = {
   ref: string;
   model: string;
   size: string;
+  image?: string;
 };
 
 type Accessory = {
   ref: string;
   model: string;
+  image?: string;
 };
 
 type LocationItem = {
@@ -119,6 +123,7 @@ export async function get_one_location(
           model: c.model,
           blazer: c.blazer,
           pant: c.pant,
+          image: c.image,
         }))
       : [],
     shirt: locationData.shirt
@@ -126,6 +131,7 @@ export async function get_one_location(
           ref: locationData.shirt.ref,
           model: locationData.shirt.model,
           size: locationData.shirt.size,
+          image: locationData.shirt.image,
         }
       : null,
     shoe: locationData.shoe
@@ -133,12 +139,14 @@ export async function get_one_location(
           ref: locationData.shoe.ref,
           model: locationData.shoe.model,
           size: locationData.shoe.size,
+          image: locationData.shoe.image,
         }
       : null,
     accessories: Array.isArray(locationData.accessory)
       ? locationData.accessory.map((a: any) => ({
           ref: a.ref,
           model: a.model,
+          image: a.image,
         }))
       : [],
   };

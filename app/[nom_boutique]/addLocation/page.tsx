@@ -13,7 +13,7 @@ const Page = () => {
   ]);
   const [shirt, setShirt] = useState<ItemCloth>({ model: "", size: "" });
   const [shoe, setShoe] = useState<ItemCloth>({ model: "", size: "" });
-  const [accessories, setAccessories] = useState<string[]>([]); // ✅ string[]
+  const [accessories, setAccessories] = useState<string[]>([]);
 
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState<string | null>(null);

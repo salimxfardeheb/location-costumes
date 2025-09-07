@@ -17,6 +17,7 @@ export interface ItemCloth {
   blazer?: string;
   pant?: string;
   size?: string;
+  image?: string;
 }
 
 export interface LocationInput {
@@ -50,11 +51,13 @@ export async function create_location(location: LocationInput) {
       if (!reqCostumeSnapshot.empty) {
         const id_costume = reqCostumeSnapshot.docs[0].id;
         const costumeRef = doc(db, "costume", id_costume);
+
         costumeRefs.push({
           ref: costumeRef,
           model: model.model,
           blazer: model.blazer,
           pant: model.pant,
+          image: reqCostumeSnapshot.docs[0].data().image_path ?? null,
         });
       }
     }
@@ -72,8 +75,9 @@ export async function create_location(location: LocationInput) {
         const id_shirt = reqShirtSnapshot.docs[0].id;
         shirtData = {
           ref: doc(db, "shirt", id_shirt),
-          model : location.shirt?.model,
+          model: location.shirt?.model,
           size: location.shirt.size,
+          image: reqShirtSnapshot.docs[0].data().image_path ?? null,
         };
       }
     }
@@ -93,6 +97,7 @@ export async function create_location(location: LocationInput) {
           ref: doc(db, "shoe", id_shoe),
           model: location.shoe?.model,
           size: location.shoe.size,
+          image: reqShoeSnapshot.docs[0].data().image_path ?? null,
         };
       }
     }
@@ -112,6 +117,7 @@ export async function create_location(location: LocationInput) {
           accessoryRefs.push({
             ref: doc(db, "accessory", id_acc),
             model: acc.model,
+            image: reqAccSnapshot.docs[0].data().image_path ?? null,
           });
         }
       }
