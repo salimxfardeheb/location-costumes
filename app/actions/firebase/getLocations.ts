@@ -49,7 +49,7 @@ type LocationItem = {
   accessories: Accessory[];
 };
 
-export async function get_locations(): Promise<LocationItem[]> {
+export async function get_locations(showAll: boolean): Promise<LocationItem[]> {
   const session = await getServerSession(authOptions);
   const id_boutique = session?.user?.boutiqueId;
 
@@ -64,8 +64,11 @@ export async function get_locations(): Promise<LocationItem[]> {
   );
 
   const reqSnapshot = await getDocs(req);
+  const today = new Date();
+  const threeDaysLater = new Date();
+  threeDaysLater.setDate(today.getDate() + 3);
 
-  return reqSnapshot.docs.map((snap) => {
+  const locations = reqSnapshot.docs.map((snap) => {
     const data = snap.data();
     return {
       id: snap.id,
@@ -76,6 +79,7 @@ export async function get_locations(): Promise<LocationItem[]> {
             model: c.model,
             blazer: c.blazer,
             pant: c.pant,
+            image: c.image,
           }))
         : [],
 
@@ -84,6 +88,7 @@ export async function get_locations(): Promise<LocationItem[]> {
             ref: data.shirt.ref,
             model: data.shirt.model,
             size: data.shirt.size,
+            image: data.shirt.image,
           }
         : null,
 
@@ -92,6 +97,7 @@ export async function get_locations(): Promise<LocationItem[]> {
             ref: data.shoe.ref,
             model: data.shoe.model,
             size: data.shoe.size,
+            image: data.shoe.image,
           }
         : null,
 
@@ -99,10 +105,20 @@ export async function get_locations(): Promise<LocationItem[]> {
         ? data.accessory.map((a: any) => ({
             ref: a.ref,
             model: a.model,
+            image: a.image,
           }))
         : [],
     };
   });
+
+  if (!showAll) {
+    return locations.filter((loc) => {
+      const date = new Date(loc.date_sortie);
+      return date >= today && date <= threeDaysLater;
+    });
+  }
+
+  return locations;
 }
 
 export async function get_one_location(

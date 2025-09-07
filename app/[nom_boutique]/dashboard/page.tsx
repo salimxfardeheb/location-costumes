@@ -13,7 +13,7 @@ export default async function Dashboard() {
     "Accessoires",
   ];
 
-  const result = await get_locations();
+  const result = await get_locations(false);
   const sortLocationsByDate = result.sort(
     (a, b) => a.date_sortie.getTime() - b.date_sortie.getTime()
   );
