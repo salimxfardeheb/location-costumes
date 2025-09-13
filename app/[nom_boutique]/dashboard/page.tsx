@@ -27,12 +27,12 @@ export default async function Dashboard({
     <div className="w-full">
       <div className="mt-11 mx-5 bg-white rounded-2xl shadow-lg border border-gray-200 overflow-hidden">
         {/* Header */}
-        <div className="w-full flex justify-between items-center px-8 py-5 bg-gradient-to-r from-[#06B9AE] to-[#0A7871] text-white rounded-t-2xl">
+        <div className="w-full flex justify-between items-center px-8 py-5 rounded-t-2xl">
           <p className="text-2xl font-semibold">{showAll ? "Tous les locations" : "Locations à venir"}</p>
       
         <Link
           href={`/1/dashboard?all=${!showAll}`}
-          className="text-sm font-medium bg-white text-[#06B9AE] px-4 py-2 rounded-lg hover:bg-[#06B9AE] hover:text-white transition"
+          className="text-sm font-medium text-[#06B9AE] px-2 py-1 rounded-lg hover:outline-1 hover:text-[#06B9AE] transition"
         >   
           {showAll ? "Voir uniquement à venir" : "Voir tout"}
         </Link>
@@ -42,7 +42,7 @@ export default async function Dashboard({
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
-              <tr className="bg-gray-100 text-gray-700">
+              <tr className="bg-gradient-to-r from-[#06B9AE] to-[#0A7871] text-white">
                 {rows.map((col, i) => (
                   <th
                     key={i}
