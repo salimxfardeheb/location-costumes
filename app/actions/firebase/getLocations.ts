@@ -110,15 +110,6 @@ export async function get_locations(showAll: boolean): Promise<LocationItem[]> {
         : [],
     };
   });
-
-  if (!showAll) {
-    return locations.filter((loc) => {
-      const date = new Date(loc.date_sortie);
-      return date >= today;
-    });
-  }
-
-  return locations;
 }
 
 export async function get_one_location(
