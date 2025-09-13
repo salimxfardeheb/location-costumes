@@ -4,7 +4,11 @@ import { get_locations } from "@/app/actions/firebase/getLocations";
 import Link from "next/link";
 import { IoInformationCircleOutline } from "react-icons/io5";
 
-export default async function Dashboard() {
+export default async function Dashboard({
+  searchParams,
+}: {
+  searchParams: { all?: string };
+}) {
   const rows = [
     "Date Sortie",
     "Costume",
@@ -12,8 +16,9 @@ export default async function Dashboard() {
     "Chaussure",
     "Accessoires",
   ];
+  const showAll = searchParams.all === 'true'; // 
 
-  const result = await get_locations(false);
+  const result = await get_locations(showAll);
   const sortLocationsByDate = result.sort(
     (a, b) => a.date_sortie.getTime() - b.date_sortie.getTime()
   );
@@ -23,13 +28,14 @@ export default async function Dashboard() {
       <div className="mt-11 mx-5 bg-white rounded-2xl shadow-lg border border-gray-200 overflow-hidden">
         {/* Header */}
         <div className="w-full flex justify-between items-center px-8 py-5 bg-gradient-to-r from-[#06B9AE] to-[#0A7871] text-white rounded-t-2xl">
-          <p className="text-2xl font-semibold">Locations à venir</p>
-          <Link
-            href={""}
-            className="text-sm font-medium bg-white text-[#06B9AE] px-4 py-2 rounded-lg hover:bg-[#06B9AE] hover:text-white transition"
-          >
-            Voir tout
-          </Link>
+          <p className="text-2xl font-semibold">{showAll ? "Tous les locations" : "Locations à venir"}</p>
+      
+        <Link
+          href={`/1/dashboard?all=${!showAll}`}
+          className="text-sm font-medium bg-white text-[#06B9AE] px-4 py-2 rounded-lg hover:bg-[#06B9AE] hover:text-white transition"
+        >   
+          {showAll ? "Voir uniquement à venir" : "Voir tout"}
+        </Link>
         </div>
 
         {/* Table */}
