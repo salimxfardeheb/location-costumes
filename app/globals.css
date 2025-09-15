@@ -22,4 +22,7 @@
   .details-location {
     @apply flex gap-2;
   }
+  .switch {
+    @apply rounded-full bg-[#06B9AE] hover:opacity-80 text-5xl pr-1 pl-0.5 text-white;
+  }
 }

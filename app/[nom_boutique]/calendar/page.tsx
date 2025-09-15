@@ -1,11 +1,5 @@
-import React from 'react'
+import Calendar from "./components/calendar";
 
-const page = () => {
-  return (
-    <div>
-      calendar
-    </div>
-  )
+export default function Page() {
+  return <Calendar />;
 }
-
-export default page
