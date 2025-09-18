@@ -1,6 +1,6 @@
 import React from "react";
-import { get_one_category_cloth } from "@/app/actions/firebase/getCategoryCloth";
-import { deleteModel } from "@/app/actions/firebase/deleteModel";
+import { get_one_category_cloth } from "@/app/firebase/getCategoryCloth";
+import { deleteModel } from "@/app/firebase/deleteModel";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 

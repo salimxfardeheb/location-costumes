@@ -1,4 +1,4 @@
-import { create_item_cloth } from "@/app/actions/firebase/createCategoryCloth";
+import { create_item_cloth } from "@/app/firebase/createCategoryCloth";
 import { handleUpload } from "@/app/functions";
 import React, { useState } from "react";
 

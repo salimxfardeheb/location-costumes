@@ -1,5 +1,5 @@
 "use server";
-import { get_all_category_cloth } from "@/app/actions/firebase/getCategoryCloth";
+import { get_all_category_cloth } from "@/app/firebase/getCategoryCloth";
 import Link from "next/link";
 import React from "react";
 

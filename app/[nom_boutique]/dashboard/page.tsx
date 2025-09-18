@@ -1,6 +1,6 @@
 "use server";
 
-import { get_locations } from "@/app/actions/firebase/getLocations";
+import { get_locations } from "@/app/firebase/getLocations";
 import Link from "next/link";
 import { IoInformationCircleOutline } from "react-icons/io5";
 
@@ -16,7 +16,7 @@ export default async function Dashboard({
     "Chaussure",
     "Accessoires",
   ];
-  const showAll = searchParams.all === 'true'; // 
+  const showAll = searchParams.all === 'true'; 
 
   const result = await get_locations(showAll);
   const sortLocationsByDate = result.sort(

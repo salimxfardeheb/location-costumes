@@ -1,7 +1,7 @@
 "use client";
 
 import {  useState } from "react";
-import { create_boutique } from "@/app/actions/firebase/createBoutique"
+import { create_boutique } from "@/app/firebase/createBoutique"
 
 export default function page() {
   const [SHOP_NAME, SET_SHOP_NAME] = useState("");

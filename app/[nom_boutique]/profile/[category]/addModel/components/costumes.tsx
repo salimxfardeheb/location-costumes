@@ -1,9 +1,9 @@
 "use client";
-import { create_item_cloth } from "@/app/actions/firebase/createCategoryCloth";
+import { create_item_cloth } from "@/app/firebase/createCategoryCloth";
 import { handleUpload } from "@/app/functions";
 import React, { useState } from "react";
 
-import { size } from "@/app/actions/firebase/createCategoryCloth";
+import { size } from "@/app/firebase/createCategoryCloth";
 
 const Costumes = () => {
   const [model, setModel] = useState("");

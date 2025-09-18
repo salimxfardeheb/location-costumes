@@ -1,6 +1,6 @@
 // app/api/location/route.ts
 import { NextResponse } from "next/server";
-import { create_location } from "@/app/actions/firebase/createLocation";
+import { create_location } from "@/app/firebase/createLocation";
 
 export async function POST(req: Request) {
   try {

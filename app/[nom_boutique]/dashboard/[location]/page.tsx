@@ -1,5 +1,5 @@
 "use server";
-import { get_one_location } from "@/app/actions/firebase/getLocations";
+import { get_one_location } from "@/app/firebase/getLocations";
 import Link from "next/link";
 import React from "react";
 

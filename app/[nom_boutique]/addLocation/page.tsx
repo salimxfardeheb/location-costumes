@@ -2,7 +2,7 @@
 import {
   ItemCloth,
   LocationInput,
-} from "@/app/actions/firebase/createLocation";
+} from "@/app/firebase/createLocation";
 import React, { useState } from "react";
 import { MdOutlineCancel } from "react-icons/md";
 

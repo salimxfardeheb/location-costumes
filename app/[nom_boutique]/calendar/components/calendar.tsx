@@ -1,19 +1,70 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import dayjs from "dayjs";
-import customParseFormat from "dayjs/plugin/customParseFormat";
 import { MdOutlineNavigateNext, MdOutlineNavigateBefore } from "react-icons/md";
 
+type Costume = {
+  ref: string;
+  model: string;
+  blazer: string;
+  pant: string;
+  image?: string;
+};
 
-dayjs.extend(customParseFormat);
+type Shirt = {
+  ref: string;
+  model: string;
+  size: string;
+  image?: string;
+};
+
+type Shoe = {
+  ref: string;
+  model: string;
+  size: string;
+  image?: string;
+};
+
+type Accessory = {
+  ref: string;
+  model: string;
+  image?: string;
+};
+
+type LocationItem = {
+  id: string;
+  date_sortie: string;
+  costumes: Costume[];
+  shirt: Shirt | null;
+  shoe: Shoe | null;
+  accessories: Accessory[];
+};
 
 const Calendar = () => {
   const [currentMonth, setCurrentMonth] = useState(dayjs());
+  const [locations, setLocations] = useState<LocationItem[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const res = await fetch("/api/calendar");
+        const data = await res.json();
+        if (data.success) {
+          setLocations(data.data);
+        }
+      } catch (err) {
+        console.error("Erreur fetch locations:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchData();
+  }, []);
 
   const startOfMonth = currentMonth.startOf("month");
   const endOfMonth = currentMonth.endOf("month");
-
   const startDate = startOfMonth.startOf("week");
   const endDate = endOfMonth.endOf("week");
 
@@ -27,47 +78,18 @@ const Calendar = () => {
   const nextMonth = () => setCurrentMonth(currentMonth.add(1, "month"));
   const prevMonth = () => setCurrentMonth(currentMonth.subtract(1, "month"));
 
-  // Exemple de locations
-  const locationToday = [
-    {
-      location: "19/09/2025",
-      model: ["1"],
-      chemise: "simple",
-      chaussure: "Mu",
-      accessoires: ["Cravate"],
-    },
-    {
-      location: "17/09/2025",
-      model: ["2", "3"],
-      chemise: "noir",
-      chaussure: "Mu",
-      accessoires: ["ceinture"],
-    },
-    {
-      location: "18/09/2025",
-      model: ["2", "3"],
-      chemise: "noir",
-      chaussure: "Mu",
-      accessoires: ["ceinture", "Cravate"],
-    },
-  ];
-
   return (
     <div className="p-6 max-w-7xl mx-auto">
-      {/* Header */}
       <div className="flex justify-around items-center mb-6">
         <button onClick={prevMonth} className="switch">
           <MdOutlineNavigateBefore />
         </button>
-        <h2 className="text-xl font-bold">
-          {currentMonth.format("MMMM YYYY")}
-        </h2>
+        <h2 className="text-xl font-bold">{currentMonth.format("MMMM YYYY")}</h2>
         <button onClick={nextMonth} className="switch">
           <MdOutlineNavigateNext />
         </button>
       </div>
 
-      {/* Days of week */}
       <div className="grid grid-cols-7 text-center font-semibold">
         {["Dim", "Lun", "Mar", "Mer", "Jeu", "Ven", "Sam"].map((d) => (
           <div key={d} className="p-2">
@@ -76,17 +98,14 @@ const Calendar = () => {
         ))}
       </div>
 
-      {/* Calendar grid */}
       <div className="grid grid-cols-7 text-center">
         {days.map((dayItem) => {
           const isCurrentMonth = dayItem.month() === currentMonth.month();
           const isToday = dayItem.isSame(dayjs(), "day");
 
-          // Filtrer les locations du jour
-          const eventsOfDay = locationToday.filter((loc) =>
-            dayItem.isSame(dayjs(loc.location, "DD/MM/YYYY"), "day")
+          const eventsOfDay = locations.filter((loc) =>
+            dayItem.isSame(dayjs(loc.date_sortie), "day")
           );
-          console.log(eventsOfDay)
 
           return (
             <div
@@ -103,23 +122,44 @@ const Calendar = () => {
                     : ""
                 }`}
             >
-              {/* Numéro du jour */}
               <span className="font-semibold">{dayItem.date()}</span>
 
-              {/* Affichage des locations */}
+              {loading && <span className="text-xs text-gray-400">⏳</span>}
+
               <div className="flex flex-col gap-1 mt-1 w-full">
-                {eventsOfDay.map((loc, i) => (
+                {eventsOfDay.map((loc) => (
                   <div
-                    key={i}
+                    key={loc.id}
                     className="text-xs rounded px-1 py-0.5 border border-[#06B9AE] cursor-pointer"
                   >
-                    Mod: <span className="text-[#06B9AE]"> {loc.model.join(", ")}</span>  
-                    <br />
-                    Chem: <span className="text-[#06B9AE]">{loc.chemise}  </span>
-                    <br />
-                    Chaus: <span className="text-[#06B9AE]"> {loc.chaussure}</span>
-                    <br />
-                    Acc: <span className="text-[#06B9AE]" >{loc.accessoires.join(", ")}</span>
+                    {loc.costumes.length > 0 && (
+                      <div>
+                        Costumes:{" "}
+                        <span className="text-[#06B9AE]">
+                          {loc.costumes.map((c) => c.model).join(", ")}
+                        </span>
+                      </div>
+                    )}
+                    {loc.shirt && (
+                      <div>
+                        Chemise:{" "}
+                        <span className="text-[#06B9AE]">{loc.shirt.model}</span>
+                      </div>
+                    )}
+                    {loc.shoe && (
+                      <div>
+                        Chaussure:{" "}
+                        <span className="text-[#06B9AE]">{loc.shoe.model}</span>
+                      </div>
+                    )}
+                    {loc.accessories.length > 0 && (
+                      <div>
+                        Acc:{" "}
+                        <span className="text-[#06B9AE]">
+                          {loc.accessories.map((a) => a.model).join(", ")}
+                        </span>
+                      </div>
+                    )}
                   </div>
                 ))}
               </div>
