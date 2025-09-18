@@ -84,7 +84,9 @@ const Calendar = () => {
         <button onClick={prevMonth} className="switch">
           <MdOutlineNavigateBefore />
         </button>
-        <h2 className="text-xl font-bold">{currentMonth.format("MMMM YYYY")}</h2>
+        <h2 className="text-xl font-bold">
+          {currentMonth.format("MMMM YYYY")}
+        </h2>
         <button onClick={nextMonth} className="switch">
           <MdOutlineNavigateNext />
         </button>
@@ -134,22 +136,52 @@ const Calendar = () => {
                   >
                     {loc.costumes.length > 0 && (
                       <div>
-                        Costumes:{" "}
+                        Mod:{" "}
                         <span className="text-[#06B9AE]">
                           {loc.costumes.map((c) => c.model).join(", ")}
+                        </span>
+                        <span>
+                          {" "}
+                          B :{" "}
+                          <span className="text-[#06B9AE]">
+                            {loc.costumes.map((c) => c.blazer).join(", ")}
+                          </span>{" "}
+                        </span>
+                        <span>
+                          {" "}
+                          P :{" "}
+                          <span className="text-[#06B9AE]">
+                            {loc.costumes.map((c) => c.pant).join(", ")}
+                          </span>
                         </span>
                       </div>
                     )}
                     {loc.shirt && (
                       <div>
-                        Chemise:{" "}
-                        <span className="text-[#06B9AE]">{loc.shirt.model}</span>
+                        Chem:{" "}
+                        <span className="text-[#06B9AE]">
+                          {loc.shirt.model}
+                        </span>
+                        <span>
+                          {" "}
+                          T :{" "}
+                          <span className="text-[#06B9AE]">
+                            {loc.shirt.size}
+                          </span>
+                        </span>
                       </div>
                     )}
                     {loc.shoe && (
                       <div>
-                        Chaussure:{" "}
+                        Chaus:{" "}
                         <span className="text-[#06B9AE]">{loc.shoe.model}</span>
+                        <span>
+                          {" "}
+                          T :{" "}
+                          <span className="text-[#06B9AE]">
+                            {loc.shoe.size}
+                          </span>
+                        </span>
                       </div>
                     )}
                     {loc.accessories.length > 0 && (
