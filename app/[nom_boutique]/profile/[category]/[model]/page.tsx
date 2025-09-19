@@ -61,13 +61,13 @@ const Page = async ({ params }: Props) => {
               </div>
             </div>
           )}
-          {(category === "shirt" || category === "shoe") && (
+          {(category === "chemise" || category === "chaussure") && (
             <div className="sizes-big-container">
               <div>
-                {category === "shirt" && (
+                {category === "chemise" && (
                   <p>Taille disponibles des chemise :</p>
                 )}
-                {category === "shoe" && <p>pointure disponibles :</p>}
+                {category === "chaussure" && <p>pointure disponibles :</p>}
               </div>
               <div className="sizes-container">
                 {result.size.map((size: string, i: number) => (
@@ -78,7 +78,7 @@ const Page = async ({ params }: Props) => {
               </div>
             </div>
           )}
-          {category === "accessory" && (
+          {category === "accessoire" && (
             <div className="flex items-center gap-6 font-semibold">
               <p>Description : </p>
               {result.description}

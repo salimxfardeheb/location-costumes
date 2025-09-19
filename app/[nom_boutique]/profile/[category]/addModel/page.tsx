@@ -11,9 +11,9 @@ const page = () => {
   return (
     <div>
       {pathName.includes("costume") && <Costumes />}
-      {pathName.includes("shirt") && <Shirt />}
-      {pathName.includes("shoe") && <Shoe />}
-      {pathName.includes("accessory") && <Accessory />}
+      {pathName.includes("chemise") && <Shirt />}
+      {pathName.includes("chaussure") && <Shoe />}
+      {pathName.includes("accessoire") && <Accessory />}
     </div>
   );
 };

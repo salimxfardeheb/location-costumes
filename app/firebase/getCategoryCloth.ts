@@ -4,9 +4,9 @@ import { db } from "@/lib/firebase/connect";
 import { collection, query, where, getDocs, doc } from "firebase/firestore";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+import { categories } from "@/app/functions";
 
-const allowedModels = ["costume", "shirt", "shoe", "accessory"];
-
+ 
 export async function get_all_category_cloth(
   item: string
 ): Promise<{ model: string; image: string | null }[]> {
@@ -17,7 +17,7 @@ export async function get_all_category_cloth(
     throw new Error("Boutique ID manquant");
   }
 
-  if (!allowedModels.includes(item)) {
+  if (!categories.includes(item)) {
     throw new Error("Table non valide");
   }
 
@@ -44,7 +44,7 @@ export async function get_one_category_cloth(item: string, model: string) {
   if (!id_boutique) {
     throw new Error("Boutique ID manquant");
   }
-  if (!allowedModels.includes(item) && id_boutique) {
+  if (!categories.includes(item) && id_boutique) {
     throw new Error("Table non valide");
   }
 

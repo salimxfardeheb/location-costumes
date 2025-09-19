@@ -23,12 +23,13 @@ export interface ItemCloth {
 export interface LocationInput {
   location_date: string;
   costume: ItemCloth[];
-  shirt?: ItemCloth;
-  shoe?: ItemCloth;
-  accessory?: ItemCloth[];
+  chemise?: ItemCloth;
+  chaussure?: ItemCloth;
+  accessoire?: ItemCloth[];
 }
 
 export async function create_location(location: LocationInput) {
+  console.log(location);
   const session = await getServerSession(authOptions);
   const id_boutique = session?.user?.boutiqueId;
 
@@ -62,52 +63,52 @@ export async function create_location(location: LocationInput) {
       }
     }
 
-    // --- Shirt ---
+    // --- chemise ---
     let shirtData = null;
-    if (location.shirt) {
+    if (location.chemise) {
       const reqShirt = query(
-        collection(db, "shirt"),
+        collection(db, "chemise"),
         where("id_boutique", "==", boutiqueRef),
-        where("model", "==", location.shirt.model)
+        where("model", "==", location.chemise.model)
       );
       const reqShirtSnapshot = await getDocs(reqShirt);
       if (!reqShirtSnapshot.empty) {
         const id_shirt = reqShirtSnapshot.docs[0].id;
         shirtData = {
-          ref: doc(db, "shirt", id_shirt),
-          model: location.shirt?.model,
-          size: location.shirt.size,
+          ref: doc(db, "chemise", id_shirt),
+          model: location.chemise?.model,
+          size: location.chemise.size,
           image: reqShirtSnapshot.docs[0].data().image_path ?? null,
         };
       }
     }
 
-    // --- Shoe ---
+    // --- chaussure ---
     let shoeData = null;
-    if (location.shoe) {
+    if (location.chaussure) {
       const reqShoe = query(
-        collection(db, "shoe"),
+        collection(db, "chaussure"),
         where("id_boutique", "==", boutiqueRef),
-        where("model", "==", location.shoe.model)
+        where("model", "==", location.chaussure.model)
       );
       const reqShoeSnapshot = await getDocs(reqShoe);
       if (!reqShoeSnapshot.empty) {
         const id_shoe = reqShoeSnapshot.docs[0].id;
         shoeData = {
-          ref: doc(db, "shoe", id_shoe),
-          model: location.shoe?.model,
-          size: location.shoe.size,
+          ref: doc(db, "chaussure", id_shoe),
+          model: location.chaussure?.model,
+          size: location.chaussure.size,
           image: reqShoeSnapshot.docs[0].data().image_path ?? null,
         };
       }
     }
 
-    // --- Accessory ---
+    // --- accessoire ---
     const accessoryRefs: any[] = [];
-    if (location.accessory && location.accessory.length > 0) {
-      for (const acc of location.accessory) {
+    if (location.accessoire && location.accessoire.length > 0) {
+      for (const acc of location.accessoire) {
         const reqAcc = query(
-          collection(db, "accessory"),
+          collection(db, "accessoire"),
           where("id_boutique", "==", boutiqueRef),
           where("model", "==", acc.model)
         );
@@ -115,7 +116,7 @@ export async function create_location(location: LocationInput) {
         if (!reqAccSnapshot.empty) {
           const id_acc = reqAccSnapshot.docs[0].id;
           accessoryRefs.push({
-            ref: doc(db, "accessory", id_acc),
+            ref: doc(db, "accessoire", id_acc),
             model: acc.model,
             image: reqAccSnapshot.docs[0].data().image_path ?? null,
           });
@@ -128,9 +129,9 @@ export async function create_location(location: LocationInput) {
       id_boutique: boutiqueRef,
       location_date: location.location_date,
       costume: costumeRefs,
-      shirt: shirtData,
-      shoe: shoeData,
-      accessory: accessoryRefs,
+      chemise: shirtData,
+      chaussure: shoeData,
+      accessoire: accessoryRefs,
     };
 
     const docRef = await addDoc(collection(db, "location"), locationData);

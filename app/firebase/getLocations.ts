@@ -20,21 +20,21 @@ type Costume = {
   image?: string;
 };
 
-type Shirt = {
+type Chemise = {
   ref: string;
   model: string;
   size: string;
   image?: string;
 };
 
-type Shoe = {
+type Chausssure = {
   ref: string;
   model: string;
   size: string;
   image?: string;
 };
 
-type Accessory = {
+type Accessoire = {
   ref: string;
   model: string;
   image?: string;
@@ -44,9 +44,9 @@ type LocationItem = {
   id: string;
   date_sortie: Date;
   costumes: Costume[];
-  shirt: Shirt | null;
-  shoe: Shoe | null;
-  accessories: Accessory[];
+  chemise: Chemise | null;
+  chaussure: Chausssure | null;
+  accessories: Accessoire[];
 };
 
 export async function get_locations(showAll: boolean): Promise<LocationItem[]> {
@@ -83,26 +83,26 @@ export async function get_locations(showAll: boolean): Promise<LocationItem[]> {
           }))
         : [],
 
-      shirt: data.shirt
+      chemise: data.chemise
         ? {
-            ref: data.shirt.ref,
-            model: data.shirt.model,
-            size: data.shirt.size,
-            image: data.shirt.image,
+            ref: data.chemise.ref,
+            model: data.chemise.model,
+            size: data.chemise.size,
+            image: data.chemise.image,
           }
         : null,
 
-      shoe: data.shoe
+      chaussure: data.chaussure
         ? {
-            ref: data.shoe.ref,
-            model: data.shoe.model,
-            size: data.shoe.size,
-            image: data.shoe.image,
+            ref: data.chaussure.ref,
+            model: data.chaussure.model,
+            size: data.chaussure.size,
+            image: data.chaussure.image,
           }
         : null,
 
-      accessories: Array.isArray(data.accessory)
-        ? data.accessory.map((a: any) => ({
+      accessories: Array.isArray(data.accessoire)
+        ? data.accessoire.map((a: any) => ({
             ref: a.ref,
             model: a.model,
             image: a.image,
@@ -142,24 +142,24 @@ export async function get_one_location(
           image: c.image,
         }))
       : [],
-    shirt: locationData.shirt
+    chemise: locationData.chemise
       ? {
-          ref: locationData.shirt.ref,
-          model: locationData.shirt.model,
-          size: locationData.shirt.size,
-          image: locationData.shirt.image,
+          ref: locationData.chemise.ref,
+          model: locationData.chemise.model,
+          size: locationData.chemise.size,
+          image: locationData.chemise.image,
         }
       : null,
-    shoe: locationData.shoe
+    chaussure: locationData.chaussure
       ? {
-          ref: locationData.shoe.ref,
-          model: locationData.shoe.model,
-          size: locationData.shoe.size,
-          image: locationData.shoe.image,
+          ref: locationData.chaussure.ref,
+          model: locationData.chaussure.model,
+          size: locationData.chaussure.size,
+          image: locationData.chaussure.image,
         }
       : null,
-    accessories: Array.isArray(locationData.accessory)
-      ? locationData.accessory.map((a: any) => ({
+    accessories: Array.isArray(locationData.accessoire)
+      ? locationData.accessoire.map((a: any) => ({
           ref: a.ref,
           model: a.model,
           image: a.image,

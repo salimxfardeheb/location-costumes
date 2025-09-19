@@ -29,7 +29,7 @@ const page = async ({ params }: Props) => {
               className="max-w-56 h-64 object-cover rounded-xl shadow"
             />
             <p className="text-xl font-mono mt-2">
-              modèle n° : <span>{item.model}</span>
+              modèle: <span>{item.model}</span>
             </p>
             
           </Link>

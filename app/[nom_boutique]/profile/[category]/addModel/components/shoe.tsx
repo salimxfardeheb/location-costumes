@@ -1,7 +1,4 @@
-import {
-  create_item_cloth,
-  size,
-} from "@/app/firebase/createCategoryCloth";
+import { create_item_cloth, size } from "@/app/firebase/createCategoryCloth";
 import { handleUpload } from "@/app/functions";
 import React, { useState } from "react";
 
@@ -23,14 +20,13 @@ const shoe = () => {
     { size: "43", locate: false },
     { size: "44", locate: false },
   ];
-  const Colors = ["Black", "Brown"];
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!uploadedUrl) return;
 
     const item = {
-      type_collection: "shoe",
+      type_collection: "chaussure",
       model: model,
       image_path: uploadedUrl,
       size: sizes,
@@ -79,24 +75,6 @@ const shoe = () => {
             onChange={(e) => setModel(e.target.value)}
           />
         </label>
-        <label className="flex gap-10 justify-between w-2/5">
-          <span className="text-xl text-nowrap">Sélectionner la couleur :</span>
-          <ul className="flex gap-10">
-            {Colors.map((c) => (
-              <li key={c} className="flex gap-3">
-                <input
-                  type="radio"
-                  name="color"
-                  checked={color === c}
-                  value={c}
-                  onChange={() => setColor(c)}
-                />
-                {c}
-              </li>
-            ))}
-          </ul>
-        </label>
-
         <label
           htmlFor="taille"
           className="flex flex-col gap-6 justify-between w-full text-nowrap "

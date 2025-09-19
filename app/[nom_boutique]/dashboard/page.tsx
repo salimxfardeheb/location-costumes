@@ -75,8 +75,8 @@ export default async function Dashboard({
                       </span>
                     ))}
                   </td>
-                  <td className="px-6 py-4">{data.shirt?.model}</td>
-                  <td className="px-6 py-4">{data.shoe?.model}</td>
+                  <td className="px-6 py-4">{data.chemise?.model}</td>
+                  <td className="px-6 py-4">{data.chaussure?.model}</td>
                   <td className="px-6 py-4">
                     {data.accessories.map((model, i) => (
                       <span key={i}>{model.model},</span>

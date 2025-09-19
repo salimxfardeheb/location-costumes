@@ -14,7 +14,7 @@ const accessory = () => {
     e.preventDefault();
     if (!uploadedUrl) return;
     const item = {
-      type_collection: "accessory",
+      type_collection: "accessoire",
       model: model,
       image_path: uploadedUrl,
       description: text,

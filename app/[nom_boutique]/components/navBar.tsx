@@ -25,6 +25,9 @@ const navBar = () => {
         <Link href={`/${nom_boutique}/addLocation`} className="bg-[#F39C12] text-white text-lg font-medium px-5 py-2 rounded-2xl hover:opacity-90">
           Ajouter une location
         </Link>
+        <Link href={`/${nom_boutique}/calendar/searchModel`} className="bg-[#F39C12] text-white text-lg font-medium px-5 py-2 rounded-2xl hover:opacity-90">
+          Rechercher
+        </Link>
       </div>
     </div>
   );

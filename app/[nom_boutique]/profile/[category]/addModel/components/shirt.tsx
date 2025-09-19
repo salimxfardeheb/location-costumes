@@ -27,7 +27,7 @@ const Shirt = () => {
     if (!uploadedUrl) return;
 
     const item = {
-      type_collection: "shirt",
+      type_collection: "chemise",
       model: model,
       image_path: uploadedUrl,
       size: sizes,
@@ -73,24 +73,6 @@ const Shirt = () => {
             value={model}
             onChange={(e) => setModel(e.target.value)}
           />
-        </label>
-
-        <label className="flex gap-10 justify-between w-2/5">
-          <span className="text-xl text-nowrap">Sélectionner la couleur :</span>
-          <ul className="flex gap-10">
-            {availableColors.map((c) => (
-              <li key={c} className="flex gap-3">
-                <input
-                  type="radio"
-                  name="color"
-                  checked={color === c}
-                  value={c}
-                  onChange={() => setColor(c)}
-                />
-                {c}
-              </li>
-            ))}
-          </ul>
         </label>
 
         <label className="flex flex-col gap-6 w-full text-nowrap">

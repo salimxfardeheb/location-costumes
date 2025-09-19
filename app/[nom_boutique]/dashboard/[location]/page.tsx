@@ -62,37 +62,37 @@ const page = async ({ params }: Props) => {
             </div>
           ))}
         </div>
-        {/* shirt */}
+        {/* chemise */}
         <div className="py-10 flex flex-col gap-1 w-fit text-lg font-semibold">
           <img
-            src={result?.shirt?.image}
+            src={result?.chemise?.image}
             className="max-w-56 h-64 object-cover rounded-xl shadow"
           />
           <div className="px-4 flex flex-col gap-1">
             <div className="details-location">
               <p>Model :</p>
-              <p>{result?.shirt?.model}</p>
+              <p>{result?.chemise?.model}</p>
             </div>
             <div className="details-location">
               <p>taille :</p>
-              <p>{result?.shirt?.size}</p>
+              <p>{result?.chemise?.size}</p>
             </div>
           </div>
         </div>
-        {/* shoe */}
+        {/* chaussure */}
         <div className="py-10 flex flex-col gap-1 w-fit text-lg font-semibold">
           <img
-            src={result?.shoe?.image}
+            src={result?.chaussure?.image}
             className="max-w-56 h-64 object-cover rounded-xl shadow"
           />
           <div className="px-4 flex flex-col gap-1">
             <div className="details-location">
               <p>Model :</p>
-              <p>{result?.shoe?.model}</p>
+              <p>{result?.chaussure?.model}</p>
             </div>
             <div className="details-location">
               <p>pointure :</p>
-              <p>{result?.shoe?.size}</p>
+              <p>{result?.chaussure?.size}</p>
             </div>
           </div>
         </div>

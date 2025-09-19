@@ -1,8 +1,5 @@
 "use client";
-import {
-  ItemCloth,
-  LocationInput,
-} from "@/app/firebase/createLocation";
+import { ItemCloth, LocationInput } from "@/app/firebase/createLocation";
 import React, { useState } from "react";
 import { MdOutlineCancel } from "react-icons/md";
 
@@ -11,8 +8,11 @@ const Page = () => {
   const [costumes, setCostumes] = useState<ItemCloth[]>([
     { model: "", blazer: "", pant: "" },
   ]);
-  const [shirt, setShirt] = useState<ItemCloth>({ model: "", size: "" });
-  const [shoe, setShoe] = useState<ItemCloth>({ model: "", size: "" });
+  const [chemise, setChemise] = useState<ItemCloth>({ model: "", size: "" });
+  const [chaussure, setChaussure] = useState<ItemCloth>({
+    model: "",
+    size: "",
+  });
   const [accessories, setAccessories] = useState<string[]>([]);
 
   const [loading, setLoading] = useState(false);
@@ -37,26 +37,26 @@ const Page = () => {
       const newLocation: LocationInput = {
         location_date: locationDate,
         costume: costumes,
-        shirt,
-        shoe,
-        accessory: accessories.map((a) => ({ model: a })),
+        chemise,
+        chaussure,
+        accessoire: accessories.map((a) => ({ model: a })),
       };
 
       const res = await fetch("/api/location", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(newLocation),
-    });
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(newLocation),
+      });
 
-    const data = await res.json();
+      const data = await res.json();
 
-    if (!res.ok) throw new Error(data.error || "Erreur API");
+      if (!res.ok) throw new Error(data.error || "Erreur API");
 
       setSuccess("✅ Location ajoutée avec succès !");
       setLocationDate("");
       setCostumes([{ model: "", blazer: "", pant: "" }]);
-      setShirt({ model: "", size: "" });
-      setShoe({ model: "", size: "" });
+      setChemise({ model: "", size: "" });
+      setChaussure({ model: "", size: "" });
       setAccessories([]);
     } catch (err) {
       setError("❌ Une erreur est survenue lors de l’ajout de la location");
@@ -176,8 +176,10 @@ const Page = () => {
               <input
                 type="text"
                 placeholder="N° Model"
-                value={shirt.model}
-                onChange={(e) => setShirt({ ...shirt, model: e.target.value })}
+                value={chemise.model}
+                onChange={(e) =>
+                  setChemise({ ...chemise, model: e.target.value })
+                }
                 className="bg-[#B6FFF6] px-5 py-2 rounded-xl border-2 border-[#36CBC1]"
               />
             </label>
@@ -186,8 +188,10 @@ const Page = () => {
               <input
                 type="text"
                 placeholder="Taille"
-                value={shirt.size}
-                onChange={(e) => setShirt({ ...shirt, size: e.target.value })}
+                value={chemise.size}
+                onChange={(e) =>
+                  setChemise({ ...chemise, size: e.target.value })
+                }
                 className="w-24 bg-[#B6FFF6] px-5 py-2 rounded-xl border-2 border-[#36CBC1]"
               />
             </label>
@@ -203,8 +207,10 @@ const Page = () => {
               <input
                 type="text"
                 placeholder="N° Model"
-                value={shoe.model}
-                onChange={(e) => setShoe({ ...shoe, model: e.target.value })}
+                value={chaussure.model}
+                onChange={(e) =>
+                  setChaussure({ ...chaussure, model: e.target.value })
+                }
                 className="bg-[#B6FFF6] px-5 py-2 rounded-xl border-2 border-[#36CBC1]"
               />
             </label>
@@ -213,8 +219,10 @@ const Page = () => {
               <input
                 type="text"
                 placeholder="Taille"
-                value={shoe.size}
-                onChange={(e) => setShoe({ ...shoe, size: e.target.value })}
+                value={chaussure.size}
+                onChange={(e) =>
+                  setChaussure({ ...chaussure, size: e.target.value })
+                }
                 className="w-24 bg-[#B6FFF6] px-5 py-2 rounded-xl border-2 border-[#36CBC1]"
               />
             </label>

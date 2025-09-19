@@ -13,8 +13,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import fs from "fs/promises";
 import path from "path";
-
-const allowedModels = ["costume", "shirt", "shoe", "accessory"];
+import { categories } from "@/app/functions";
 
 export async function deleteModel(item: string, model: string) {
   const session = await getServerSession(authOptions);
@@ -23,7 +22,7 @@ export async function deleteModel(item: string, model: string) {
   if (!id_boutique) {
     throw new Error("Boutique ID manquant");
   }
-  if (!allowedModels.includes(item)) {
+  if (!categories.includes(item)) {
     throw new Error("Table non valide");
   }
 
