@@ -25,4 +25,18 @@
   .switch {
     @apply rounded-full bg-[#06B9AE] hover:opacity-80 text-5xl pr-1 pl-0.5 text-white;
   }
+.optCategory {
+  @apply px-2 py-1 hover:bg-[#B6FFF6];
+}
+  select {
+    appearance: base-select;
+    &::picker(select) {
+      appearance: base-select;
+      border-radius: var(--radius-xl);
+      padding: 4px;
+      margin: 10px 0px;
+      border-width: 2px;
+      border-color: #06b9ae;
+    }
+  }
 }
