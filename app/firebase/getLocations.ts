@@ -167,3 +167,65 @@ export async function get_one_location(
       : [],
   };
 }
+
+export async function get_location_perDate(
+  location_date: String
+): Promise<LocationItem[]> {
+  const session = await getServerSession(authOptions);
+  const id_boutique = session?.user?.boutiqueId;
+
+  if (!id_boutique) {
+    throw new Error("Boutique ID manquant");
+  }
+
+  const boutiqueRef = doc(db, "shop", id_boutique);
+  const req = query(
+    collection(db, "location"),
+    where("id_boutique", "==", boutiqueRef),
+    where("location_date", "==", location_date)
+  );
+  const reqSnapshot = await getDocs(req);
+  const locations = reqSnapshot.docs.map((snap) => {
+    const data = snap.data();
+    return {
+      id: snap.id,
+      date_sortie: new Date(data.location_date),
+      costumes: Array.isArray(data.costume)
+        ? data.costume.map((c: any) => ({
+            ref: c.ref,
+            model: c.model,
+            blazer: c.blazer,
+            pant: c.pant,
+            image: c.image,
+          }))
+        : [],
+
+      chemise: data.chemise
+        ? {
+            ref: data.chemise.ref,
+            model: data.chemise.model,
+            size: data.chemise.size,
+            image: data.chemise.image,
+          }
+        : null,
+
+      chaussure: data.chaussure
+        ? {
+            ref: data.chaussure.ref,
+            model: data.chaussure.model,
+            size: data.chaussure.size,
+            image: data.chaussure.image,
+          }
+        : null,
+
+      accessories: Array.isArray(data.accessoire)
+        ? data.accessoire.map((a: any) => ({
+            ref: a.ref,
+            model: a.model,
+            image: a.image,
+          }))
+        : [],
+    };
+  });
+  return locations;
+}

@@ -1,13 +1,26 @@
 "use client";
+import { useParams, useRouter } from "next/navigation";
 import React, { useState } from "react";
 
 const Page = () => {
+  const { nom_boutique } = useParams();
   const [date_location, setDateLocation] = useState("");
-  const [category, setCategory] = useState("select");
+  const [category, setCategory] = useState("costume");
+    const router = useRouter();
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+
+    const query = new URLSearchParams({
+      date: date_location,
+      category: category,
+    });
+
+    router.push(`/${nom_boutique}/dashboard/searchModel/resultats?${query.toString()}`);
+  };
   return (
     <div className="flex justify-center items-center p-10 ">
-      <form className="flex flex-col gap-10 w-full max-w-lg bg-white p-10 rounded-2xl shadow-lg">
-        {/* Date */}
+      <form onSubmit={handleSubmit} className="flex flex-col gap-10 w-full max-w-lg bg-white p-10 rounded-2xl shadow-lg">
         <label className="flex flex-col gap-2 w-full">
           <span className="text-lg font-medium text-gray-700">
             Sélectionner la date de location :
@@ -21,7 +34,6 @@ const Page = () => {
           />
         </label>
 
-        {/* Category */}
         <label htmlFor="category" className="flex flex-col gap-2 w-full">
           <span className="text-lg font-medium text-gray-700">
             Sélectionner catégorie :
@@ -32,6 +44,7 @@ const Page = () => {
               id="category"
               className="w-full p-3 border-2 bg-[#B6FFF6] border-[#36CBC1] rounded-xl focus:outline-none transition-all cursor-pointer"
               value={category}
+               onChange={(e) => setCategory(e.target.value)}
             >
               <option value="costume" className="optCategory">
                 Costume
@@ -49,7 +62,6 @@ const Page = () => {
           </div>
         </label>
 
-        {/* Button */}
         <button
           type="submit"
           className="bg-[#F39C12] text-white font-semibold px-8 py-3 rounded-xl shadow-md hover:opacity-90 hover:scale-105 transition-transform"

@@ -14,12 +14,12 @@ const Costumes = () => {
   const [contentMessage, setContentMessage] = useState("");
 
   const sizes: size[] = [
-    { size: "48", locate: false },
-    { size: "50", locate: false },
-    { size: "52", locate: false },
-    { size: "54", locate: false },
-    { size: "56", locate: false },
-    { size: "58", locate: false },
+    { size: "48" , location_date : [""] },
+    { size: "50" , location_date : [""] },
+    { size: "52" , location_date : [""] },
+    { size: "54" , location_date : [""] },
+    { size: "56" , location_date : [""] },
+    { size: "58" , location_date : [""] },
   ];
 
   const handleSubmit = async (e: React.FormEvent) => {

@@ -9,7 +9,7 @@ import { categories } from "@/app/functions";
 
 export interface size {
   size : string,
-  locate : boolean
+  location_date: string[]
 }
 
 interface collection_item {

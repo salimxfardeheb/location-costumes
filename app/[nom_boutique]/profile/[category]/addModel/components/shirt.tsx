@@ -13,12 +13,12 @@ const Shirt = () => {
   const [contentMessage, setContentMessage] = useState("");
 
   const availableSizes = [
-    {size: "XS" , locate: false},
-    {size: "S" , locate: false},
-    {size: "M" , locate: false},
-    {size: "L" , locate: false},
-    {size: "XL" , locate: false},
-    {size: "2XL" , locate: false},
+    { size: "XS" , location_date : [""]},
+    { size: "S"  , location_date : [""]},
+    { size: "M"  , location_date : [""]},
+    { size: "L"  , location_date : [""]},
+    { size: "XL" , location_date : [""]},
+    { size: "2XL", location_date : [""]},
   ];
   const availableColors = ["Black", "White"];
 
@@ -96,7 +96,7 @@ const Shirt = () => {
               <li key={s.size} className="flex items-center gap-2">
                 <input
                   type="checkbox"
-                  checked={sizes.some((ss)=> ss.size === s.size)}
+                  checked={sizes.some((ss) => ss.size === s.size)}
                   value={s.size}
                   onChange={(e) =>
                     setSizes((prev) =>

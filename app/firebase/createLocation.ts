@@ -8,9 +8,11 @@ import {
   where,
   query,
   getDocs,
+  setDoc,
 } from "firebase/firestore";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+import { size } from "./createCategoryCloth";
 
 export interface ItemCloth {
   model: string;
@@ -29,7 +31,6 @@ export interface LocationInput {
 }
 
 export async function create_location(location: LocationInput) {
-  console.log(location);
   const session = await getServerSession(authOptions);
   const id_boutique = session?.user?.boutiqueId;
 
@@ -52,6 +53,14 @@ export async function create_location(location: LocationInput) {
       if (!reqCostumeSnapshot.empty) {
         const id_costume = reqCostumeSnapshot.docs[0].id;
         const costumeRef = doc(db, "costume", id_costume);
+        const constumeData = reqCostumeSnapshot.docs[0].data();
+        constumeData.blazerSize.map((size: size) => {
+          if (model.blazer === size.size) {
+            size.location_date.push(location.location_date);
+          }
+        });
+
+        await setDoc(costumeRef, constumeData);
 
         costumeRefs.push({
           ref: costumeRef,
@@ -74,9 +83,17 @@ export async function create_location(location: LocationInput) {
       const reqShirtSnapshot = await getDocs(reqShirt);
       if (!reqShirtSnapshot.empty) {
         const id_shirt = reqShirtSnapshot.docs[0].id;
+        const shirtRef = doc(db, "chemise", id_shirt);
+        const setShirtData = reqShirtSnapshot.docs[0].data();
+        setShirtData.size.map((size: size) => {
+          if (location.chemise?.size === size.size) {
+            size.location_date.push(location.location_date);
+          }
+        });
+        await setDoc(shirtRef, setShirtData);
         shirtData = {
-          ref: doc(db, "chemise", id_shirt),
-          model: location.chemise?.model,
+          ref: shirtRef,
+          model: location.chemise.model,
           size: location.chemise.size,
           image: reqShirtSnapshot.docs[0].data().image_path ?? null,
         };
@@ -94,8 +111,16 @@ export async function create_location(location: LocationInput) {
       const reqShoeSnapshot = await getDocs(reqShoe);
       if (!reqShoeSnapshot.empty) {
         const id_shoe = reqShoeSnapshot.docs[0].id;
+        const refShoe = doc(db, "chaussure", id_shoe);
+        const setShoeData = reqShoeSnapshot.docs[0].data();
+        setShoeData.size.map((size: size) => {
+          if (location.chaussure?.size === size.size) {
+            size.location_date.push(location.location_date);
+          }
+        });
+        await setDoc(refShoe, setShoeData);
         shoeData = {
-          ref: doc(db, "chaussure", id_shoe),
+          ref: refShoe,
           model: location.chaussure?.model,
           size: location.chaussure.size,
           image: reqShoeSnapshot.docs[0].data().image_path ?? null,

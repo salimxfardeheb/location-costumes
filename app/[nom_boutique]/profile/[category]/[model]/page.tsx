@@ -3,6 +3,7 @@ import { get_one_category_cloth } from "@/app/firebase/getCategoryCloth";
 import { deleteModel } from "@/app/firebase/deleteModel";
 import Link from "next/link";
 import { redirect } from "next/navigation";
+import {size} from "@/app/firebase/createCategoryCloth"
 
 interface Props {
   params: {
@@ -16,6 +17,7 @@ const Page = async ({ params }: Props) => {
   const { category, model, nom_boutique } = await params;
   const decodedModel = decodeURIComponent(model);
   const result = await get_one_category_cloth(category, decodedModel);
+  console.log(result)
 
   if (!result) return;
 
@@ -41,10 +43,10 @@ const Page = async ({ params }: Props) => {
             <div className="sizes-big-container">
               <p>Taille disponibles des blazers :</p>
               <div className="sizes-container">
-                {result.blazerSize.map((size: string, i: number) => (
-                  <div key={i} className="sizes-details">
-                    {size}
-                  </div>
+                {result.blazerSize.map((size: size, i: number) => (
+                    <div key={i} className="sizes-details">
+                    {size.size}
+                    </div>
                 ))}
               </div>
             </div>
@@ -53,9 +55,9 @@ const Page = async ({ params }: Props) => {
             <div className="sizes-big-container">
               <p>Taille disponibles des pantallons :</p>
               <div className="sizes-container">
-                {result.pantSize.map((size: string, i: number) => (
+                {result.pantSize.map((size: size, i: number) => (
                   <div key={i} className="sizes-details">
-                    {size}
+                    {size.size}
                   </div>
                 ))}
               </div>
