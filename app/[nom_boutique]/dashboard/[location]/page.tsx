@@ -13,6 +13,7 @@ interface Props {
 const page = async ({ params }: Props) => {
   const { nom_boutique, location } = await params;
   const result = await get_one_location(location);
+  console.log(result)
   return (
     <div className="w-full mt-10 px-20">
       <div className="flex justify-between items-center w-full">
@@ -35,7 +36,7 @@ const page = async ({ params }: Props) => {
       </div>
       <div className="flex flex-wrap justify-center gap-12">
         {/* costume */}
-        <div className="flex gap-12">
+        {result?.costumes && <div className="flex gap-12">
           {result?.costumes.map((model, i) => (
             <div
               key={i}
@@ -61,9 +62,9 @@ const page = async ({ params }: Props) => {
               </div>
             </div>
           ))}
-        </div>
+        </div>}
         {/* chemise */}
-        <div className="py-10 flex flex-col gap-1 w-fit text-lg font-semibold">
+        {result?.chemise && <div className="py-10 flex flex-col gap-1 w-fit text-lg font-semibold">
           <img
             src={result?.chemise?.image}
             className="max-w-56 h-64 object-cover rounded-xl shadow"
@@ -78,9 +79,9 @@ const page = async ({ params }: Props) => {
               <p>{result?.chemise?.size}</p>
             </div>
           </div>
-        </div>
+        </div>}
         {/* chaussure */}
-        <div className="py-10 flex flex-col gap-1 w-fit text-lg font-semibold">
+        {result?.chaussure && <div className="py-10 flex flex-col gap-1 w-fit text-lg font-semibold">
           <img
             src={result?.chaussure?.image}
             className="max-w-56 h-64 object-cover rounded-xl shadow"
@@ -95,9 +96,9 @@ const page = async ({ params }: Props) => {
               <p>{result?.chaussure?.size}</p>
             </div>
           </div>
-        </div>
+        </div>}
         {/* accessories */}
-        <div className="flex gap-12">
+        {result?.accessories && <div className="flex gap-12">
           {result?.accessories.map((model, i) => (
             <div
               key={i}
@@ -115,7 +116,7 @@ const page = async ({ params }: Props) => {
               </div>
             </div>
           ))}
-        </div>
+        </div>}
       </div>
     </div>
   );

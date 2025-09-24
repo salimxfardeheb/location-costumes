@@ -41,6 +41,11 @@ export async function create_location(location: LocationInput) {
   try {
     const boutiqueRef = doc(db, "shop", id_boutique);
 
+    let missingCostume = false;
+    let missingChemise = false;
+    let missingChaussure = false;
+    let missingAcc = false;
+
     // --- Costumes ---
     const costumeRefs: any[] = [];
     for (const model of location.costume) {
@@ -50,38 +55,40 @@ export async function create_location(location: LocationInput) {
         where("model", "==", model.model)
       );
       const reqCostumeSnapshot = await getDocs(reqCostume);
-      if (!reqCostumeSnapshot.empty) {
-        const id_costume = reqCostumeSnapshot.docs[0].id;
-        const costumeRef = doc(db, "costume", id_costume);
-        const constumeData = reqCostumeSnapshot.docs[0].data();
-        constumeData.blazerSize.map((size: size) => {
-          if (model.blazer === size.size) {
-            size.location_date.push(location.location_date);
-          }
-        });
-
-        await setDoc(costumeRef, constumeData);
-
-        costumeRefs.push({
-          ref: costumeRef,
-          model: model.model,
-          blazer: model.blazer,
-          pant: model.pant,
-          image: reqCostumeSnapshot.docs[0].data().image_path ?? null,
-        });
+      if (reqCostumeSnapshot.empty) {
+        missingCostume = true;
+        break;
       }
+      const id_costume = reqCostumeSnapshot.docs[0].id;
+      const costumeRef = doc(db, "costume", id_costume);
+      const constumeData = reqCostumeSnapshot.docs[0].data();
+      constumeData.blazerSize.map((size: size) => {
+        if (model.blazer === size.size) {
+          size.location_date.push(location.location_date);
+        }
+      });
+      await setDoc(costumeRef, constumeData);
+      costumeRefs.push({
+        ref: costumeRef,
+        model: model.model,
+        blazer: model.blazer,
+        pant: model.pant,
+        image: reqCostumeSnapshot.docs[0].data().image_path ?? null,
+      });
     }
 
     // --- chemise ---
     let shirtData = null;
-    if (location.chemise) {
+    if (location.chemise && location.chemise.model.trim() !== "") {
       const reqShirt = query(
         collection(db, "chemise"),
         where("id_boutique", "==", boutiqueRef),
         where("model", "==", location.chemise.model)
       );
       const reqShirtSnapshot = await getDocs(reqShirt);
-      if (!reqShirtSnapshot.empty) {
+      if (reqShirtSnapshot.empty) {
+        missingChemise = true;
+      } else {
         const id_shirt = reqShirtSnapshot.docs[0].id;
         const shirtRef = doc(db, "chemise", id_shirt);
         const setShirtData = reqShirtSnapshot.docs[0].data();
@@ -91,6 +98,7 @@ export async function create_location(location: LocationInput) {
           }
         });
         await setDoc(shirtRef, setShirtData);
+
         shirtData = {
           ref: shirtRef,
           model: location.chemise.model,
@@ -102,14 +110,16 @@ export async function create_location(location: LocationInput) {
 
     // --- chaussure ---
     let shoeData = null;
-    if (location.chaussure) {
+    if (location.chaussure && location.chaussure.model.trim() !== "") {
       const reqShoe = query(
         collection(db, "chaussure"),
         where("id_boutique", "==", boutiqueRef),
         where("model", "==", location.chaussure.model)
       );
       const reqShoeSnapshot = await getDocs(reqShoe);
-      if (!reqShoeSnapshot.empty) {
+      if (reqShoeSnapshot.empty) {
+        missingChaussure = true;
+      } else {
         const id_shoe = reqShoeSnapshot.docs[0].id;
         const refShoe = doc(db, "chaussure", id_shoe);
         const setShoeData = reqShoeSnapshot.docs[0].data();
@@ -138,15 +148,32 @@ export async function create_location(location: LocationInput) {
           where("model", "==", acc.model)
         );
         const reqAccSnapshot = await getDocs(reqAcc);
-        if (!reqAccSnapshot.empty) {
-          const id_acc = reqAccSnapshot.docs[0].id;
-          accessoryRefs.push({
-            ref: doc(db, "accessoire", id_acc),
-            model: acc.model,
-            image: reqAccSnapshot.docs[0].data().image_path ?? null,
-          });
+        if (reqAccSnapshot.empty) {
+          missingAcc = true;
+          break;
         }
+        const id_acc = reqAccSnapshot.docs[0].id;
+        const accessoryRef = doc(db, "accessoire", id_acc);
+
+        accessoryRefs.push({
+          ref: accessoryRef,
+          model: acc.model,
+          image: reqAccSnapshot.docs[0].data().image_path ?? null,
+        });
       }
+    }
+
+    if (missingCostume) {
+      throw new Error("Costume existe pas");
+    }
+    if (missingChemise) {
+      throw new Error("Chemise existe pas");
+    }
+    if (missingChaussure) {
+      throw new Error("Chaussure existe pas");
+    }
+    if (missingAcc) {
+      throw new Error("Accessoire existe pas");
     }
 
     // --- Création de la location ---

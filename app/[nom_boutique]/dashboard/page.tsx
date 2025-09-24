@@ -16,7 +16,7 @@ export default async function Dashboard({
     "Chaussure",
     "Accessoires",
   ];
-  const showAll = searchParams.all === 'true'; 
+  const showAll = searchParams.all === "true";
 
   const result = await get_locations(showAll);
   const sortLocationsByDate = result.sort(
@@ -28,14 +28,16 @@ export default async function Dashboard({
       <div className="mt-11 mx-5 bg-white rounded-2xl shadow-lg border border-gray-200 overflow-hidden">
         {/* Header */}
         <div className="w-full flex justify-between items-center px-8 py-5 rounded-t-2xl">
-          <p className="text-2xl font-semibold">{showAll ? "Tous les locations" : "Locations à venir"}</p>
-      
-        <Link
-          href={`/1/dashboard?all=${!showAll}`}
-          className="text-sm font-medium text-[#06B9AE] px-2 py-1 rounded-lg hover:outline-1 hover:text-[#06B9AE] transition"
-        >   
-          {showAll ? "Voir uniquement à venir" : "Voir tout"}
-        </Link>
+          <p className="text-2xl font-semibold">
+            {showAll ? "Tous les locations" : "Locations à venir"}
+          </p>
+
+          <Link
+            href={`/1/dashboard?all=${!showAll}`}
+            className="text-sm font-medium text-[#06B9AE] px-2 py-1 rounded-lg hover:outline-1 hover:text-[#06B9AE] transition"
+          >
+            {showAll ? "Voir uniquement à venir" : "Voir tout"}
+          </Link>
         </div>
 
         {/* Table */}
@@ -55,40 +57,72 @@ export default async function Dashboard({
               </tr>
             </thead>
             <tbody>
-              {sortLocationsByDate.map((data, i) => (
-                <tr
-                  key={i}
-                  className="text-center h-16 font-medium text-gray-800 hover:bg-[#E6FFFA] transition"
-                >
-                  <td className="px-6 py-4">
-                    {data.date_sortie instanceof Date
-                      ? data.date_sortie.toLocaleDateString()
-                      : data.date_sortie}
-                  </td>
-                  <td className="px-6 py-4">
-                    {data.costumes.map((model, i) => (
-                      <span
-                        key={i}
-                        className="px-2 border rounded-4xl mx-2 bg-gray-300 text-gray-600"
-                      >
-                        {model.model}
-                      </span>
-                    ))}
-                  </td>
-                  <td className="px-6 py-4">{data.chemise?.model}</td>
-                  <td className="px-6 py-4">{data.chaussure?.model}</td>
-                  <td className="px-6 py-4">
-                    {data.accessories.map((model, i) => (
-                      <span key={i}>{model.model},</span>
-                    ))}
-                  </td>
-                  <td className="px-6 py-4 flex justify-end">
-                    <Link href={`dashboard/${data.id}`}>
-                      <IoInformationCircleOutline className="text-2xl text-[#06B9AE] hover:text-[#0A7871] transition" />
-                    </Link>
+              {sortLocationsByDate.length === 0 ? (
+                <tr>
+                  <td
+                    colSpan={rows.length + 1} // +1 pour la colonne action
+                    className="text-center py-6 text-gray-500 font-medium"
+                  >
+                    🚫 Aucune location trouvée
                   </td>
                 </tr>
-              ))}
+              ) : (
+                sortLocationsByDate.map((data, i) => (
+                  <tr
+                    key={i}
+                    className="text-center h-16 font-medium text-gray-800 hover:bg-[#E6FFFA] transition"
+                  >
+                    <td className="px-6 py-4">
+                      {data.date_sortie instanceof Date
+                        ? data.date_sortie.toLocaleDateString()
+                        : data.date_sortie}
+                    </td>
+
+                    {data.costumes && data.costumes.length > 0 ? (
+                      <td className="px-6 py-4">
+                        {data.costumes.map((model, i) => (
+                          <span
+                            key={i}
+                            className="px-2 border rounded-4xl mx-2 bg-gray-300 text-gray-600"
+                          >
+                            {model.model}
+                          </span>
+                        ))}
+                      </td>
+                    ) : (
+                      <td>Aucun Costume</td>
+                    )}
+
+                    {data.chemise ? (
+                      <td className="px-6 py-4">{data.chemise?.model}</td>
+                    ) : (
+                      <td>Aucune Chemise</td>
+                    )}
+
+                    {data.chaussure ? (
+                      <td className="px-6 py-4">{data.chaussure?.model}</td>
+                    ) : (
+                      <td>Aucune Chaussure</td>
+                    )}
+
+                    {data.accessories && data.accessories.length > 0 ? (
+                      <td className="px-6 py-4">
+                        {data.accessories.map((model, i) => (
+                          <span key={i}>{model.model}, </span>
+                        ))}
+                      </td>
+                    ) : (
+                      <td>Aucun Accessoire</td>
+                    )}
+
+                    <td className="px-6 py-4 flex justify-end">
+                      <Link href={`dashboard/${data.id}`}>
+                        <IoInformationCircleOutline className="text-2xl text-[#06B9AE] hover:text-[#0A7871] transition" />
+                      </Link>
+                    </td>
+                  </tr>
+                ))
+              )}
             </tbody>
           </table>
         </div>

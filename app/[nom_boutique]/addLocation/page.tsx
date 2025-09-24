@@ -58,8 +58,8 @@ const Page = () => {
       setChemise({ model: "", size: "" });
       setChaussure({ model: "", size: "" });
       setAccessories([]);
-    } catch (err) {
-      setError("❌ Une erreur est survenue lors de l’ajout de la location");
+    } catch (err : any) {
+      setError(err.message || "❌ Une erreur est survenue lors de l’ajout de la location");
     } finally {
       setLoading(false);
     }

@@ -7,10 +7,10 @@ export async function POST(req: Request) {
     const body = await req.json();
     const location = await create_location(body);
     return NextResponse.json({ success: true, location });
-  } catch (err) {
-    console.error("❌ API error:", err);
+  } catch (err : any) {
+    console.error("❌ API error:", err.message);
     return NextResponse.json(
-      { success: false, error: "Erreur lors de la création" },
+      { success: false, error:  err.message },
       { status: 500 }
     );
   }
