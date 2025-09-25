@@ -60,7 +60,7 @@ export default async function Dashboard({
               {sortLocationsByDate.length === 0 ? (
                 <tr>
                   <td
-                    colSpan={rows.length + 1} // +1 pour la colonne action
+                    colSpan={rows.length + 1}
                     className="text-center py-6 text-gray-500 font-medium"
                   >
                     🚫 Aucune location trouvée

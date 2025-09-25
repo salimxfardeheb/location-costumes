@@ -10,15 +10,15 @@ const containerItem = () => {
 
   return (
     <div>
-      <ul className="flex flex-row justify-around gap-4 md:gap-8 mt-4 md:mt-0 text-xl font-medium">
+      <ul className="flex flex-row justify-around gap-4 md:gap-8 mt-4 md:mt-0 text-xl font-medium bg-gradient-to-r from-[#06B9AE] to-[#0A7871] text-white py-4 rounded-md">
         {categories.map((link) => (
-          <li key={link} className="pb-2">
+          <li key={link} className="">
             <Link
               href={"/" + nom_boutique + "/profile/" + link}
               className={`${
                 currentPath.startsWith(`/${nom_boutique}/profile/${link}`)
-                  ? "text-[#06B9AE] border-b-2"
-                  : "text-[#767373]"
+                  ? "text-[#B6FFF6] border-b-2"
+                  : "text-white"
               }  ease-linear duration-100`}
             >
               {link}

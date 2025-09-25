@@ -1,4 +1,5 @@
 "use client";
+import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 
@@ -16,7 +17,9 @@ export default function ResultatsPage() {
     const fetchResults = async () => {
       setLoading(true);
       try {
-        const res = await fetch(`/api/resultats?date=${date}&category=${category}`);
+        const res = await fetch(
+          `/api/resultats?date=${date}&category=${category}`
+        );
         const data = await res.json();
         if (data.success) {
           setResults(data.data);
@@ -32,15 +35,17 @@ export default function ResultatsPage() {
 
     fetchResults();
   }, [date, category]);
-  console.log(results)
+  console.log(results);
 
   return (
-    <div className="p-10">
-      <h1 className="text-xl font-bold mb-4">Résultats</h1>
-      <p className="text-gray-600 mb-6">
-        Date : <span className="font-semibold">{date}</span> | Catégorie :{" "}
-        <span className="font-semibold">{category}</span>
-      </p>
+    <div className="flex flex-col justify-center items-center gap-9 mt-16">
+      <div className="flex flex-col items-center w-full bg-white rounded-2xl shadow-md">
+        <h1 className="w-full px-10 py-4 text-4xl rounded-t-2xl  font-bold mb-4 bg-gradient-to-r from-[#06B9AE] to-[#0A7871] text-white">Résultats</h1>
+        <p className="w-full px-10 text-gray-600 mb-6 text-lg">
+          Date : <span className="font-semibold">{date}</span> | Catégorie :{" "}
+          <span className="font-semibold">{category}</span>
+        </p>
+      </div>
 
       {loading && <p className="text-blue-500">Chargement...</p>}
 
@@ -48,17 +53,27 @@ export default function ResultatsPage() {
         <p className="text-gray-500">Aucun résultat trouvé.</p>
       )}
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div className="px-[3.5%] flex flex-wrap gap-32 w-full">
         {results.map((item, i) => (
-          <div key={i} className="p-4 border rounded-lg bg-white shadow-sm">
-            <h2 className="font-semibold text-lg">{item.model}</h2>
-            {item.image_path && (
-              <img
-                src={item.image_path}
-                alt={item.image_path}
-                className="w-32 h-32 object-cover rounded mt-2"
-              />
-            )}
+          <div
+            key={i}
+            className="flex flex-col justify-center items-center w-fit"
+          >
+            <Link
+              href={`${category}/${item.model}`}
+              className="hover:scale-105 duration-100"
+            >
+              {item.image_path && (
+                <img
+                  src={item.image_path}
+                  alt={item.image_path}
+                  className="max-w-56 h-64 object-cover rounded-xl shadow"
+                />
+              )}
+              <p className="text-xl font-mono mt-2">
+                modèle: <span>{item.model}</span>
+              </p>
+            </Link>
           </div>
         ))}
       </div>

@@ -6,10 +6,9 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { categories } from "@/app/functions";
 
-
 export interface size {
-  size : string,
-  location_date: string[]
+  size: string;
+  location_date: string[];
 }
 
 interface collection_item {
@@ -21,7 +20,6 @@ interface collection_item {
   size?: size[]; // shirt & shoe
   description?: string; // accessoire
 }
-
 
 export async function create_item_cloth(item: collection_item) {
   const session = await getServerSession(authOptions);
@@ -37,11 +35,10 @@ export async function create_item_cloth(item: collection_item) {
   try {
     const { type_collection, ...data } = item;
     const boutiqueRef = doc(db, "shop", id_boutique);
-    const docRef = await addDoc(collection(db, item.type_collection), {
+    await addDoc(collection(db, item.type_collection), {
       ...data,
       id_boutique: boutiqueRef,
     });
-    console.log("Model crée avec succée ! ID : ", docRef.id);
   } catch (e) {
     console.error("error : ", e);
   }

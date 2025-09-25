@@ -55,7 +55,6 @@ export async function create_location(location: LocationInput) {
     const costumeRefs: any[] = [];
     if (location.costume && location.costume.length > 0) {
       for (const model of location.costume) {
-        // ✅ Si le champ "model" est vide => on ignore ce costume
         if (!model.model || model.model.trim() === "") {
           continue;
         }
@@ -75,7 +74,6 @@ export async function create_location(location: LocationInput) {
         const costumeRef = doc(db, "costume", id_costume);
         const costumeData = reqCostumeSnapshot.docs[0].data();
 
-        // --- Vérif blazer obligatoire si model rempli ---
         if (!model.blazer) {
           missingCostumeBlazer = true;
         } else {
@@ -93,7 +91,6 @@ export async function create_location(location: LocationInput) {
           }
         }
 
-        // --- Vérif pant obligatoire si model rempli ---
         if (!model.pant) {
           missingCostumePant = true;
         } else {
@@ -139,7 +136,6 @@ export async function create_location(location: LocationInput) {
         const shirtRef = doc(db, "chemise", id_shirt);
         const setShirtData = reqShirtSnapshot.docs[0].data();
 
-        // ✅ Si model rempli => size obligatoire
         if (!location.chemise.size) {
           missingChemiseSize = true;
         } else {
@@ -184,7 +180,6 @@ export async function create_location(location: LocationInput) {
         const refShoe = doc(db, "chaussure", id_shoe);
         const setShoeData = reqShoeSnapshot.docs[0].data();
 
-        // ✅ Si model rempli => size obligatoire
         if (!location.chaussure.size) {
           missingChaussureSize = true;
         } else {
@@ -217,7 +212,7 @@ export async function create_location(location: LocationInput) {
     const accessoryRefs: any[] = [];
     if (location.accessoire && location.accessoire.length > 0) {
       for (const acc of location.accessoire) {
-        if (!acc.model || acc.model.trim() === "") continue; // ✅ ignorer si pas de model
+        if (!acc.model || acc.model.trim() === "") continue;
 
         const reqAcc = query(
           collection(db, "accessoire"),
@@ -240,7 +235,6 @@ export async function create_location(location: LocationInput) {
       }
     }
 
-    // --- Validation finale ---
     if (missingCostume || missingCostumeBlazer || missingCostumePant) {
       throw new Error("Costume existe pas ou taille manquante");
     }
@@ -265,7 +259,7 @@ export async function create_location(location: LocationInput) {
     };
 
     const docRef = await addDoc(collection(db, "location"), locationData);
-    console.log("Location ajoutée avec ID: ", docRef.id);
+  
 
     return { id: docRef.id, ...locationData };
   } catch (e) {
