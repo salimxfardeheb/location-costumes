@@ -17,7 +17,6 @@ const Page = async ({ params }: Props) => {
   const { category, model, nom_boutique } = await params;
   const decodedModel = decodeURIComponent(model);
   const result = await get_one_category_cloth(category, decodedModel);
-  console.log(result)
 
   if (!result) return;
 

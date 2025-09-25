@@ -2,6 +2,7 @@
 import { ItemCloth, LocationInput } from "@/app/firebase/createLocation";
 import React, { useState } from "react";
 import { MdOutlineCancel } from "react-icons/md";
+import { checkAvailability } from "@/app/firebase/checkAvailability";
 
 const Page = () => {
   const [locationDate, setLocationDate] = useState("");
@@ -58,8 +59,11 @@ const Page = () => {
       setChemise({ model: "", size: "" });
       setChaussure({ model: "", size: "" });
       setAccessories([]);
-    } catch (err : any) {
-      setError(err.message || "❌ Une erreur est survenue lors de l’ajout de la location");
+    } catch (err: any) {
+      setError(
+        err.message ||
+          "❌ Une erreur est survenue lors de l’ajout de la location"
+      );
     } finally {
       setLoading(false);
     }
@@ -103,7 +107,7 @@ const Page = () => {
         </label>
 
         {/* Costumes dynamiques */}
-        <div className="flex w-full">
+        <div className="flex w-full justify-between items-start">
           <div className="flex flex-col gap-6 min-w-fit">
             <span className="text-xl font-semibold">Costumes :</span>
             {costumes.map((c, index) => (
@@ -145,18 +149,65 @@ const Page = () => {
                   />
                 </label>
                 {costumes.length > 1 && (
-                  <button
-                    type="button"
-                    onClick={() => removeCostume(index)}
-                    className="text-red-500 hover:opacity-85"
-                  >
-                    <MdOutlineCancel className="text-3xl" />
-                  </button>
+                  <div>
+                    <button
+                      type="button"
+                      onClick={() => removeCostume(index)}
+                      className="text-red-500 hover:opacity-85"
+                    >
+                      <MdOutlineCancel className="text-3xl" />
+                    </button>
+                  </div>
                 )}
+                <button
+                  className="self-center border-2 border-[#36CBC1] text-sm hover:bg-[#B6FFF6] cursor-pointer text-[#36CBC1]  px-3 py-1 rounded-lg hover:opacity-85"
+                  onClick={async () => {
+                    try {
+                      const result = await checkAvailability(
+                        c.model ?? "",
+                        c.blazer ?? "",
+                        c.pant ?? "",
+                        locationDate
+                      );
+
+                      if(result.missingModel)
+
+                      if (result.missingCostumeBlazer) {
+                        setError(
+                          "⚠️ Taille de blazer introuvable ou non renseignée !"
+                        );
+                      } else if (result.blazerLocate) {
+                        setError("❌ Ce blazer est déjà loué à cette date !");
+                      }
+
+                      if (result.missingCostumePant) {
+                        setError(
+                          "⚠️ Taille de pantalon introuvable ou non renseignée !"
+                        );
+                      } else if (result.pantLocate) {
+                        setError("❌ Ce pantalon est déjà loué à cette date !");
+                      }
+
+                      if (
+                        !result.missingCostumeBlazer &&
+                        !result.missingCostumePant &&
+                        !result.blazerLocate &&
+                        !result.pantLocate
+                      ) {
+                        alert("✅ Costume disponible !");
+                      }
+                    } catch (err) {
+                      console.error(err);
+                      alert("Erreur lors de la vérification.");
+                    }
+                  }}
+                >
+                  Vérifier
+                </button>
               </div>
             ))}
           </div>
-          <div className="w-full flex justify-end">
+          <div className="flex flex-col justify-end gap-4">
             <button
               type="button"
               onClick={addCostume}
