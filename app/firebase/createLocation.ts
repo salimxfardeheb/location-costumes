@@ -24,7 +24,7 @@ export interface ItemCloth {
 
 export interface LocationInput {
   location_date: string;
-  costume: ItemCloth[];
+  costume?: ItemCloth[];
   chemise?: ItemCloth;
   chaussure?: ItemCloth;
   accessoire?: ItemCloth[];
@@ -46,35 +46,81 @@ export async function create_location(location: LocationInput) {
     let missingChaussure = false;
     let missingAcc = false;
 
+    let missingCostumeBlazer = false;
+    let missingCostumePant = false;
+    let missingChemiseSize = false;
+    let missingChaussureSize = false;
+
     // --- Costumes ---
     const costumeRefs: any[] = [];
-    for (const model of location.costume) {
-      const reqCostume = query(
-        collection(db, "costume"),
-        where("id_boutique", "==", boutiqueRef),
-        where("model", "==", model.model)
-      );
-      const reqCostumeSnapshot = await getDocs(reqCostume);
-      if (reqCostumeSnapshot.empty) {
-        missingCostume = true;
-        break;
-      }
-      const id_costume = reqCostumeSnapshot.docs[0].id;
-      const costumeRef = doc(db, "costume", id_costume);
-      const constumeData = reqCostumeSnapshot.docs[0].data();
-      constumeData.blazerSize.map((size: size) => {
-        if (model.blazer === size.size) {
-          size.location_date.push(location.location_date);
+    if (location.costume && location.costume.length > 0) {
+      for (const model of location.costume) {
+        // ✅ Si le champ "model" est vide => on ignore ce costume
+        if (!model.model || model.model.trim() === "") {
+          continue;
         }
-      });
-      await setDoc(costumeRef, constumeData);
-      costumeRefs.push({
-        ref: costumeRef,
-        model: model.model,
-        blazer: model.blazer,
-        pant: model.pant,
-        image: reqCostumeSnapshot.docs[0].data().image_path ?? null,
-      });
+
+        const reqCostume = query(
+          collection(db, "costume"),
+          where("id_boutique", "==", boutiqueRef),
+          where("model", "==", model.model)
+        );
+        const reqCostumeSnapshot = await getDocs(reqCostume);
+        if (reqCostumeSnapshot.empty) {
+          missingCostume = true;
+          break;
+        }
+
+        const id_costume = reqCostumeSnapshot.docs[0].id;
+        const costumeRef = doc(db, "costume", id_costume);
+        const costumeData = reqCostumeSnapshot.docs[0].data();
+
+        // --- Vérif blazer obligatoire si model rempli ---
+        if (!model.blazer) {
+          missingCostumeBlazer = true;
+        } else {
+          const blazerFound = costumeData.blazerSize?.some(
+            (s: size) => s.size === model.blazer
+          );
+          if (!blazerFound) {
+            missingCostumeBlazer = true;
+          } else {
+            costumeData.blazerSize.forEach((s: size) => {
+              if (s.size === model.blazer) {
+                s.location_date.push(location.location_date);
+              }
+            });
+          }
+        }
+
+        // --- Vérif pant obligatoire si model rempli ---
+        if (!model.pant) {
+          missingCostumePant = true;
+        } else {
+          const pantFound = costumeData.pantSize?.some(
+            (s: size) => s.size === model.pant
+          );
+          if (!pantFound) {
+            missingCostumePant = true;
+          } else {
+            costumeData.pantSize.forEach((s: size) => {
+              if (s.size === model.pant) {
+                s.location_date.push(location.location_date);
+              }
+            });
+          }
+        }
+
+        await setDoc(costumeRef, costumeData);
+
+        costumeRefs.push({
+          ref: costumeRef,
+          model: model.model,
+          blazer: model.blazer,
+          pant: model.pant,
+          image: reqCostumeSnapshot.docs[0].data().image_path ?? null,
+        });
+      }
     }
 
     // --- chemise ---
@@ -92,11 +138,25 @@ export async function create_location(location: LocationInput) {
         const id_shirt = reqShirtSnapshot.docs[0].id;
         const shirtRef = doc(db, "chemise", id_shirt);
         const setShirtData = reqShirtSnapshot.docs[0].data();
-        setShirtData.size.map((size: size) => {
-          if (location.chemise?.size === size.size) {
-            size.location_date.push(location.location_date);
+
+        // ✅ Si model rempli => size obligatoire
+        if (!location.chemise.size) {
+          missingChemiseSize = true;
+        } else {
+          const shirtFound = setShirtData.size.some(
+            (s: size) => s.size === location.chemise?.size
+          );
+          if (!shirtFound) {
+            missingChemiseSize = true;
+          } else {
+            setShirtData.size.forEach((s: size) => {
+              if (s.size === location.chemise?.size) {
+                s.location_date.push(location.location_date);
+              }
+            });
           }
-        });
+        }
+
         await setDoc(shirtRef, setShirtData);
 
         shirtData = {
@@ -123,12 +183,27 @@ export async function create_location(location: LocationInput) {
         const id_shoe = reqShoeSnapshot.docs[0].id;
         const refShoe = doc(db, "chaussure", id_shoe);
         const setShoeData = reqShoeSnapshot.docs[0].data();
-        setShoeData.size.map((size: size) => {
-          if (location.chaussure?.size === size.size) {
-            size.location_date.push(location.location_date);
+
+        // ✅ Si model rempli => size obligatoire
+        if (!location.chaussure.size) {
+          missingChaussureSize = true;
+        } else {
+          const shoeFound = setShoeData.size.some(
+            (s: size) => s.size === location.chaussure?.size
+          );
+          if (!shoeFound) {
+            missingChaussureSize = true;
+          } else {
+            setShoeData.size.forEach((s: size) => {
+              if (s.size === location.chaussure?.size) {
+                s.location_date.push(location.location_date);
+              }
+            });
           }
-        });
+        }
+
         await setDoc(refShoe, setShoeData);
+
         shoeData = {
           ref: refShoe,
           model: location.chaussure?.model,
@@ -142,6 +217,8 @@ export async function create_location(location: LocationInput) {
     const accessoryRefs: any[] = [];
     if (location.accessoire && location.accessoire.length > 0) {
       for (const acc of location.accessoire) {
+        if (!acc.model || acc.model.trim() === "") continue; // ✅ ignorer si pas de model
+
         const reqAcc = query(
           collection(db, "accessoire"),
           where("id_boutique", "==", boutiqueRef),
@@ -163,14 +240,15 @@ export async function create_location(location: LocationInput) {
       }
     }
 
-    if (missingCostume) {
-      throw new Error("Costume existe pas");
+    // --- Validation finale ---
+    if (missingCostume || missingCostumeBlazer || missingCostumePant) {
+      throw new Error("Costume existe pas ou taille manquante");
     }
-    if (missingChemise) {
-      throw new Error("Chemise existe pas");
+    if (missingChemise || missingChemiseSize) {
+      throw new Error("Chemise existe pas ou taille manquante");
     }
-    if (missingChaussure) {
-      throw new Error("Chaussure existe pas");
+    if (missingChaussure || missingChaussureSize) {
+      throw new Error("Chaussure existe pas ou pointure manquante");
     }
     if (missingAcc) {
       throw new Error("Accessoire existe pas");
