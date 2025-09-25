@@ -51,6 +51,9 @@ export async function create_location(location: LocationInput) {
     let missingChemiseSize = false;
     let missingChaussureSize = false;
 
+    let blazerLocate = false;
+    let pantLocate = false;
+
     // --- Costumes ---
     const costumeRefs: any[] = [];
     if (location.costume && location.costume.length > 0) {
@@ -74,35 +77,50 @@ export async function create_location(location: LocationInput) {
         const costumeRef = doc(db, "costume", id_costume);
         const costumeData = reqCostumeSnapshot.docs[0].data();
 
+        // --- Vérif blazer ---
+        let blazerLocate = false;
         if (!model.blazer) {
-          missingCostumeBlazer = true;
+          missingCostumeBlazer = true; // model rempli mais blazer vide
         } else {
           const blazerFound = costumeData.blazerSize?.some(
             (s: size) => s.size === model.blazer
           );
+
           if (!blazerFound) {
-            missingCostumeBlazer = true;
+            missingCostumeBlazer = true; // taille n’existe pas
           } else {
             costumeData.blazerSize.forEach((s: size) => {
               if (s.size === model.blazer) {
-                s.location_date.push(location.location_date);
+                // ⚡ on vérifie uniquement la taille demandée
+                if (s.location_date.includes(location.location_date)) {
+                  blazerLocate = true; // déjà réservé
+                } else {
+                  s.location_date.push(location.location_date); // on réserve
+                }
               }
             });
           }
         }
 
+        // --- Vérif pantalon ---
+        let pantLocate = false;
         if (!model.pant) {
           missingCostumePant = true;
         } else {
           const pantFound = costumeData.pantSize?.some(
             (s: size) => s.size === model.pant
           );
+
           if (!pantFound) {
             missingCostumePant = true;
           } else {
             costumeData.pantSize.forEach((s: size) => {
               if (s.size === model.pant) {
-                s.location_date.push(location.location_date);
+                if (s.location_date.includes(location.location_date)) {
+                  pantLocate = true; // déjà réservé pour CETTE taille
+                } else {
+                  s.location_date.push(location.location_date);
+                }
               }
             });
           }
@@ -247,6 +265,12 @@ export async function create_location(location: LocationInput) {
     if (missingAcc) {
       throw new Error("Accessoire existe pas");
     }
+    if (blazerLocate) {
+      throw new Error("Blazer n'est pas disponible à cette date");
+    }
+    if (pantLocate) {
+      throw new Error("Le pantalon n'est pas disponible à cette date");
+    }
 
     // --- Création de la location ---
     const locationData = {
@@ -259,7 +283,6 @@ export async function create_location(location: LocationInput) {
     };
 
     const docRef = await addDoc(collection(db, "location"), locationData);
-  
 
     return { id: docRef.id, ...locationData };
   } catch (e) {
