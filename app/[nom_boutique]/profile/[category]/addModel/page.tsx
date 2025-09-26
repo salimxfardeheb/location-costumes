@@ -6,7 +6,7 @@ import Shoe from "./components/shoe";
 import Accessory from "./components/accessory";
 import { usePathname } from "next/navigation";
 
-const page = () => {
+const Page = () => {
   const pathName = usePathname();
   return (
     <div>
@@ -18,4 +18,4 @@ const page = () => {
   );
 };
 
-export default page;
+export default Page;

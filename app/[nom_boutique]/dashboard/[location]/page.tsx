@@ -10,7 +10,7 @@ interface Props {
   };
 }
 
-const page = async ({ params }: Props) => {
+const Page = async ({ params }: Props) => {
   const { nom_boutique, location } = await params;
   const result = await get_one_location(location);
   console.log(result)
@@ -122,4 +122,4 @@ const page = async ({ params }: Props) => {
   );
 };
 
-export default page;
+export default Page;

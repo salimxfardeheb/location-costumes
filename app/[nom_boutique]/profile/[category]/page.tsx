@@ -9,7 +9,7 @@ interface Props {
   };
 }
 
-const page = async ({ params }: Props) => {
+const Page = async ({ params }: Props) => {
   const { category } = await params;
 
   const result = await get_all_category_cloth(category);
@@ -46,4 +46,4 @@ const page = async ({ params }: Props) => {
   );
 };
 
-export default page;
+export default Page;

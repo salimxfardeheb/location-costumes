@@ -43,7 +43,7 @@ type LocationItem = {
   accessories: Accessoire[];
 };
 
-const page = () => {
+const Page = () => {
   const [currentMonth, setCurrentMonth] = useState(dayjs());
   const [locations, setLocations] = useState<LocationItem[]>([]);
   const [loading, setLoading] = useState(true);
@@ -203,4 +203,4 @@ const page = () => {
   );
 };
 
-export default page;
+export default Page;
