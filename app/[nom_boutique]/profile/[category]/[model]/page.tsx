@@ -71,9 +71,9 @@ const Page = async ({ params }: Props) => {
                 {category === "chaussure" && <p>pointure disponibles :</p>}
               </div>
               <div className="sizes-container">
-                {result.size.map((size: string, i: number) => (
+                {result.size.map((size: size, i: number) => (
                   <div key={i} className="sizes-details">
-                    {size}
+                    {size.size}
                   </div>
                 ))}
               </div>

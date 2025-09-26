@@ -3,7 +3,6 @@ import { ItemCloth, LocationInput } from "@/app/firebase/createLocation";
 import React, { useState } from "react";
 import { MdOutlineCancel } from "react-icons/md";
 import { checkAvailability } from "@/app/firebase/checkAvailability";
-import { span } from "framer-motion/client";
 
 const Page = () => {
   const [locationDate, setLocationDate] = useState("");
@@ -17,13 +16,13 @@ const Page = () => {
   });
   const [accessories, setAccessories] = useState<string[]>([]);
 
+  const [verificationMessages, setVerificationMessages] = useState<string[]>(
+    []
+  );
+
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
-
-  const [available, setAvailable] = useState(false);
-  const [unavailableB, setUnavailableB] = useState(false);
-  const [unavailableP, setUnavailableP] = useState(false);
 
   const accessory = [
     "Cravate",
@@ -33,6 +32,33 @@ const Page = () => {
     "Montre",
   ];
 
+  // --- Vérification disponibilité avant ajout
+  const verifyCostume = async (c: ItemCloth, index: number) => {
+    try {
+      const result = await checkAvailability(
+        c.model ?? "",
+        c.blazer ?? "",
+        c.pant ?? "",
+        locationDate
+      );
+
+      const newMessages = [...verificationMessages];
+      if (!result.ok) {
+        newMessages[index] = result.message ?? "❌ Erreur lors de la vérification";
+      } else {
+        newMessages[index] = "✅ Costume disponible !";
+      }
+      setVerificationMessages(newMessages);
+
+      return result.ok;
+    } catch (err: any) {
+      const newMessages = [...verificationMessages];
+      newMessages[index] = "❌ Erreur lors de la vérification du costume";
+      setVerificationMessages(newMessages);
+      return false;
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
@@ -40,6 +66,14 @@ const Page = () => {
     setSuccess(null);
 
     try {
+      for (let i = 0; i < costumes.length; i++) {
+        const ok = await verifyCostume(costumes[i], i);
+        if (!ok) {
+          setLoading(false);
+          return;
+        }
+      }
+
       const newLocation: LocationInput = {
         location_date: locationDate,
         costume: costumes,
@@ -55,7 +89,6 @@ const Page = () => {
       });
 
       const data = await res.json();
-
       if (!res.ok) throw new Error(data.error || "Erreur API");
 
       setSuccess("✅ Location ajoutée avec succès !");
@@ -64,11 +97,9 @@ const Page = () => {
       setChemise({ model: "", size: "" });
       setChaussure({ model: "", size: "" });
       setAccessories([]);
+      setVerificationMessages([]);
     } catch (err: any) {
-      setError(
-        err.message ||
-          "❌ Une erreur est survenue lors de l’ajout de la location"
-      );
+      setError(err.message || "❌ Une erreur est survenue lors de l’ajout de la location");
     } finally {
       setLoading(false);
     }
@@ -86,22 +117,23 @@ const Page = () => {
 
   const addCostume = () => {
     setCostumes([...costumes, { model: "", blazer: "", pant: "" }]);
+    setVerificationMessages([...verificationMessages, ""]);
   };
 
   const removeCostume = (index: number) => {
-    const newCostumes = costumes.filter((_, i) => i !== index);
-    setCostumes(newCostumes);
+    setCostumes(costumes.filter((_, i) => i !== index));
+    setVerificationMessages(verificationMessages.filter((_, i) => i !== index));
   };
 
   return (
-    <div className="mt-10 flex flex-col justify-center items-center w-fit mx-auto">
+    <div className="mt-10 flex flex-col justify-center items-center w-full">
       <form
         onSubmit={handleSubmit}
-        className="flex flex-col justify-between items-center gap-10 p-6"
+        className="flex flex-col gap-12 p-8 bg-white shadow-lg rounded-2xl w-[900px] max-w-full"
       >
         {/* Date */}
-        <label className="flex justify-start items-center gap-4">
-          <span className="text-xl">Sélectionner la date :</span>
+        <label className="flex flex-col gap-2">
+          <span className="text-xl font-semibold">Sélectionner la date :</span>
           <input
             type="date"
             className="bg-[#B6FFF6] px-5 py-2 rounded-xl border-2 border-[#36CBC1]"
@@ -112,12 +144,15 @@ const Page = () => {
         </label>
 
         {/* Costumes dynamiques */}
-        <div className="flex w-full justify-between items-start">
-          <div className="flex flex-col gap-6 min-w-fit min-h-fit">
-            <span className="text-xl font-semibold">Costumes :</span>
-            {costumes.map((c, index) => (
-              <div key={index} className="flex gap-6 items-start min-h-fit">
-                <label className="flex flex-col gap-2 items-start">
+        <div className="flex flex-col gap-6">
+          <span className="text-xl font-semibold">Costumes :</span>
+          {costumes.map((c, index) => (
+            <div
+              key={index}
+              className="flex flex-col gap-2 p-4 border rounded-xl bg-gray-50"
+            >
+              <div className="grid grid-cols-4 gap-4 items-end">
+                <label className="flex flex-col gap-1">
                   <span>Model :</span>
                   <input
                     type="text"
@@ -126,10 +161,10 @@ const Page = () => {
                     onChange={(e) =>
                       handleCostumeChange(index, "model", e.target.value)
                     }
-                    className="bg-[#B6FFF6] px-4 py-2 rounded-xl border-2 border-[#36CBC1]"
+                    className="bg-[#B6FFF6] px-3 py-2 rounded-xl border-2 border-[#36CBC1]"
                   />
                 </label>
-                <label className="flex flex-col items-start gap-2">
+                <label className="flex flex-col gap-1">
                   <span>Blazer :</span>
                   <input
                     type="text"
@@ -138,14 +173,11 @@ const Page = () => {
                     onChange={(e) =>
                       handleCostumeChange(index, "blazer", e.target.value)
                     }
-                    className="w-24 bg-[#B6FFF6] px-4 py-2 rounded-xl border-2 border-[#36CBC1]"
+                    className="bg-[#B6FFF6] px-3 py-2 rounded-xl border-2 border-[#36CBC1]"
                   />
-                  {unavailableB && (
-                    <span className="w-2/3 text-sm">❌ Ce blazer est déjà loué à cette date !</span>
-                  )}
                 </label>
-                <label className="flex flex-col items-start gap-2 ">
-                  <span>Pants :</span>
+                <label className="flex flex-col gap-1">
+                  <span>Pantalon :</span>
                   <input
                     type="text"
                     placeholder="Taille"
@@ -153,95 +185,58 @@ const Page = () => {
                     onChange={(e) =>
                       handleCostumeChange(index, "pant", e.target.value)
                     }
-                    className="w-24 bg-[#B6FFF6] px-4 py-2 rounded-xl border-2 border-[#36CBC1]"
+                    className="bg-[#B6FFF6] px-3 py-2 rounded-xl border-2 border-[#36CBC1]"
                   />
-                  {unavailableP && (
-                    <span className="w-2/3 text-sm">
-                      ❌ Ce pantalon est déjà loué à cette date !
-                    </span>
-                  )}
                 </label>
-                {costumes.length > 1 && (
-                  <div>
+
+                <div className="flex gap-2 items-center">
+                  <button
+                    type="button"
+                    onClick={() => verifyCostume(c, index)}
+                    className="border-2 border-[#36CBC1] text-sm hover:bg-[#B6FFF6] cursor-pointer text-[#36CBC1] px-3 py-1 rounded-lg"
+                  >
+                    Vérifier
+                  </button>
+                  {costumes.length > 1 && (
                     <button
                       type="button"
                       onClick={() => removeCostume(index)}
                       className="text-red-500 hover:opacity-85"
                     >
-                      <MdOutlineCancel className="text-3xl" />
+                      <MdOutlineCancel className="text-2xl" />
                     </button>
-                  </div>
-                )}
-                  <button
-                  className="self-end border-2 border-[#36CBC1] text-sm hover:bg-[#B6FFF6] cursor-pointer text-[#36CBC1]  px-3 py-1 rounded-lg hover:opacity-85"
-                  type="button"
-                  onClick={async () => {
-                    try {
-                      const result = await checkAvailability(
-                        c.model ?? "",
-                        c.blazer ?? "",
-                        c.pant ?? "",
-                        locationDate
-                      );
-
-                      if(result.missingModel) {
-                        alert("⚠️ Model introuvable ou non renseignée !")
-                      }
-
-                      // Blazer
-                      if (result.missingCostumeBlazer) {
-                        alert(
-                          "⚠️ Taille de blazer introuvable ou non renseignée !"
-                        );
-                      } else if (result.blazerLocate) {
-                        setUnavailableB(true);
-                      }
-
-                      // Pantalon
-                      if (result.missingCostumePant) {
-                        alert(
-                          "⚠️ Taille de pantalon introuvable ou non renseignée !"
-                        );
-                      } else if (result.pantLocate) {
-                        setUnavailableP(true);
-                      }
-
-                      // Costume dispo
-                      if (
-                        !result.missingCostumeBlazer &&
-                        !result.missingCostumePant &&
-                        !result.blazerLocate &&
-                        !result.pantLocate
-                      ) {
-                        setAvailable(true);
-                      }
-                    } catch (err : any) {
-                      alert("⚠️ Modèle inexistant !");
-                    }
-                  }}
-                >
-                  Vérifier
-                </button>
+                  )}
+                </div>
               </div>
-            ))}
-            {available && <span>✅ Costume disponible !</span>}
-          </div>
-          <div className="flex flex-col justify-end gap-4">
-            <button
-              type="button"
-              onClick={addCostume}
-              className="self-start bg-[#36CBC1] text-white px-4 py-2 rounded-lg hover:opacity-85"
-            >
-              Ajouter un autre modèle
-            </button>
-          </div>
+              {/* Message de vérification */}
+              {verificationMessages[index] && (
+                <p
+                  className={`text-sm mt-1 ${
+                    verificationMessages[index].startsWith("✅")
+                      ? "text-green-600"
+                      : "text-red-600"
+                  }`}
+                >
+                  {verificationMessages[index]}
+                </p>
+              )}
+            </div>
+          ))}
+
+          <button
+            type="button"
+            onClick={addCostume}
+            className="self-start bg-[#36CBC1] text-white px-4 py-2 rounded-lg hover:opacity-85"
+          >
+            Ajouter un autre modèle
+          </button>
         </div>
 
         {/* Chemise */}
-        <div className="flex flex-col gap-10 w-full">
+        <div className="flex flex-col gap-3">
           <span className="text-xl font-semibold">Chemise :</span>
-          <div className="flex gap-7">
-            <label className="flex gap-4 justify-start items-center">
+          <div className="grid grid-cols-2 gap-6">
+            <label className="flex flex-col gap-1">
               <span>Model :</span>
               <input
                 type="text"
@@ -250,10 +245,10 @@ const Page = () => {
                 onChange={(e) =>
                   setChemise({ ...chemise, model: e.target.value })
                 }
-                className="bg-[#B6FFF6] px-5 py-2 rounded-xl border-2 border-[#36CBC1]"
+                className="bg-[#B6FFF6] px-3 py-2 rounded-xl border-2 border-[#36CBC1]"
               />
             </label>
-            <label className="flex justify-start items-center gap-4">
+            <label className="flex flex-col gap-1">
               <span>Taille :</span>
               <input
                 type="text"
@@ -262,17 +257,17 @@ const Page = () => {
                 onChange={(e) =>
                   setChemise({ ...chemise, size: e.target.value })
                 }
-                className="w-24 bg-[#B6FFF6] px-5 py-2 rounded-xl border-2 border-[#36CBC1]"
+                className="bg-[#B6FFF6] px-3 py-2 rounded-xl border-2 border-[#36CBC1]"
               />
             </label>
           </div>
         </div>
 
         {/* Chaussure */}
-        <div className="flex flex-col gap-10 w-full">
+        <div className="flex flex-col gap-3">
           <span className="text-xl font-semibold">Chaussure :</span>
-          <div className="flex items-center gap-7">
-            <label className="flex gap-4 justify-start items-center">
+          <div className="grid grid-cols-2 gap-6">
+            <label className="flex flex-col gap-1">
               <span>Model :</span>
               <input
                 type="text"
@@ -281,10 +276,10 @@ const Page = () => {
                 onChange={(e) =>
                   setChaussure({ ...chaussure, model: e.target.value })
                 }
-                className="bg-[#B6FFF6] px-5 py-2 rounded-xl border-2 border-[#36CBC1]"
+                className="bg-[#B6FFF6] px-3 py-2 rounded-xl border-2 border-[#36CBC1]"
               />
             </label>
-            <label className="flex justify-start items-center gap-4">
+            <label className="flex flex-col gap-1">
               <span>Pointure :</span>
               <input
                 type="text"
@@ -293,37 +288,35 @@ const Page = () => {
                 onChange={(e) =>
                   setChaussure({ ...chaussure, size: e.target.value })
                 }
-                className="w-24 bg-[#B6FFF6] px-5 py-2 rounded-xl border-2 border-[#36CBC1]"
+                className="bg-[#B6FFF6] px-3 py-2 rounded-xl border-2 border-[#36CBC1]"
               />
             </label>
           </div>
         </div>
 
         {/* Accessoires */}
-        <div>
-          <label className="flex flex-col justify-start items-start gap-4">
-            <span className="text-xl font-semibold">Accessoires :</span>
-            <ul className="flex gap-20 text-xl">
-              {accessory.map((acc) => (
-                <li key={acc} className="flex gap-4">
-                  <input
-                    type="checkbox"
-                    value={acc}
-                    checked={accessories.includes(acc)}
-                    onChange={(e) =>
-                      setAccessories((prev) =>
-                        e.target.checked
-                          ? [...prev, acc]
-                          : prev.filter((s) => s !== acc)
-                      )
-                    }
-                    className="w-4 rounded-full"
-                  />
-                  {acc}
-                </li>
-              ))}
-            </ul>
-          </label>
+        <div className="flex flex-col gap-3">
+          <span className="text-xl font-semibold">Accessoires :</span>
+          <ul className="flex gap-10 flex-wrap text-lg">
+            {accessory.map((acc) => (
+              <li key={acc} className="flex gap-2 items-center">
+                <input
+                  type="checkbox"
+                  value={acc}
+                  checked={accessories.includes(acc)}
+                  onChange={(e) =>
+                    setAccessories((prev) =>
+                      e.target.checked
+                        ? [...prev, acc]
+                        : prev.filter((s) => s !== acc)
+                    )
+                  }
+                  className="w-4 h-4"
+                />
+                {acc}
+              </li>
+            ))}
+          </ul>
         </div>
 
         {/* Bouton submit */}
@@ -335,7 +328,7 @@ const Page = () => {
           {loading ? "Ajout en cours..." : "Ajouter la location"}
         </button>
 
-        {/* Messages */}
+        {/* Messages globaux */}
         {success && <p className="text-green-600 text-center">{success}</p>}
         {error && <p className="text-red-600 text-center">{error}</p>}
       </form>

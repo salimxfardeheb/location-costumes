@@ -56,7 +56,6 @@ export async function deleteModel(item: string, model: string) {
     }
 
     await deleteDoc(doc(db, item, result_item.id));
-    console.log("Modèle supprimé :", result_item.id);
   } catch (e) {
     console.error("error : ", e);
   }

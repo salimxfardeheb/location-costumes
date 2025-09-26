@@ -60,7 +60,6 @@ export async function get_one_category_cloth(item: string, model: string) {
     throw new Error("Model non trouvé");
   }
   const one_doc = reqSnapshot.docs[0];
-  const result_item = one_doc.data()
 
-  return result_item;
+ return JSON.parse(JSON.stringify(one_doc.data()));
 }

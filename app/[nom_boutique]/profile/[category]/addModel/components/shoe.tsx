@@ -13,12 +13,12 @@ const shoe = () => {
   const [contentMessage, setContentMessage] = useState("");
 
   const Allsizes = [
-    { size: "39",location_date : [""]},
-    { size: "40",location_date : [""]},
-    { size: "41",location_date : [""]},
-    { size: "42",location_date : [""]},
-    { size: "43",location_date : [""]},
-    { size: "44",location_date : [""]},
+    { size: "39",location_date : []},
+    { size: "40",location_date : []},
+    { size: "41",location_date : []},
+    { size: "42",location_date : []},
+    { size: "43",location_date : []},
+    { size: "44",location_date : []},
   ];
 
   const handleSubmit = async (e: React.FormEvent) => {

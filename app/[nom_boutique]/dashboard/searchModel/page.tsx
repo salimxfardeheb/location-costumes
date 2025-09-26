@@ -64,7 +64,7 @@ const Page = () => {
 
         <button
           type="submit"
-          className="bg-[#F39C12] text-white font-semibold px-8 py-3 rounded-xl shadow-md hover:opacity-90 hover:scale-105 transition-transform"
+          className="bg-gray-300 text-white font-semibold px-8 py-3 rounded-xl" disabled
         >
           Rechercher
         </button>
@@ -72,5 +72,6 @@ const Page = () => {
     </div>
   );
 };
+ // class recherch : bg-[#F39C12] text-white font-semibold px-8 py-3 rounded-xl shadow-md hover:opacity-90 hover:scale-102 transition-transform
 
 export default Page;

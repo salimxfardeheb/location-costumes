@@ -3,6 +3,8 @@
 import { useState, useEffect } from "react";
 import dayjs from "dayjs";
 import { MdOutlineNavigateNext, MdOutlineNavigateBefore } from "react-icons/md";
+import Link from "next/link";
+import { useParams } from "next/navigation";
 
 type Costume = {
   ref: string;
@@ -45,6 +47,7 @@ const page = () => {
   const [currentMonth, setCurrentMonth] = useState(dayjs());
   const [locations, setLocations] = useState<LocationItem[]>([]);
   const [loading, setLoading] = useState(true);
+    const { nom_boutique } = useParams();
 
   useEffect(() => {
     const fetchData = async () => {
@@ -130,10 +133,7 @@ const page = () => {
 
               <div className="flex flex-col gap-1 mt-1 w-full">
                 {eventsOfDay.map((loc) => (
-                  <div
-                    key={loc.id}
-                    className="text-xs rounded px-1 py-0.5 border border-[#06B9AE] cursor-pointer"
-                  >
+                  <Link href={`/${nom_boutique}/dashboard/${loc.id}`} key={loc.id} className="text-xs rounded px-1 py-0.5 border border-[#06B9AE] cursor-pointer">
                     {loc.costumes.length > 0 && (
                       <div>
                         Mod:{" "}
@@ -192,7 +192,7 @@ const page = () => {
                         </span>
                       </div>
                     )}
-                  </div>
+                  </Link>
                 ))}
               </div>
             </div>

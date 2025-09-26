@@ -13,6 +13,7 @@ import {
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { size } from "./createCategoryCloth";
+import { checkAvailability } from "./checkAvailability";
 
 export interface ItemCloth {
   model: string;
@@ -58,6 +59,16 @@ export async function create_location(location: LocationInput) {
     const costumeRefs: any[] = [];
     if (location.costume && location.costume.length > 0) {
       for (const model of location.costume) {
+        const result = await checkAvailability(
+          model.model,
+          model.blazer!,
+          model.pant!,
+          location.location_date
+        );
+
+        if (!result.ok) {
+          throw new Error(result.message);
+        }
         if (!model.model || model.model.trim() === "") {
           continue;
         }
@@ -77,55 +88,17 @@ export async function create_location(location: LocationInput) {
         const costumeRef = doc(db, "costume", id_costume);
         const costumeData = reqCostumeSnapshot.docs[0].data();
 
-        // --- Vérif blazer ---
-        let blazerLocate = false;
-        if (!model.blazer) {
-          missingCostumeBlazer = true; // model rempli mais blazer vide
-        } else {
-          const blazerFound = costumeData.blazerSize?.some(
-            (s: size) => s.size === model.blazer
-          );
-
-          if (!blazerFound) {
-            missingCostumeBlazer = true; // taille n’existe pas
-          } else {
-            costumeData.blazerSize.forEach((s: size) => {
-              if (s.size === model.blazer) {
-                // ⚡ on vérifie uniquement la taille demandée
-                if (s.location_date.includes(location.location_date)) {
-                  blazerLocate = true; // déjà réservé
-                } else {
-                  s.location_date.push(location.location_date); // on réserve
-                }
-              }
-            });
+        costumeData.blazerSize.forEach((s: size) => {
+          if (s.size === model.blazer) {
+            s.location_date.push(location.location_date);
           }
-        }
+        });
 
-        // --- Vérif pantalon ---
-        let pantLocate = false;
-        if (!model.pant) {
-          missingCostumePant = true;
-        } else {
-          const pantFound = costumeData.pantSize?.some(
-            (s: size) => s.size === model.pant
-          );
-
-          if (!pantFound) {
-            missingCostumePant = true;
-          } else {
-            costumeData.pantSize.forEach((s: size) => {
-              if (s.size === model.pant) {
-                if (s.location_date.includes(location.location_date)) {
-                  pantLocate = true; // déjà réservé pour CETTE taille
-                } else {
-                  s.location_date.push(location.location_date);
-                }
-              }
-            });
+        costumeData.pantSize.forEach((s: size) => {
+          if (s.size === model.pant) {
+            s.location_date.push(location.location_date);
           }
-        }
-
+        });
         await setDoc(costumeRef, costumeData);
 
         costumeRefs.push({

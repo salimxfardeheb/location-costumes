@@ -13,12 +13,12 @@ const Shirt = () => {
   const [contentMessage, setContentMessage] = useState("");
 
   const availableSizes = [
-    { size: "XS" , location_date : [""]},
-    { size: "S"  , location_date : [""]},
-    { size: "M"  , location_date : [""]},
-    { size: "L"  , location_date : [""]},
-    { size: "XL" , location_date : [""]},
-    { size: "2XL", location_date : [""]},
+    { size: "XS" , location_date : []},
+    { size: "S"  , location_date : []},
+    { size: "M"  , location_date : []},
+    { size: "L"  , location_date : []},
+    { size: "XL" , location_date : []},
+    { size: "2XL", location_date : []},
   ];
   const availableColors = ["Black", "White"];
 
