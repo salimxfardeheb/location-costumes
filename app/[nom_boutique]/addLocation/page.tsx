@@ -3,6 +3,7 @@ import { ItemCloth, LocationInput } from "@/app/firebase/createLocation";
 import React, { useState } from "react";
 import { MdOutlineCancel } from "react-icons/md";
 import { checkAvailability } from "@/app/firebase/checkAvailability";
+import { span } from "framer-motion/client";
 
 const Page = () => {
   const [locationDate, setLocationDate] = useState("");
@@ -19,6 +20,10 @@ const Page = () => {
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+
+  const [available, setAvailable] = useState(false);
+  const [unavailableB, setUnavailableB] = useState(false);
+  const [unavailableP, setUnavailableP] = useState(false);
 
   const accessory = [
     "Cravate",
@@ -108,11 +113,11 @@ const Page = () => {
 
         {/* Costumes dynamiques */}
         <div className="flex w-full justify-between items-start">
-          <div className="flex flex-col gap-6 min-w-fit">
+          <div className="flex flex-col gap-6 min-w-fit min-h-fit">
             <span className="text-xl font-semibold">Costumes :</span>
             {costumes.map((c, index) => (
-              <div key={index} className="flex gap-6 items-center">
-                <label className="flex gap-2 items-center">
+              <div key={index} className="flex gap-6 items-start min-h-fit">
+                <label className="flex flex-col gap-2 items-start">
                   <span>Model :</span>
                   <input
                     type="text"
@@ -124,7 +129,7 @@ const Page = () => {
                     className="bg-[#B6FFF6] px-4 py-2 rounded-xl border-2 border-[#36CBC1]"
                   />
                 </label>
-                <label className="flex gap-2 items-center">
+                <label className="flex flex-col items-start gap-2">
                   <span>Blazer :</span>
                   <input
                     type="text"
@@ -135,8 +140,11 @@ const Page = () => {
                     }
                     className="w-24 bg-[#B6FFF6] px-4 py-2 rounded-xl border-2 border-[#36CBC1]"
                   />
+                  {unavailableB && (
+                    <span className="w-2/3 text-sm">❌ Ce blazer est déjà loué à cette date !</span>
+                  )}
                 </label>
-                <label className="flex gap-2 items-center">
+                <label className="flex flex-col items-start gap-2 ">
                   <span>Pants :</span>
                   <input
                     type="text"
@@ -147,6 +155,11 @@ const Page = () => {
                     }
                     className="w-24 bg-[#B6FFF6] px-4 py-2 rounded-xl border-2 border-[#36CBC1]"
                   />
+                  {unavailableP && (
+                    <span className="w-2/3 text-sm">
+                      ❌ Ce pantalon est déjà loué à cette date !
+                    </span>
+                  )}
                 </label>
                 {costumes.length > 1 && (
                   <div>
@@ -159,8 +172,9 @@ const Page = () => {
                     </button>
                   </div>
                 )}
-                <button
-                  className="self-center border-2 border-[#36CBC1] text-sm hover:bg-[#B6FFF6] cursor-pointer text-[#36CBC1]  px-3 py-1 rounded-lg hover:opacity-85"
+                  <button
+                  className="self-end border-2 border-[#36CBC1] text-sm hover:bg-[#B6FFF6] cursor-pointer text-[#36CBC1]  px-3 py-1 rounded-lg hover:opacity-85"
+                  type="button"
                   onClick={async () => {
                     try {
                       const result = await checkAvailability(
@@ -170,35 +184,39 @@ const Page = () => {
                         locationDate
                       );
 
-                      if(result.missingModel)
+                      if(result.missingModel) {
+                        alert("⚠️ Model introuvable ou non renseignée !")
+                      }
 
+                      // Blazer
                       if (result.missingCostumeBlazer) {
-                        setError(
+                        alert(
                           "⚠️ Taille de blazer introuvable ou non renseignée !"
                         );
                       } else if (result.blazerLocate) {
-                        setError("❌ Ce blazer est déjà loué à cette date !");
+                        setUnavailableB(true);
                       }
 
+                      // Pantalon
                       if (result.missingCostumePant) {
-                        setError(
+                        alert(
                           "⚠️ Taille de pantalon introuvable ou non renseignée !"
                         );
                       } else if (result.pantLocate) {
-                        setError("❌ Ce pantalon est déjà loué à cette date !");
+                        setUnavailableP(true);
                       }
 
+                      // Costume dispo
                       if (
                         !result.missingCostumeBlazer &&
                         !result.missingCostumePant &&
                         !result.blazerLocate &&
                         !result.pantLocate
                       ) {
-                        alert("✅ Costume disponible !");
+                        setAvailable(true);
                       }
-                    } catch (err) {
-                      console.error(err);
-                      alert("Erreur lors de la vérification.");
+                    } catch (err : any) {
+                      alert("⚠️ Modèle inexistant !");
                     }
                   }}
                 >
@@ -206,6 +224,7 @@ const Page = () => {
                 </button>
               </div>
             ))}
+            {available && <span>✅ Costume disponible !</span>}
           </div>
           <div className="flex flex-col justify-end gap-4">
             <button

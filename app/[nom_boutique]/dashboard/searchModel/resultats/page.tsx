@@ -1,6 +1,6 @@
 "use client";
 import Link from "next/link";
-import { useSearchParams } from "next/navigation";
+import { useParams, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 
 export default function ResultatsPage() {
@@ -10,6 +10,8 @@ export default function ResultatsPage() {
 
   const [results, setResults] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
+
+    const { nom_boutique } = useParams();
 
   useEffect(() => {
     if (!date || !category) return;
@@ -59,10 +61,6 @@ export default function ResultatsPage() {
             key={i}
             className="flex flex-col justify-center items-center w-fit"
           >
-            <Link
-              href={`${category}/${item.model}`}
-              className="hover:scale-105 duration-100"
-            >
               {item.image_path && (
                 <img
                   src={item.image_path}
@@ -73,7 +71,6 @@ export default function ResultatsPage() {
               <p className="text-xl font-mono mt-2">
                 modèle: <span>{item.model}</span>
               </p>
-            </Link>
           </div>
         ))}
       </div>
