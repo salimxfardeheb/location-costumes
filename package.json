@@ -11,7 +11,7 @@
   "dependencies": {
     "bcrypt": "^6.0.0",
     "dayjs": "^1.11.18",
-    "firebase": "^12.2.1",
+    "firebase": "^12.3.0",
     "framer-motion": "^12.23.12",
     "next": "^15.5.2",
     "next-auth": "^4.24.11",
