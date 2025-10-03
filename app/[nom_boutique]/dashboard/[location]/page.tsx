@@ -5,8 +5,8 @@ import React from "react";
 
 interface Props {
   params: {
-    nom_boutique: any;
-    location: any;
+    nom_boutique: string;
+    location: string;
   };
 }
 
