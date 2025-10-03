@@ -5,12 +5,12 @@ import React from "react";
 
 interface Props {
   params: {
-    nom_boutique: string;
-    location: string;
+    nom_boutique: any;
+    location: any;
   };
 }
 
-const Page = async ({ params }: Props) => {
+const Page = async ({ params }: Props): Promise<any>=> {
   const { nom_boutique, location } = await params;
   const result = await get_one_location(location);
   console.log(result)
