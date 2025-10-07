@@ -1,5 +1,6 @@
 import { create_item_cloth, size } from "@/app/firebase/createCategoryCloth";
 import { handleUpload } from "@/app/functions";
+import { useParams } from "next/navigation";
 import React, { useState } from "react";
 
 const Shirt = () => {
@@ -12,15 +13,21 @@ const Shirt = () => {
 
   const [contentMessage, setContentMessage] = useState("");
 
+  const { nom_boutique } = useParams();
+
   const availableSizes = [
-    { size: "XS" , location_date : []},
-    { size: "S"  , location_date : []},
-    { size: "M"  , location_date : []},
-    { size: "L"  , location_date : []},
-    { size: "XL" , location_date : []},
-    { size: "2XL", location_date : []},
+    { size: "XS", location_date: [] },
+    { size: "S", location_date: [] },
+    { size: "M", location_date: [] },
+    { size: "L", location_date: [] },
+    { size: "XL", location_date: [] },
+    { size: "2XL", location_date: [] },
+    { size: "3XL", location_date: [] },
+    { size: "4XL", location_date: [] },
+    { size: "5XL", location_date: [] },
+    { size: "7XL", location_date: [] },
+    { size: "8XL", location_date: [] },
   ];
-  const availableColors = ["Black", "White"];
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -126,7 +133,12 @@ const Shirt = () => {
               hover:file:bg-[#059e95]
               cursor-pointer"
             onChange={(e) => {
-              handleUpload(e, setPreview, setUploadedUrl);
+              handleUpload(
+                e,
+                setPreview,
+                setUploadedUrl,
+                typeof nom_boutique === "string" ? nom_boutique : ""
+              );
             }}
           />
           {preview && <img src={preview} alt="preview" width={200} />}

@@ -2,6 +2,8 @@
 import { create_item_cloth } from "@/app/firebase/createCategoryCloth";
 import { handleUpload } from "@/app/functions";
 import React, { useState } from "react";
+import { useParams } from "next/navigation";
+
 
 import { size } from "@/app/firebase/createCategoryCloth";
 
@@ -13,13 +15,21 @@ const Costumes = () => {
   const [uploadedUrl, setUploadedUrl] = useState<string | null>(null);
   const [contentMessage, setContentMessage] = useState("");
 
+      const { nom_boutique } = useParams();
+
   const sizes: size[] = [
-    { size: "50" , location_date : [] },
+    { size: "44" , location_date : [] },
+    { size: "46" , location_date : [] },
     { size: "48" , location_date : [] },
+    { size: "50" , location_date : [] },
     { size: "52" , location_date : [] },
     { size: "54" , location_date : [] },
     { size: "56" , location_date : [] },
     { size: "58" , location_date : [] },
+    { size: "60" , location_date : [] },
+    { size: "62" , location_date : [] },
+    { size: "64" , location_date : [] },
+    { size: "66" , location_date : [] },
   ];
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -168,7 +178,7 @@ const Costumes = () => {
                hover:file:bg-[#059e95]
                cursor-pointer"
             onChange={(e) => {
-              handleUpload(e, setPreview, setUploadedUrl);
+              handleUpload(e, setPreview, setUploadedUrl, typeof nom_boutique === "string" ? nom_boutique : "");
             }}
           />
           {preview && <img src={preview} alt="preview" width={200} />}

@@ -1,13 +1,12 @@
 import { NextResponse } from "next/server";
-import { promises as fs } from "fs";
-import path from "path";
+import {  ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import {storage} from "@/lib/firebase/connect"
 
 export async function POST(req: Request) {
   try {
     const formData = await req.formData();
     const file = formData.get("image") as File;
-
-    console.log("YOUR FILE "+file)
+    const boutiqueId = formData.get("boutiqueId") as string;
 
     if (!file) {
       return NextResponse.json({ error: "Aucun fichier reçu" }, { status: 400 });
@@ -16,22 +15,22 @@ export async function POST(req: Request) {
     const bytes = await file.arrayBuffer();
     const buffer = Buffer.from(bytes);
 
-    const uploadDir = path.join(process.cwd(), "public", "uploads");
-    await fs.mkdir(uploadDir, { recursive: true });
-
     const fileName = `${Date.now()}-${file.name}`;
-    const filePath = path.join(uploadDir, fileName);
+    const filePath = `boutiques/${boutiqueId || "general"}/${fileName}`;
 
-    await fs.writeFile(filePath, buffer);
+    const imageRef = ref(storage, filePath);
+    await uploadBytes(imageRef, buffer);
+
+    const downloadUrl = await getDownloadURL(imageRef);
 
     return NextResponse.json({
-      message: "Fichier uploadé avec succès",
-      url: `/uploads/${fileName}`,
+      message: "Image uploadée avec succès",
+      url: downloadUrl,
     });
   } catch (error) {
-    console.error("Erreur serveur :", error);
+    console.error("Erreur lors de l'upload Firebase :", error);
     return NextResponse.json(
-      { error: "Erreur lors de l'upload" },
+      { error: "Erreur lors de l'upload Firebase" },
       { status: 500 }
     );
   }

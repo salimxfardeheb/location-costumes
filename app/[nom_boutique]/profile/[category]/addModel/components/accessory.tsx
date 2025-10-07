@@ -1,5 +1,6 @@
 import { create_item_cloth } from "@/app/firebase/createCategoryCloth";
 import { handleUpload } from "@/app/functions";
+import { useParams } from "next/navigation";
 import React, { useState } from "react";
 
 const accessory = () => {
@@ -9,6 +10,7 @@ const accessory = () => {
   const [text, setText] = useState("");
   const [contentMessage, setContentMessage] = useState("");
   const label = ["Cravate", "Papillion", "Ceinture", "Montre"];
+  const { nom_boutique } = useParams();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -85,7 +87,12 @@ const accessory = () => {
                hover:file:bg-[#059e95]
                cursor-pointer"
             onChange={(e) => {
-              handleUpload(e, setPreview, setUploadedUrl);
+              handleUpload(
+                e,
+                setPreview,
+                setUploadedUrl,
+                typeof nom_boutique === "string" ? nom_boutique : ""
+              );
             }}
           />
           {preview && <img src={preview} alt="preview" width={200} />}
