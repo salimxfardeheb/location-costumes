@@ -52,7 +52,7 @@ const accessory = () => {
                   name="model"
                   checked={model === c}
                   value={c}
-                  onChange={() => setModel(c)}
+                  onChange={() => setModel(c)} required
                 />
                 <p className="text-nowrap">{c}</p>
               </li>

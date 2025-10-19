@@ -4,10 +4,9 @@ import { get_locations } from "@/app/firebase/getLocations";
 import Link from "next/link";
 import { IoInformationCircleOutline } from "react-icons/io5";
 
-export default async function Dashboard({
-  searchParams,
-}: {
-  searchParams: { all?: string };
+export default async function Dashboard(props: {
+  params: Promise<{ nom_boutique: string }>;
+  searchParams: Promise<{ all?: string }>;
 }) {
   const rows = [
     "Date Sortie",
@@ -16,8 +15,12 @@ export default async function Dashboard({
     "Chaussure",
     "Accessoires",
   ];
+  const params = await props.params;
+  const searchParams = await props.searchParams;
+  
   const showAll = searchParams.all === "true";
-
+  const { nom_boutique } = params;
+  
   const result = await get_locations(showAll);
   const sortLocationsByDate = result.sort(
     (a, b) => a.date_sortie.getTime() - b.date_sortie.getTime()
@@ -33,7 +36,7 @@ export default async function Dashboard({
           </p>
 
           <Link
-            href={`/1/dashboard?all=${!showAll}`}
+            href={`/${nom_boutique}/dashboard?all=${!showAll}`}
             className="text-sm font-medium text-[#06B9AE] px-2 py-1 rounded-lg hover:outline-1 hover:text-[#06B9AE] transition"
           >
             {showAll ? "Voir uniquement à venir" : "Voir tout"}

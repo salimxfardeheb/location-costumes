@@ -78,7 +78,7 @@ const shoe = () => {
             placeholder="Model"
             className="bg-[#B6FFF6] px-5 py-2 rounded-xl border-2 border-[#36CBC1] placeholder:text-gray-600 focus-within:placeholder:text-[#36CBC1] focus-within:outline-0"
             value={model}
-            onChange={(e) => setModel(e.target.value)}
+            onChange={(e) => setModel(e.target.value)} required
           />
         </label>
         <label
