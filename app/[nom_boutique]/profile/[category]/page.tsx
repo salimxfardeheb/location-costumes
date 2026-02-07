@@ -12,7 +12,12 @@ interface Props {
 const Page = async ({ params }: Props) => {
   const { category } = await params;
 
-  const result = await get_all_category_cloth(category);
+  const data = await get_all_category_cloth(category);
+  
+  // Tri alphabétique par modèle (insensible à la casse)
+  const result = data.sort((a, b) => 
+    a.model.toLowerCase().localeCompare(b.model.toLowerCase())
+  );
 
   return (
     <div className="flex flex-col justify-center items-center gap-9">
@@ -22,17 +27,16 @@ const Page = async ({ params }: Props) => {
             key={index}
             className="flex flex-col justify-center items-center w-fit"
           >
-          <Link href={`${category}/${item.model}`} className="hover:scale-105 duration-100">
-            <img
-              src={item.image || "/placeholder.png"}
-              alt={item.model}
-              className="max-w-56 h-64 object-cover rounded-xl shadow"
-            />
-            <p className="text-xl font-mono mt-2">
-              modèle: <span>{item.model}</span>
-            </p>
-            
-          </Link>
+            <Link href={`${category}/${item.model}`} className="hover:scale-105 duration-100">
+              <img
+                src={item.image || "/placeholder.png"}
+                alt={item.model}
+                className="max-w-56 h-64 object-cover rounded-xl shadow"
+              />
+              <p className="text-xl font-mono mt-2">
+                modèle: <span>{item.model}</span>
+              </p>
+            </Link>
           </div>
         ))}
       </div>
