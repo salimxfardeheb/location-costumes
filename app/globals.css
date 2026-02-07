@@ -1,18 +1,26 @@
 @import "tailwindcss";
 
 .body_root {
-  @apply bg-gradient-to-b from-white to-[#06B9AE] min-h-screen flex justify-center items-center;
+  @apply bg-gradient-to-bl from-[#373875] to-[#0c1141] min-h-screen flex justify-center items-center;
 }
 
 @layer base {
   input.login {
-    @apply bg-white py-2 px-3 rounded-md placeholder:text-shadow-gray-600;
+    @apply w-full pl-12 pr-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-yellow-500/50 focus:border-transparent transition-all duration-300 backdrop-blur-sm;
+  }
+  .Icon{
+    @apply w-5 h-5 text-gray-400;
+  }
+  .IconContainer{
+    @apply absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none;
+  }
+  .label{
+    @apply text-sm font-medium text-gray-200 block;
   }
 
   .sizes-big-container {
     @apply flex justify-between items-center gap-6 font-semibold;
   }
-
   .sizes-container {
     @apply flex gap-2;
   }
@@ -25,9 +33,9 @@
   .switch {
     @apply rounded-full bg-[#06B9AE] hover:opacity-80 text-5xl pr-1 pl-0.5 text-white;
   }
-.optCategory {
-  @apply px-2 py-1 hover:bg-[#B6FFF6];
-}
+  .optCategory {
+    @apply px-2 py-1 hover:bg-[#B6FFF6];
+  }
   select {
     appearance: base-select;
     &::picker(select) {
