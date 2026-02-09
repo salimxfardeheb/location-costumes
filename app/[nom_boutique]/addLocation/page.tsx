@@ -17,7 +17,7 @@ const Page = () => {
   const [accessories, setAccessories] = useState<string[]>([]);
 
   const [verificationMessages, setVerificationMessages] = useState<string[]>(
-    []
+    [],
   );
 
   const [loading, setLoading] = useState(false);
@@ -31,6 +31,7 @@ const Page = () => {
     "Boutons manchettes",
     "Montre",
   ];
+  const rentDate = new Date(locationDate);
 
   // --- Vérification disponibilité avant ajout
   const verifyCostume = async (c: ItemCloth, index: number) => {
@@ -39,12 +40,13 @@ const Page = () => {
         c.model ?? "",
         c.blazer ?? "",
         c.pant ?? "",
-        locationDate
+        rentDate,
       );
 
       const newMessages = [...verificationMessages];
       if (!result.ok) {
-        newMessages[index] = result.message ?? "❌ Erreur lors de la vérification";
+        newMessages[index] =
+          result.message ?? "❌ Erreur lors de la vérification";
       } else {
         newMessages[index] = "✅ Costume disponible !";
       }
@@ -75,7 +77,7 @@ const Page = () => {
       }
 
       const newLocation: LocationInput = {
-        location_date: locationDate,
+        location_date: rentDate,
         costume: costumes,
         chemise,
         chaussure,
@@ -99,7 +101,10 @@ const Page = () => {
       setAccessories([]);
       setVerificationMessages([]);
     } catch (err: any) {
-      setError(err.message || "❌ Une erreur est survenue lors de l’ajout de la location");
+      setError(
+        err.message ||
+          "❌ Une erreur est survenue lors de l’ajout de la location",
+      );
     } finally {
       setLoading(false);
     }
@@ -108,7 +113,7 @@ const Page = () => {
   const handleCostumeChange = (
     index: number,
     field: keyof ItemCloth,
-    value: string
+    value: string,
   ) => {
     const newCostumes = [...costumes];
     newCostumes[index] = { ...newCostumes[index], [field]: value };
@@ -308,7 +313,7 @@ const Page = () => {
                     setAccessories((prev) =>
                       e.target.checked
                         ? [...prev, acc]
-                        : prev.filter((s) => s !== acc)
+                        : prev.filter((s) => s !== acc),
                     )
                   }
                   className="w-4 h-4"

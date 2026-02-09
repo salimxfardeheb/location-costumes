@@ -24,7 +24,7 @@ export interface ItemCloth {
 }
 
 export interface LocationInput {
-  location_date: string;
+  location_date: Date;
   costume?: ItemCloth[];
   chemise?: ItemCloth;
   chaussure?: ItemCloth;
@@ -63,7 +63,7 @@ export async function create_location(location: LocationInput) {
           model.model,
           model.blazer!,
           model.pant!,
-          location.location_date
+          location.location_date,
         );
 
         if (!result.ok) {
@@ -76,7 +76,7 @@ export async function create_location(location: LocationInput) {
         const reqCostume = query(
           collection(db, "costume"),
           where("id_boutique", "==", boutiqueRef),
-          where("model", "==", model.model)
+          where("model", "==", model.model),
         );
         const reqCostumeSnapshot = await getDocs(reqCostume);
         if (reqCostumeSnapshot.empty) {
@@ -117,7 +117,7 @@ export async function create_location(location: LocationInput) {
       const reqShirt = query(
         collection(db, "chemise"),
         where("id_boutique", "==", boutiqueRef),
-        where("model", "==", location.chemise.model)
+        where("model", "==", location.chemise.model),
       );
       const reqShirtSnapshot = await getDocs(reqShirt);
       if (reqShirtSnapshot.empty) {
@@ -131,7 +131,7 @@ export async function create_location(location: LocationInput) {
           missingChemiseSize = true;
         } else {
           const shirtFound = setShirtData.size.some(
-            (s: size) => s.size === location.chemise?.size
+            (s: size) => s.size === location.chemise?.size,
           );
           if (!shirtFound) {
             missingChemiseSize = true;
@@ -161,7 +161,7 @@ export async function create_location(location: LocationInput) {
       const reqShoe = query(
         collection(db, "chaussure"),
         where("id_boutique", "==", boutiqueRef),
-        where("model", "==", location.chaussure.model)
+        where("model", "==", location.chaussure.model),
       );
       const reqShoeSnapshot = await getDocs(reqShoe);
       if (reqShoeSnapshot.empty) {
@@ -175,7 +175,7 @@ export async function create_location(location: LocationInput) {
           missingChaussureSize = true;
         } else {
           const shoeFound = setShoeData.size.some(
-            (s: size) => s.size === location.chaussure?.size
+            (s: size) => s.size === location.chaussure?.size,
           );
           if (!shoeFound) {
             missingChaussureSize = true;
@@ -208,7 +208,7 @@ export async function create_location(location: LocationInput) {
         const reqAcc = query(
           collection(db, "accessoire"),
           where("id_boutique", "==", boutiqueRef),
-          where("model", "==", acc.model)
+          where("model", "==", acc.model),
         );
         const reqAccSnapshot = await getDocs(reqAcc);
         if (reqAccSnapshot.empty) {

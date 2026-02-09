@@ -8,7 +8,7 @@ import { categories } from "@/app/functions";
 
 export interface size {
   size: string;
-  location_date: string[];
+  location_date: Date[];
 }
 
 interface collection_item {
