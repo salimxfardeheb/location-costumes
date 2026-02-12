@@ -33,69 +33,65 @@ export async function checkAvailability(
     const costumeData = await get_one_category_cloth("costume", model);
     const { start, end } = getBlockedInterval(location_date);
 
-    // 🔹 Vérif blazer
-    if (!blazer) {
-      return { ok: false, message: "❌ Taille de blazer manquante" };
+    // 🔹 Vérif blazer (seulement si renseigné)
+    if (blazer) {
+      const blazerFound = costumeData.blazerSize?.some(
+        (s: any) => s.size === blazer
+      );
+
+      if (!blazerFound) {
+        return {
+          ok: false,
+          message: `❌ Blazer taille ${blazer} non disponible dans ce modèle`,
+        };
+      }
+
+      const blazerUnavailable = costumeData.blazerSize?.some(
+        (s: any) =>
+          s.size === blazer &&
+          s.location_date?.some((d: Date) =>
+            isDateInInterval(new Date(d), start, end)
+          )
+      );
+
+      if (blazerUnavailable) {
+        return {
+          ok: false,
+          message: `❌ Blazer taille ${blazer} indisponible entre le ${start.getDate()} et le ${end.getDate()}`,
+        };
+      }
     }
 
-    const blazerFound = costumeData.blazerSize?.some(
-      (s: any) => s.size === blazer
-    );
+    // 🔹 Vérif pantalon (seulement si renseigné)
+    if (pant) {
+      const pantFound = costumeData.pantSize?.some(
+        (s: any) => s.size === pant
+      );
 
-    if (!blazerFound) {
-      return {
-        ok: false,
-        message: `❌ Blazer taille ${blazer} non disponible dans ce modèle`,
-      };
+      if (!pantFound) {
+        return {
+          ok: false,
+          message: `❌ Pantalon taille ${pant} non disponible dans ce modèle`,
+        };
+      }
+
+      const pantUnavailable = costumeData.pantSize?.some(
+        (s: any) =>
+          s.size === pant &&
+          s.location_date?.some((d: Date) =>
+            isDateInInterval(new Date(d), start, end)
+          )
+      );
+
+      if (pantUnavailable) {
+        return {
+          ok: false,
+          message: `❌ Pantalon taille ${pant} indisponible entre le ${start.getDate()} et le ${end.getDate()}`,
+        };
+      }
     }
 
-    const blazerUnavailable = costumeData.blazerSize?.some(
-      (s: any) =>
-        s.size === blazer &&
-        s.location_date?.some((d: Date) =>
-          isDateInInterval(new Date(d), start, end)
-        )
-    );
-
-    if (blazerUnavailable) {
-      return {
-        ok: false,
-        message: `❌ Blazer taille ${blazer} indisponible entre le ${start.getDate()} et le ${end.getDate()}`,
-      };
-    }
-
-    // 🔹 Vérif pantalon
-    if (!pant) {
-      return { ok: false, message: "❌ Taille de pantalon manquante" };
-    }
-
-    const pantFound = costumeData.pantSize?.some(
-      (s: any) => s.size === pant
-    );
-
-    if (!pantFound) {
-      return {
-        ok: false,
-        message: `❌ Pantalon taille ${pant} non disponible dans ce modèle`,
-      };
-    }
-
-    const pantUnavailable = costumeData.pantSize?.some(
-      (s: any) =>
-        s.size === pant &&
-        s.location_date?.some((d: Date) =>
-          isDateInInterval(new Date(d), start, end)
-        )
-    );
-
-    if (pantUnavailable) {
-      return {
-        ok: false,
-        message: `❌ Pantalon taille ${pant} indisponible (1 jour avant et 2 jours après la date de location)`,
-      };
-    }
-
-    // ✅ Tout est bon
+    // ✅ Tout est bon (ou les champs vides ont été ignorés)
     return { ok: true };
   } catch (err: any) {
     console.error("Erreur checkAvailability:", err);

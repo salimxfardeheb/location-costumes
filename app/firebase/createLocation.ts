@@ -29,6 +29,15 @@ export interface LocationInput {
   chemise?: ItemCloth;
   chaussure?: ItemCloth;
   accessoire?: ItemCloth[];
+  client: ClientInfo;
+}
+
+export interface ClientInfo {
+  name: string;
+  phone: string;
+  vers: number;
+  rest: number;
+  comment : string;
 }
 
 export async function create_location(location: LocationInput) {
@@ -253,6 +262,7 @@ export async function create_location(location: LocationInput) {
       chemise: shirtData,
       chaussure: shoeData,
       accessoire: accessoryRefs,
+      client : location.client
     };
 
     const docRef = await addDoc(collection(db, "location"), locationData);
