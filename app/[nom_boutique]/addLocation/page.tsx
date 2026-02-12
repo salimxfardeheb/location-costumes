@@ -246,7 +246,7 @@ const Page = () => {
 
   return (
     <div className="min-h-screen w-full py-12 px-4">
-      <div className="mx-auto max-w-5xl">
+      <div className="mx-auto max-w-full">
         {/* Steps Indicator */}
         <div className="mb-8">
           <div className="flex items-center justify-between">
@@ -256,7 +256,7 @@ const Page = () => {
                   <div
                     className={`w-12 h-12 rounded-full flex items-center justify-center font-bold text-lg transition-all duration-300 ${
                       currentStep >= step.number
-                        ? "bg-gradient-to-r from-teal-500 to-cyan-600 text-white shadow-lg"
+                        ? "bg-gradient-to-r from-[#000c79] via-[#000a35] to-[#000c79] text-white shadow-lg"
                         : "bg-gray-200 text-gray-500"
                     }`}
                   >
@@ -265,7 +265,7 @@ const Page = () => {
                   <span
                     className={`mt-2 text-sm font-medium text-center ${
                       currentStep >= step.number
-                        ? "text-teal-600"
+                        ? "text-[#000c79]"
                         : "text-gray-400"
                     }`}
                   >
@@ -276,7 +276,7 @@ const Page = () => {
                   <div
                     className={`h-1 flex-1 mx-4 transition-all duration-300 ${
                       currentStep > step.number
-                        ? "bg-gradient-to-r from-teal-500 to-cyan-600"
+                        ? "bg-gradient-to-r from-[#000c79] via-[#000a35] to-[#000c79] "
                         : "bg-gray-200"
                     }`}
                   />
@@ -288,7 +288,7 @@ const Page = () => {
 
         {/* Form Card */}
         <div className="relative">
-          <div className="absolute -inset-2 bg-gradient-to-r from-teal-500 via-cyan-400 to-teal-500 rounded-3xl blur opacity-20" />
+          <div className="absolute -inset-2 bg-gradient-to-r from-[#000c79] via-[#000a35] to-[#000c79] rounded-3xl blur opacity-20" />
 
           <form
             onSubmit={handleSubmit}
@@ -296,9 +296,9 @@ const Page = () => {
           >
             {/* Success/Error Messages */}
             {success && (
-              <div className="mb-6 border bg-green-700/20 border-green-500/80 rounded-xl p-4 flex items-center gap-3 animate-fadeIn">
+              <div className="mb-6 border bg-green-700/20 border-[#000c79] rounded-xl p-4 flex items-center gap-3 animate-fadeIn">
                 <svg
-                  className="iconLocation text-green-500 flex-shrink-0"
+                  className="iconLocation text-[#000c79]flex-shrink-0"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -310,7 +310,7 @@ const Page = () => {
                     d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
                   />
                 </svg>
-                <span className="text-green-700 font-medium text-sm">
+                <span className="text-[#000c79] font-medium text-sm">
                   {success}
                 </span>
               </div>
@@ -364,13 +364,13 @@ const Page = () => {
                   </label>
                   <input
                     type="date"
-                    className="inputLocation border-teal-200"
+                    className="inputLocation border-[#000c79]"
                     value={locationDate}
                     onChange={(e) => setLocationDate(e.target.value)}
                     required
                   />
                   {loadingModels && (
-                    <p className="text-sm text-teal-600 mt-2 flex items-center gap-2">
+                    <p className="text-sm text-[#000c79] mt-2 flex items-center gap-2">
                       <svg
                         className="animate-spin h-4 w-4"
                         fill="none"
@@ -415,7 +415,7 @@ const Page = () => {
 
                   {costumes.map((c, index) => (
                     <div key={index} className="categoryContainer">
-                      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-3 items-center">
+                      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-3 items-end">
                         <div>
                           <label className="labelLocation">Modèle</label>
                           <select
@@ -476,7 +476,7 @@ const Page = () => {
                           <button
                             type="button"
                             onClick={() => verifyCostume(c, index)}
-                            className="flex-1 bg-gradient-to-r from-teal-500 to-cyan-600 hover:from-teal-600 hover:to-cyan-700 text-white px-4 py-3 rounded-xl transition-all duration-300 transform hover:scale-[1.02] active:scale-[0.98] shadow-md text-sm font-medium"
+                            className="flex-1 bg-gradient-to-r from-[#000c79] via-[#000a35] to-[#000c79] hover:opacity-80 text-white px-4 py-3 rounded-xl transition-all duration-300 transform hover:scale-[1.02] active:scale-[0.98] shadow-md text-sm font-medium"
                           >
                             Vérifier
                           </button>
@@ -512,7 +512,7 @@ const Page = () => {
                   <button
                     type="button"
                     onClick={addCostume}
-                    className="mt-2 flex items-center gap-2 bg-white border-2 border-teal-300 text-teal-700 px-5 py-2.5 rounded-xl hover:bg-teal-50 transition-colors font-medium"
+                    className="mt-2 flex items-center gap-2 bg-white border-2 border-[#000c79] text-[#000c79] px-5 py-2.5 rounded-xl hover:bg-blue-500/20 transition-colors font-medium"
                   >
                     <svg
                       className="iconLocation"
@@ -627,7 +627,7 @@ const Page = () => {
                     {accessory.map((acc) => (
                       <label
                         key={acc}
-                        className="flex items-center gap-3 p-3 border-2 border-teal-200 rounded-xl hover:bg-teal-200/15 cursor-pointer transition-colors"
+                        className="flex items-center gap-3 p-3 border-2 border-blue-500/25 rounded-xl hover:bg-blue-200/15 cursor-pointer transition-colors"
                       >
                         <input
                           type="checkbox"
@@ -640,7 +640,7 @@ const Page = () => {
                                 : prev.filter((s) => s !== acc),
                             )
                           }
-                          className="w-5 h-5 text-teal-600 border-teal-300 rounded focus:ring-teal-500 focus:ring-2"
+                          className="w-5 h-5 text-[#000c79] border-[#000c79] rounded focus:ring-[#000c79] focus:ring-2"
                         />
                         <span className="text-sm font-medium text-gray-700">
                           {acc}
@@ -764,7 +764,7 @@ const Page = () => {
                     (currentStep === 1 && !canProceedToStep2()) ||
                     (currentStep === 2 && !canProceedToStep3())
                   }
-                  className="flex items-center gap-2 bg-gradient-to-r from-teal-500 to-cyan-600 hover:from-teal-600 hover:to-cyan-700 text-white font-bold py-3 px-6 rounded-xl transition-all duration-300 transform hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed shadow-lg"
+                  className="flex items-center gap-2 bg-gradient-to-r from-[#000c79] via-[#000a35] to-[#000c79]  hover:from-blue-800 hover:to-blue-800 text-white font-bold py-3 px-6 rounded-xl transition-all duration-300 transform hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed shadow-lg"
                 >
                   Suivant
                   <MdNavigateNext className="text-xl" />

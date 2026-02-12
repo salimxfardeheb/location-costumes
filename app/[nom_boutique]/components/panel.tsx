@@ -15,10 +15,10 @@ interface PanelProps {
   setPanelIsOpen: (open: boolean) => void;
 }
 
-const panel: React.FC<PanelProps> = ({ panelIsOpen, setPanelIsOpen }) => {
+const Panel: React.FC<PanelProps> = ({ panelIsOpen, setPanelIsOpen }) => {
   const currentPath = usePathname();
   const { nom_boutique } = useParams();
-  const shop_name_upperCase = nom_boutique?.toLocaleString().toWellFormed();
+  const shop_name_upperCase = nom_boutique?.toLocaleString().toUpperCase();
 
   const menuItems = [
     { label: "Dashboard", path: "dashboard", icon: TbLayoutDashboardFilled },
@@ -27,74 +27,108 @@ const panel: React.FC<PanelProps> = ({ panelIsOpen, setPanelIsOpen }) => {
   ];
 
   const handlePanel = () => {
-    if (!panelIsOpen) setPanelIsOpen(true);
-    else {
-      setPanelIsOpen(false);
-    }
+    setPanelIsOpen(!panelIsOpen);
   };
+
   return (
     <nav
       className={`${
-        panelIsOpen ? "w-1/6 " : "w-12"
-      } min-h-screen bg-[#06B9AE] flex flex-col justify-between transition-all duration-200`}
+        panelIsOpen ? "w-72" : "w-20"
+      } min-h-screen bg-gradient-to-b from-[#000c79] via-[#000a35] to-[#000c79] shadow-2xl flex flex-col justify-between transition-all duration-300 ease-in-out relative`}
     >
+      {/* Header Section */}
       <div className="w-full">
-        <div className="w-full">
-          <div className="flex justify-center items-center p-3 w-full">
-            {panelIsOpen ? (
-              <div className="flex justify-between items-center w-full pr-4 space-x-4">
-                <Link
-                  className="flex items-center justify-start gap-4 text-[#B6FFF6] hover:bg-[#B6FFF6] hover:text-[#06B9AE] transition-all duration-50 w-full text-2xl px-3 py-0.5 rounded-sm"
-                  href={"/"+nom_boutique+"/profile/costume"}
-                >
-                  <CgProfile className="text-3xl" />
+        <div className="p-4">
+          {panelIsOpen ? (
+            <div className="flex justify-between items-center gap-3">
+              <Link
+                className="flex items-center gap-3 text-white/90 hover:text-white hover:bg-white/10 backdrop-blur-sm transition-all duration-200 flex-1 px-4 py-3 rounded-xl group"
+                href={`/${nom_boutique}/profile/costume`}
+              >
+                <div className="bg-white/20 p-2 rounded-lg group-hover:bg-white/30 transition-all duration-200">
+                  <CgProfile className="text-2xl" />
+                </div>
+                <span className="font-semibold text-sm truncate">
                   {shop_name_upperCase}
-                </Link>
-                <button onClick={handlePanel}>
-                  <LuPanelLeftClose className="text-[#B6FFF6] text-3xl hover:text-white" />
-                </button>
-              </div>
-            ) : (
-              <button onClick={handlePanel}>
-                <LuPanelLeftOpen className="text-[#B6FFF6] text-3xl hover:text-white" />
+                </span>
+              </Link>
+              <button
+                onClick={handlePanel}
+                className="p-2 hover:bg-white/10 rounded-lg transition-all duration-200"
+                aria-label="Fermer le panneau"
+              >
+                <LuPanelLeftClose className="text-white/90 text-2xl hover:text-white transition-colors" />
               </button>
-            )}
-          </div>
+            </div>
+          ) : (
+            <div className="flex justify-center">
+              <button
+                onClick={handlePanel}
+                className="p-3 hover:bg-white/10 rounded-lg transition-all duration-200"
+                aria-label="Ouvrir le panneau"
+              >
+                <LuPanelLeftOpen className="text-white/90 text-2xl hover:text-white transition-colors" />
+              </button>
+            </div>
+          )}
         </div>
-        <div className="w-full h-[1px] bg-[#B6FFF6]" />
-        <div
-          className={`${
-            panelIsOpen ? "items-start" : "items-center"
-          } flex flex-col gap-4 py-3 px-2 justify-center`}
-        >
+
+        {/* Divider */}
+        <div className="w-full h-px bg-gradient-to-r from-transparent via-white/30 to-transparent" />
+
+        {/* Menu Items */}
+        <div className="flex flex-col gap-2 py-6 px-3">
           {menuItems.map(({ label, path, icon: Icon }) => {
             const isActive = currentPath.includes(path);
             return (
               <Link
-                href={"/"+nom_boutique +"/"+ path}
+                href={`/${nom_boutique}/${path}`}
                 key={path}
-                className="flex justify-center items-end gap-4 cursor-pointer"
+                className={`flex items-center gap-4 px-4 py-3 rounded-xl transition-all duration-200 group relative overflow-hidden ${
+                  isActive
+                    ? "bg-white text-[#000c79] shadow-lg"
+                    : "text-white/80 hover:bg-white/10 hover:text-white"
+                }`}
               >
-                <Icon
-                  className={`text-3xl ${
-                    isActive
-                      ? "text-white hover:text-[#B6FFF6]"
-                      : "text-[#B6FFF6] hover:text-white"
-                  }`}
-                />
+                {/* Active indicator */}
+                {isActive && (
+                  <div className="absolute left-0 top-0 bottom-0 w-1 bg-[#000c79] rounded-r-full" />
+                )}
+                
+                <div className={`${panelIsOpen ? "" : "mx-auto"}`}>
+                  <Icon
+                    className={`text-2xl transition-transform duration-200 ${
+                      isActive ? "scale-110" : "group-hover:scale-110"
+                    }`}
+                  />
+                </div>
+                
                 {panelIsOpen && (
-                  <p className="text-[#B6FFF6] whitespace-nowrap hover:text-white">
+                  <span className="font-medium text-sm whitespace-nowrap">
                     {label}
-                  </p>
+                  </span>
+                )}
+                
+                {/* Hover effect */}
+                {!isActive && (
+                  <div className="absolute inset-0 bg-white/0 group-hover:bg-white/5 transition-all duration-200 rounded-xl" />
                 )}
               </Link>
             );
           })}
         </div>
       </div>
-      <div>{panelIsOpen && <Logout />}</div>
+
+      {/* Footer Section */}
+      <div className="p-3">
+        {panelIsOpen && (
+          <div className="bg-white/10 backdrop-blur-sm rounded-xl p-1">
+            <Logout />
+          </div>
+        )}
+      </div>
     </nav>
   );
 };
 
-export default panel;
+export default Panel;
