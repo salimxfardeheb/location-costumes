@@ -27,7 +27,7 @@ type Chemise = {
   image?: string;
 };
 
-type Chausssure = {
+type Chaussure = {
   ref: string;
   model: string;
   size: string;
@@ -40,13 +40,22 @@ type Accessoire = {
   image?: string;
 };
 
+type Client = {
+  name: string;
+  phone: string;
+  vers: number;
+  rest: number;
+  comment?: string;
+};
+
 type LocationItem = {
   id: string;
   date_sortie: Date;
   costumes: Costume[];
   chemise: Chemise | null;
-  chaussure: Chausssure | null;
+  chaussure: Chaussure | null;
   accessories: Accessoire[];
+  client: Client | null;
 };
 
 export async function get_locations(showAll: boolean): Promise<LocationItem[]> {
@@ -60,7 +69,7 @@ export async function get_locations(showAll: boolean): Promise<LocationItem[]> {
   const boutiqueRef = doc(db, "shop", id_boutique);
   const req = query(
     collection(db, "location"),
-    where("id_boutique", "==", boutiqueRef)
+    where("id_boutique", "==", boutiqueRef),
   );
 
   const reqSnapshot = await getDocs(req);
@@ -108,6 +117,15 @@ export async function get_locations(showAll: boolean): Promise<LocationItem[]> {
             image: a.image,
           }))
         : [],
+      client: data.client
+        ? {
+            name: data.client.name,
+            phone: data.client.phone,
+            vers: data.client.vers,
+            rest: data.client.rest,
+            comment: data.client.comment,
+          }
+        : null,
     };
   });
 
@@ -122,7 +140,7 @@ export async function get_locations(showAll: boolean): Promise<LocationItem[]> {
 }
 
 export async function get_one_location(
-  id_location: string
+  id_location: string,
 ): Promise<LocationItem | null> {
   const locationRef = doc(db, "location", id_location);
   const snapshot = await getDoc(locationRef);
@@ -165,11 +183,20 @@ export async function get_one_location(
           image: a.image,
         }))
       : [],
+    client: locationData.client
+      ? {
+          name: locationData.client.name,
+          phone: locationData.client.phone,
+          vers: locationData.client.vers,
+          rest: locationData.client.rest,
+          comment: locationData.client.comment,
+        }
+      : null,
   };
 }
 
 export async function get_location_perDate(
-  location_date: String
+  location_date: String,
 ): Promise<LocationItem[]> {
   const session = await getServerSession(authOptions);
   const id_boutique = session?.user?.boutiqueId;
@@ -182,7 +209,7 @@ export async function get_location_perDate(
   const req = query(
     collection(db, "location"),
     where("id_boutique", "==", boutiqueRef),
-    where("location_date", "==", location_date)
+    where("location_date", "==", location_date),
   );
   const reqSnapshot = await getDocs(req);
   const locations = reqSnapshot.docs.map((snap) => {
@@ -225,6 +252,16 @@ export async function get_location_perDate(
             image: a.image,
           }))
         : [],
+
+      client: data.client
+        ? {
+            name: data.client.name,
+            phone: data.client.phone,
+            vers: data.client.vers,
+            rest: data.client.rest,
+            comment: data.client.comment,
+          }
+        : null,
     };
   });
   return locations;

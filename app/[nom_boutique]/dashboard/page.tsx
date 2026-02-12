@@ -3,12 +3,17 @@
 import { get_locations } from "@/app/firebase/getLocations";
 import Link from "next/link";
 import { IoInformationCircleOutline } from "react-icons/io5";
+import { FiEye, FiCalendar, FiUser } from "react-icons/fi";
 
 export default async function Dashboard(props: {
   params: Promise<{ nom_boutique: string }>;
   searchParams: Promise<{ all?: string }>;
 }) {
   const rows = [
+    "Client",
+    "Téléphone",
+    "Versement",
+    "Rest",
     "Date Sortie",
     "Costume",
     "Chemise",
@@ -17,117 +22,219 @@ export default async function Dashboard(props: {
   ];
   const params = await props.params;
   const searchParams = await props.searchParams;
-  
+
   const showAll = searchParams.all === "true";
   const { nom_boutique } = params;
-  
+
   const result = await get_locations(showAll);
   const sortLocationsByDate = result.sort(
-    (a, b) => a.date_sortie.getTime() - b.date_sortie.getTime()
+    (a, b) => a.date_sortie.getTime() - b.date_sortie.getTime(),
   );
 
   return (
-    <div className="w-full">
-      <div className="mt-11 mx-5 bg-white rounded-2xl shadow-lg border border-gray-200 overflow-hidden">
-        {/* Header */}
-        <div className="w-full flex justify-between items-center px-8 py-5 rounded-t-2xl">
-          <p className="text-2xl font-semibold">
-            {showAll ? "Tous les locations" : "Locations à venir"}
-          </p>
+    <div className="w-full min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 p-6">
+      <div className="max-w-[1600px] mx-auto">
+        {/* Card Container */}
+        <div className="bg-white rounded-3xl shadow-xl border border-gray-200 overflow-hidden">
+          {/* Header */}
+          <div className=" px-8 py-6">
+            <div className="flex justify-between items-center">
+              <div className="flex items-center gap-3">
+                <div className="bg-white/20 backdrop-blur-sm p-2 rounded-xl">
+                  <FiCalendar className="text-black text-2xl" />
+                </div>
+                <div>
+                  <p className="text-2xl font-bold">
+                    {showAll ? "Toutes les locations" : "Locations à venir"}
+                  </p>
+                  <p className="text-black/80 text-sm mt-1">
+                    {sortLocationsByDate.length} location(s) au total
+                  </p>
+                </div>
+              </div>
 
-          <Link
-            href={`/${nom_boutique}/dashboard?all=${!showAll}`}
-            className="text-sm font-medium text-[#06B9AE] px-2 py-1 rounded-lg hover:outline-1 hover:text-[#06B9AE] transition"
-          >
-            {showAll ? "Voir uniquement à venir" : "Voir tout"}
-          </Link>
-        </div>
+              <Link
+                href={`/${nom_boutique}/dashboard?all=${!showAll}`}
+                className="bg-white text-[#000c79] hover:border-2 hover:border-[#000c79] font-semibold px-6 py-3 rounded-xl active:scale-95  flex items-center gap-2 shadow-lg group"
+              >
+                <FiEye className="text-lg group-hover:scale-110 transition-transform" />
+                <span className="text-sm">
+                  {showAll ? "Voir uniquement à venir" : "Voir tout"}
+                </span>
+              </Link>
+            </div>
+          </div>
 
-        {/* Table */}
-        <div className="overflow-x-auto">
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="bg-gradient-to-r from-[#06B9AE] to-[#0A7871] text-white">
-                {rows.map((col, i) => (
-                  <th
-                    key={i}
-                    className="px-6 py-4 font-semibold uppercase tracking-wide"
-                  >
-                    {col}
-                  </th>
-                ))}
-                <th className="px-6 py-4"></th>
-              </tr>
-            </thead>
-            <tbody>
-              {sortLocationsByDate.length === 0 ? (
-                <tr>
-                  <td
-                    colSpan={rows.length + 1}
-                    className="text-center py-6 text-gray-500 font-medium"
-                  >
-                    🚫 Aucune location trouvée
-                  </td>
+          {/* Table */}
+          <div className="overflow-x-auto">
+            <table className="w-full">
+              <thead>
+                <tr className="bg-gradient-to-r from-[#000c79] via-[#000a35] to-[#000c79] text-white">
+                  {rows.map((col, i) => (
+                    <th
+                      key={i}
+                      className="px-6 py-4 text-center font-semibold text-xs uppercase tracking-wider"
+                    >
+                      {col}
+                    </th>
+                  ))}
+                  <th className="px-6 py-4"></th>
                 </tr>
-              ) : (
-                sortLocationsByDate.map((data, i) => (
-                  <tr
-                    key={i}
-                    className="text-center h-16 font-medium text-gray-800 hover:bg-[#E6FFFA] transition"
-                  >
-                    <td className="px-6 py-4">
-                      {data.date_sortie instanceof Date
-                        ? data.date_sortie.toLocaleDateString()
-                        : data.date_sortie}
-                    </td>
-
-                    {data.costumes && data.costumes.length > 0 ? (
-                      <td className="px-6 py-4">
-                        {data.costumes.map((model, i) => (
-                          <span
-                            key={i}
-                            className="px-2 border rounded-4xl mx-2 bg-gray-300 text-gray-600"
-                          >
-                            {model.model}
-                          </span>
-                        ))}
-                      </td>
-                    ) : (
-                      <td>Aucun Costume</td>
-                    )}
-
-                    {data.chemise ? (
-                      <td className="px-6 py-4">{data.chemise?.model}</td>
-                    ) : (
-                      <td>Aucune Chemise</td>
-                    )}
-
-                    {data.chaussure ? (
-                      <td className="px-6 py-4">{data.chaussure?.model}</td>
-                    ) : (
-                      <td>Aucune Chaussure</td>
-                    )}
-
-                    {data.accessories && data.accessories.length > 0 ? (
-                      <td className="px-6 py-4">
-                        {data.accessories.map((model, i) => (
-                          <span key={i}>{model.model}, </span>
-                        ))}
-                      </td>
-                    ) : (
-                      <td>Aucun Accessoire</td>
-                    )}
-
-                    <td className="px-6 py-4 flex justify-end">
-                      <Link href={`dashboard/${data.id}`}>
-                        <IoInformationCircleOutline className="text-2xl text-[#06B9AE] hover:text-[#0A7871] transition" />
-                      </Link>
+              </thead>
+              <tbody className="divide-y divide-gray-100">
+                {sortLocationsByDate.length === 0 ? (
+                  <tr>
+                    <td colSpan={rows.length + 1} className="text-center py-16">
+                      <div className="flex flex-col items-center gap-4">
+                        <div className="bg-gray-100 p-4 rounded-full">
+                          <IoInformationCircleOutline className="text-gray-400 text-5xl" />
+                        </div>
+                        <p className="text-gray-500 font-medium text-md">
+                          Aucune location trouvée
+                        </p>
+                        <p className="text-gray-400 text-sm">
+                          Commencez par ajouter une nouvelle location
+                        </p>
+                      </div>
                     </td>
                   </tr>
-                ))
-              )}
-            </tbody>
-          </table>
+                ) : (
+                  sortLocationsByDate.map((data, i) => (
+                      <tr
+                        key={i}
+                        className="hover:bg-gradient-to-r hover:from-blue-900/20 hover:to-transparent transition-all duration-200 group"
+                      >
+                        <td className="px-6 py-4">
+                          <div className="flex items-center gap-2">
+                            <div className="bg-[#000c79]/10 p-2 rounded-lg group-hover:bg-[#000c79]/20 transition-colors">
+                              <FiUser className="text-[#000c79]" />
+                            </div>
+                            <span className="font-medium text-gray-800">
+                              {data.client?.name || (
+                                <span className="text-gray-400 italic">
+                                  Aucun nom
+                                </span>
+                              )}
+                            </span>
+                          </div>
+                        </td>
+
+                        <td className="px-6 py-4">
+                          <span className="text-gray-700 font-mono text-sm">
+                            {data.client?.phone || (
+                              <span className="text-gray-400 italic">
+                                Aucun numéro
+                              </span>
+                            )}
+                          </span>
+                        </td>
+
+                        <td className="px-6 py-4">
+                          {data.client?.vers ? (
+                            <span className="bg-green-100 text-green-700 px-3 py-1 rounded-lg font-semibold text-sm">
+                              {data.client.vers} DA
+                            </span>
+                          ) : (
+                            <span className="text-gray-400 italic">
+                              Aucun versement
+                            </span>
+                          )}
+                        </td>
+
+                        <td className="px-6 py-4">
+                          {data.client?.rest ? (
+                            <span className="bg-orange-100 text-orange-700 px-3 py-1 rounded-lg font-semibold text-sm">
+                              {data.client.rest} DA
+                            </span>
+                          ) : (
+                            <span className="text-gray-400 italic">
+                              Aucun reste
+                            </span>
+                          )}
+                        </td>
+
+                        <td className="px-6 py-4">
+                          <div className="flex items-center gap-2">
+                            <FiCalendar className="text-[#06B9AE]" />
+                            <span className="font-medium text-gray-800">
+                              {data.date_sortie instanceof Date
+                                ? data.date_sortie.toLocaleDateString("fr-FR", {
+                                    day: "2-digit",
+                                    month: "short",
+                                    year: "numeric",
+                                  })
+                                : data.date_sortie}
+                            </span>
+                          </div>
+                        </td>
+
+                        <td className="px-6 py-4">
+                          {data.costumes && data.costumes.length > 0 ? (
+                            <div className="flex flex-wrap gap-1">
+                              {data.costumes.map((model, i) => (
+                                <span
+                                  key={i}
+                                  className="px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-xs font-semibold"
+                                >
+                                  {model.model}
+                                </span>
+                              ))}
+                            </div>
+                          ) : (
+                            <span className="text-gray-400 italic">
+                              Aucun costume
+                            </span>
+                          )}
+                        </td>
+
+                        <td className="px-6 py-4">
+                          {data.chemise ? (
+                            <span className="px-3 py-1 bg-purple-100 text-purple-700 rounded-full text-xs font-semibold">
+                              {data.chemise.model}
+                            </span>
+                          ) : (
+                            <span className="text-gray-400 italic">
+                              Aucune chemise
+                            </span>
+                          )}
+                        </td>
+
+                        <td className="px-6 py-4">
+                          {data.chaussure ? (
+                            <span className="px-3 py-1 bg-amber-100 text-amber-700 rounded-full text-xs font-semibold">
+                              {data.chaussure.model}
+                            </span>
+                          ) : (
+                            <span className="text-gray-400 italic">
+                              Aucune chaussure
+                            </span>
+                          )}
+                        </td>
+
+                        <td className="px-6 py-4">
+                          {data.accessories && data.accessories.length > 0 ? (
+                            <div className="flex flex-wrap gap-1">
+                              {data.accessories.map((model, i) => (
+                                <span
+                                  key={i}
+                                  className="px-2 py-1 bg-pink-100 text-pink-700 rounded-full text-xs font-semibold"
+                                >
+                                  {model.model}
+                                </span>
+                              ))}
+                            </div>
+                          ) : (
+                            <span className="text-gray-400 italic">
+                              Aucun accessoire
+                            </span>
+                          )}
+                        </td>
+                      </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
+          </div>
         </div>
       </div>
     </div>
