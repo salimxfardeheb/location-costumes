@@ -47,7 +47,7 @@ export async function create_location(location: LocationInput) {
   if (!id_boutique) {
     throw new Error("Boutique ID manquant");
   }
-
+  console.log(location)
   try {
     const boutiqueRef = doc(db, "shop", id_boutique);
 

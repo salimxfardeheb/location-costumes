@@ -234,7 +234,6 @@ const Page = () => {
   };
 
   const canProceedToStep3 = () => {
-    // Au moins un costume avec modèle sélectionné
     return costumes.some((c) => c.model !== "");
   };
 
