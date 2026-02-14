@@ -11,52 +11,7 @@ import {
 } from "firebase/firestore";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
-
-type Costume = {
-  ref: string;
-  model: string;
-  blazer: string;
-  pant: string;
-  image?: string;
-};
-
-type Chemise = {
-  ref: string;
-  model: string;
-  size: string;
-  image?: string;
-};
-
-type Chaussure = {
-  ref: string;
-  model: string;
-  size: string;
-  image?: string;
-};
-
-type Accessoire = {
-  ref: string;
-  model: string;
-  image?: string;
-};
-
-type Client = {
-  name: string;
-  phone: string;
-  vers: number;
-  rest: number;
-  comment?: string;
-};
-
-type LocationItem = {
-  id: string;
-  date_sortie: Date;
-  costumes: Costume[];
-  chemise: Chemise | null;
-  chaussure: Chaussure | null;
-  accessories: Accessoire[];
-  client: Client | null;
-};
+import { Location as LocationItem} from "@/app/functions"
 
 export async function get_locations(showAll: boolean): Promise<LocationItem[]> {
   const session = await getServerSession(authOptions);
@@ -115,8 +70,10 @@ export async function get_locations(showAll: boolean): Promise<LocationItem[]> {
             ref: a.ref,
             model: a.model,
             image: a.image,
+            description: a.description,
           }))
         : [],
+
       client: data.client
         ? {
             name: data.client.name,
@@ -181,6 +138,7 @@ export async function get_one_location(
           ref: a.ref,
           model: a.model,
           image: a.image,
+          description : a.description,
         }))
       : [],
     client: locationData.client
@@ -250,6 +208,7 @@ export async function get_location_perDate(
             ref: a.ref,
             model: a.model,
             image: a.image,
+            description: a.description,
           }))
         : [],
 

@@ -29,4 +29,52 @@ export async function handleUpload(
   setUploadedUrl(data.url);
 }
 
+export type Costume = {
+  ref: string;
+  model: string;
+  blazer: string;
+  pant: string;
+  image?: string;
+};
+
+export type Chemise = {
+  ref: string;
+  model: string;
+  size: string;
+  image?: string;
+};
+
+export type Chaussure = {
+  ref: string;
+  model: string;
+  size: string;
+  image?: string;
+};
+
+export type Accessoire = {
+  ref: string;
+  model: string;
+  image?: string;
+  description? : string
+};
+
+export type Client = {
+  name: string;
+  phone: string;
+  vers: number;
+  rest: number;
+  comment : string;
+};
+
+export type Location = {
+  location_date: Date;
+  id: string;
+  date_sortie: Date | string;
+  costumes: Costume[];
+  chemise: Chemise | null;
+  chaussure: Chaussure | null;
+  accessories: Accessoire[];
+  client: Client | null;
+};
+
 export const categories = ["costume", "chemise", "chaussure", "accessoire"];

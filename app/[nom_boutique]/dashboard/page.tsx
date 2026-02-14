@@ -28,7 +28,7 @@ export default async function Dashboard(props: {
 
   const result = await get_locations(showAll);
   const sortLocationsByDate = result.sort(
-    (a, b) => a.date_sortie.getTime() - b.date_sortie.getTime(),
+    (a, b) => new Date(a.date_sortie).getTime() - new Date(b.date_sortie).getTime(),
   );
 
   return (
@@ -55,7 +55,7 @@ export default async function Dashboard(props: {
 
               <Link
                 href={`/${nom_boutique}/dashboard?all=${!showAll}`}
-                className="bg-white text-[#000c79] hover:border-2 hover:border-[#000c79] font-semibold px-6 py-3 rounded-xl active:scale-95  flex items-center gap-2 shadow-lg group"
+                className="bg-white text-[#000c79] hover:outline-2 hover:outline-[#000c79] font-semibold px-6 py-3 rounded-xl active:scale-95  flex items-center gap-2 shadow-lg group"
               >
                 <FiEye className="text-lg group-hover:scale-110 transition-transform" />
                 <span className="text-sm">
