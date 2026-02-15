@@ -1,5 +1,6 @@
 "use server";
 import { get_one_location } from "@/app/firebase/getLocations";
+import DeleteLocationButton from "@/app/[nom_boutique]/components/deleteLocationButton"
 import Link from "next/link";
 import React from "react";
 import {
@@ -7,7 +8,6 @@ import {
   FiUser,
   FiPhone,
   FiEdit,
-  FiTrash2,
   FiArrowLeft,
   FiClock,
   FiCheckCircle,
@@ -69,13 +69,7 @@ const Page = async ({ params }: Props): Promise<any> => {
               <FiEdit className="text-lg group-hover:scale-110 transition-transform" />
               <span className="font-semibold">Modifier</span>
             </Link>
-            <Link
-              href={`/${nom_boutique}/dashboard`}
-              className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-5 py-2.5 bg-red-600 text-white rounded-xl hover:bg-red-700 transition-all shadow-md hover:shadow-lg active:scale-95"
-            >
-              <FiTrash2 className="text-lg" />
-              <span className="font-semibold">Supprimer</span>
-            </Link>
+            <DeleteLocationButton nom_boutique={nom_boutique} idLocation={location}/>
           </div>
         </div>
 
