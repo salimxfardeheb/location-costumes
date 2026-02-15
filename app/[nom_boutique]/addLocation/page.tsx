@@ -295,9 +295,9 @@ const Page = () => {
           >
             {/* Success/Error Messages */}
             {success && (
-              <div className="mb-6 border bg-green-700/20 border-[#000c79] rounded-xl p-4 flex items-center gap-3 animate-fadeIn">
+              <div className="mb-6 border bg-green-700/20 border-green-100 rounded-xl p-4 flex items-center gap-3 animate-fadeIn">
                 <svg
-                  className="iconLocation text-[#000c79]flex-shrink-0"
+                  className="iconLocation text-green-700 flex-shrink-0"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -309,7 +309,7 @@ const Page = () => {
                     d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
                   />
                 </svg>
-                <span className="text-[#000c79] font-medium text-sm">
+                <span className="text-green-700 font-medium text-sm">
                   {success}
                 </span>
               </div>
