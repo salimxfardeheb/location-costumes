@@ -29,8 +29,32 @@ export async function handleUpload(
   setUploadedUrl(data.url);
 }
 
+export interface ItemCloth {
+  model: string;
+  blazer?: string;
+  pant?: string;
+  size?: string;
+  image?: string;
+}
+
+export interface LocationInput {
+  location_date: Date;
+  costume?: ItemCloth[];
+  chemise?: ItemCloth;
+  chaussure?: ItemCloth;
+  accessoire?: ItemCloth[];
+  client: Client;
+  total : number
+}
+
+export interface size {
+  size: string;
+  location_date: Date[];
+}
+
+
 export type Costume = {
-  ref: string;
+  ref: string;      
   model: string;
   blazer: string;
   pant: string;
@@ -67,14 +91,14 @@ export type Client = {
 };
 
 export type Location = {
-  location_date: Date;
   id: string;
-  date_sortie: Date | string;
+  location_date: Date;
   costumes: Costume[];
   chemise: Chemise | null;
   chaussure: Chaussure | null;
   accessories: Accessoire[];
   client: Client | null;
+  total : number;
 };
 
 export const categories = ["costume", "chemise", "chaussure", "accessoire"];

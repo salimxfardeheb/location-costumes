@@ -1,15 +1,11 @@
 "use client";
-import {
-  ItemCloth,
-  LocationInput,
-  ClientInfo,
-} from "@/app/firebase/createLocation";
+
 import React, { useState, useEffect } from "react";
 import { MdOutlineCancel } from "react-icons/md";
 import { TbHanger } from "react-icons/tb";
 import { checkAvailability } from "@/app/firebase/checkAvailability";
 import { get_all_category_cloth } from "@/app/firebase/getCategoryCloth";
-import { categories } from "@/app/functions";
+import { categories, Client, ItemCloth, LocationInput } from "@/app/functions";
 import { RiShirtLine } from "react-icons/ri";
 import { LiaShoePrintsSolid } from "react-icons/lia";
 import { IoIosBowtie } from "react-icons/io";
@@ -35,7 +31,7 @@ const Page = () => {
     size: "",
   });
   const [accessories, setAccessories] = useState<string[]>([]);
-  const [client, setClient] = useState<ClientInfo>({
+  const [client, setClient] = useState<Client>({
     name: "",
     phone: "",
     vers: 0,
@@ -168,6 +164,7 @@ const Page = () => {
         chaussure,
         accessoire: accessories.map((a) => ({ model: a })),
         client: client,
+        total: prixTotal,
       };
 
       const res = await fetch("/api/location", {
@@ -534,9 +531,7 @@ const Page = () => {
                 <div className="categoryContainer">
                   <div className="flex items-center gap-2 mb-4">
                     <RiShirtLine className="iconLocation" />
-                    <h3 className="text-xl font-bold text-gray-800">
-                      Chemise
-                    </h3>
+                    <h3 className="text-xl font-bold text-gray-800">Chemise</h3>
                   </div>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
@@ -725,7 +720,9 @@ const Page = () => {
                     </div>
                   </div>
                   <div>
-                    <label className="labelLocation">Ajouter une remarque</label>
+                    <label className="labelLocation">
+                      Ajouter une remarque
+                    </label>
                     <textarea
                       className="inputLocation"
                       rows={5}

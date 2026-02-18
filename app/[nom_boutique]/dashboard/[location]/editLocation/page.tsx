@@ -20,7 +20,7 @@ const Page = async ({ params }: Props) => {
     </div>
   );
 }
-  // 🔥 Nettoyage pour éviter les objets non sérialisables
+  // Nettoyage pour éviter les objets non sérialisables
 const initialData = JSON.parse(JSON.stringify({
   ...rawData,
   date_sortie:

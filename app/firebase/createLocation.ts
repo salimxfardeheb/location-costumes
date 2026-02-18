@@ -12,33 +12,8 @@ import {
 } from "firebase/firestore";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
-import { size } from "./createCategoryCloth";
 import { checkAvailability } from "./checkAvailability";
-
-export interface ItemCloth {
-  model: string;
-  blazer?: string;
-  pant?: string;
-  size?: string;
-  image?: string;
-}
-
-export interface LocationInput {
-  location_date: Date;
-  costume?: ItemCloth[];
-  chemise?: ItemCloth;
-  chaussure?: ItemCloth;
-  accessoire?: ItemCloth[];
-  client: ClientInfo;
-}
-
-export interface ClientInfo {
-  name: string;
-  phone: string;
-  vers: number;
-  rest: number;
-  comment : string;
-}
+import { LocationInput, size } from "../functions";
 
 export async function create_location(location: LocationInput) {
   const session = await getServerSession(authOptions);
@@ -47,7 +22,6 @@ export async function create_location(location: LocationInput) {
   if (!id_boutique) {
     throw new Error("Boutique ID manquant");
   }
-  console.log(location)
   try {
     const boutiqueRef = doc(db, "shop", id_boutique);
 
@@ -99,12 +73,18 @@ export async function create_location(location: LocationInput) {
 
         costumeData.blazerSize.forEach((s: size) => {
           if (s.size === model.blazer) {
+            if (!Array.isArray(s.location_date)) {
+              s.location_date = [];
+            }
             s.location_date.push(location.location_date);
           }
         });
 
         costumeData.pantSize.forEach((s: size) => {
           if (s.size === model.pant) {
+            if (!Array.isArray(s.location_date)) {
+              s.location_date = [];
+            }
             s.location_date.push(location.location_date);
           }
         });
@@ -146,6 +126,9 @@ export async function create_location(location: LocationInput) {
             missingChemiseSize = true;
           } else {
             setShirtData.size.forEach((s: size) => {
+              if (!Array.isArray(s.location_date)) {
+                s.location_date = [];
+              }
               if (s.size === location.chemise?.size) {
                 s.location_date.push(location.location_date);
               }
@@ -191,6 +174,9 @@ export async function create_location(location: LocationInput) {
           } else {
             setShoeData.size.forEach((s: size) => {
               if (s.size === location.chaussure?.size) {
+                if (!Array.isArray(s.location_date)) {
+                  s.location_date = [];
+                }
                 s.location_date.push(location.location_date);
               }
             });
@@ -262,7 +248,8 @@ export async function create_location(location: LocationInput) {
       chemise: shirtData,
       chaussure: shoeData,
       accessoire: accessoryRefs,
-      client : location.client
+      client: location.client,
+      total: location.total,
     };
 
     const docRef = await addDoc(collection(db, "location"), locationData);

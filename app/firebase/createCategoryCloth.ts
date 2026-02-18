@@ -4,12 +4,8 @@ import { db } from "@/lib/firebase/connect";
 import { collection, addDoc, doc } from "firebase/firestore";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
-import { categories } from "@/app/functions";
+import { categories, size } from "@/app/functions";
 
-export interface size {
-  size: string;
-  location_date: Date[];
-}
 
 interface collection_item {
   type_collection: string; // all

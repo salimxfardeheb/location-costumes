@@ -14,6 +14,8 @@ import {
   FiPlus,
   FiTrash2,
   FiPackage,
+  FiX,
+  FiEdit,
 } from "react-icons/fi";
 import { MdOutlineCancel } from "react-icons/md";
 
@@ -41,6 +43,8 @@ const EditLocationForm: React.FC<locationProps> = ({
   const [loading, setLoading] = useState(false);
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
 
+  const [editDate, setEditDate] = useState(false);
+
   // data
   const [clientData, setClientData] = useState<Client>({
     name: initialData.client?.name || "",
@@ -50,14 +54,14 @@ const EditLocationForm: React.FC<locationProps> = ({
     comment: initialData.client?.comment || "",
   });
 
-  const [dateSortie, setDateSortie] = useState<string>(
-    initialData.date_sortie instanceof Date
-      ? initialData.date_sortie.toISOString().split("T")[0]
-      : initialData.date_sortie || "",
+  const [location_date, setDateSortie] = useState<string>(
+    initialData.location_date instanceof Date
+      ? initialData.location_date.toISOString().split("T")[0]
+      : initialData.location_date || "",
   );
 
   const [costumes, setCostumes] = useState<Costume[]>(
-    initialData.costumes || [],
+    initialData.costumes || [{ ref: "", model: "", blazer: "", pant: "" }],
   );
 
   const [chemise, setChemise] = useState<Chemise | null>(
@@ -72,6 +76,49 @@ const EditLocationForm: React.FC<locationProps> = ({
   );
 
   // handlers
+  const handleClientChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+  ) => {
+    const { name, value } = e.target;
+
+    setClientData((prev) => ({
+      ...prev,
+      [name]: name === "vers" || name === "rest" ? Number(value) : value,
+    }));
+  };
+
+  const handleCostumeChange = (
+    index: number,
+    field: keyof Costume,
+    value: string,
+  ) => {
+    const updated = [...costumes];
+    updated[index] = {
+      ...updated[index],
+      [field]: value,
+    };
+    setCostumes(updated);
+  };
+
+  const addCostume = () => {
+    setCostumes([...costumes, { ref: "", model: "", blazer: "", pant: "" }]);
+  };
+
+  const removeCostume = (index: number) => {
+    setCostumes((prev) => prev.filter((_, i) => i !== index));
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+
+    try {
+    } catch (error) {
+      console.error("Erreur modification :", error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <div className="w-full min-h-screen bg-gradient-to-br from-gray-50 via-blue-50/30 to-gray-100 p-4 sm:p-6 animate-fadeIn">
@@ -110,18 +157,65 @@ const EditLocationForm: React.FC<locationProps> = ({
               </h2>
             </div>
             {/* Date de sortie */}
-            <div className="mb-6">
-              <label className="block text-sm font-semibold text-gray-700 mb-2">
-                <FiCalendar className="inline mr-2" />
-                Date de sortie
-              </label>
-              <input
-                type="date"
-                value={dateSortie}
-                onChange={(e) => setDateSortie(e.target.value)}
-                className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
-                required
-              />
+            <div className="py-6">
+              {!editDate ? (
+                <div className="flex justify-between items-end ">
+                  <div className="flex items-center gap-4">
+                    <div className="p-3 bg-white rounded-xl shadow-sm">
+                      <FiCalendar className="text-2xl text-blue-600" />
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium text-gray-600 mb-1">
+                        Date de sortie
+                      </p>
+                      <p className="text-2xl font-bold text-gray-800">
+                        {initialData?.location_date instanceof Date
+                          ? initialData.location_date.toLocaleDateString(
+                              "fr-FR",
+                              {
+                                day: "2-digit",
+                                month: "short",
+                                year: "numeric",
+                              },
+                            )
+                          : initialData?.location_date}
+                      </p>
+                    </div>
+                  </div>
+                  <button
+                    onClick={() => setEditDate(true)}
+                    className="flex items-center gap-2 px-5 py-2.5 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-all shadow-md hover:shadow-lg active:scale-95 font-medium"
+                  >
+                    <FiEdit className="text-lg" />
+                    Modifier
+                  </button>
+                </div>
+              ) : (
+                <div className="space-y-4 flex items-end gap-4">
+                  <div className="w-full">
+                    <label className="flex items-center gap-2 text-sm font-semibold text-gray-700 mb-3">
+                      <FiCalendar className="text-blue-600" />
+                      Nouvelle date
+                    </label>
+                    <input
+                      type="date"
+                      value={location_date}
+                      onChange={(e) => setDateSortie(e.target.value)}
+                      className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all outline-none"
+                      required
+                    />
+                  </div>
+                  <div className="flex gap-3 my-5">
+                    <button
+                      onClick={() => setEditDate(false)}
+                      className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 bg-red-100 text-gray-700 rounded-xl hover:bg-red-200 transition-all font-medium active:scale-95"
+                    >
+                      <FiX className="text-lg" />
+                      Annuler
+                    </button>
+                  </div>
+                </div>
+              )}
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {/* Nom */}
@@ -134,6 +228,7 @@ const EditLocationForm: React.FC<locationProps> = ({
                   type="text"
                   name="name"
                   value={clientData.name}
+                  onChange={handleClientChange}
                   className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
                   placeholder="Entrez le nom"
                   required
@@ -150,6 +245,7 @@ const EditLocationForm: React.FC<locationProps> = ({
                   type="tel"
                   name="phone"
                   value={clientData.phone}
+                  onChange={handleClientChange}
                   className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
                   placeholder="0555 00 00 00"
                   required
@@ -159,12 +255,13 @@ const EditLocationForm: React.FC<locationProps> = ({
               <div>
                 <label className="block text-sm font-semibold text-gray-700 mb-2">
                   <FiDollarSign className="inline mr-2" />
-                  Versement (DA)
+                  Prix total
                 </label>
                 <input
                   type="number"
                   name="vers"
-                  value={clientData.vers}
+                  value={initialData.total}
+                  onChange={handleClientChange}
                   className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all"
                   placeholder="0"
                   min="0"
@@ -182,6 +279,7 @@ const EditLocationForm: React.FC<locationProps> = ({
                   type="number"
                   name="rest"
                   value={clientData.rest}
+                  onChange={handleClientChange}
                   className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all"
                   placeholder="0"
                   min="0"
@@ -197,6 +295,7 @@ const EditLocationForm: React.FC<locationProps> = ({
                 <textarea
                   name="comment"
                   value={clientData.comment}
+                  onChange={handleClientChange}
                   className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all resize-none"
                   placeholder="Notes ou commentaires..."
                   rows={3}
@@ -217,6 +316,7 @@ const EditLocationForm: React.FC<locationProps> = ({
               <button
                 type="button"
                 className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-all shadow-md hover:shadow-lg active:scale-95"
+                onClick={addCostume}
               >
                 <FiPlus className="text-lg" />
                 Ajouter
@@ -242,6 +342,9 @@ const EditLocationForm: React.FC<locationProps> = ({
                         <input
                           type="text"
                           value={costume.model}
+                          onChange={(e) =>
+                            handleCostumeChange(index, "model", e.target.value)
+                          }
                           className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
                           placeholder="Ex: C001"
                         />
@@ -253,11 +356,13 @@ const EditLocationForm: React.FC<locationProps> = ({
                         <input
                           type="text"
                           value={costume.blazer}
+                          onChange={(e) =>
+                            handleCostumeChange(index, "model", e.target.value)
+                          }
                           className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
                           placeholder="Ex: 48"
                         />
                       </div>
-
                       <div>
                         <label className="block text-sm font-semibold text-gray-700 mb-2">
                           Taille Pantalon
@@ -265,6 +370,9 @@ const EditLocationForm: React.FC<locationProps> = ({
                         <input
                           type="text"
                           value={costume.pant}
+                          onChange={(e) =>
+                            handleCostumeChange(index, "model", e.target.value)
+                          }
                           className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
                           placeholder="Ex: 44"
                         />
@@ -274,6 +382,7 @@ const EditLocationForm: React.FC<locationProps> = ({
                       type="button"
                       className="text-red-500 hover:text-red-700 max-h-12 hover:bg-red-50 p-2 rounded-lg transition-colors"
                       title="Supprimer ce costume"
+                      onClick={() => removeCostume(index)}
                     >
                       <MdOutlineCancel className="text-2xl" />
                     </button>

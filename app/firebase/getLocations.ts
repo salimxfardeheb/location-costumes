@@ -36,7 +36,7 @@ export async function get_locations(showAll: boolean): Promise<LocationItem[]> {
     const data = snap.data();
     return {
       id: snap.id,
-      date_sortie: new Date(data.location_date),
+      location_date: new Date(data.location_date),
       costumes: Array.isArray(data.costume)
         ? data.costume.map((c: any) => ({
             ref: c.ref,
@@ -83,12 +83,13 @@ export async function get_locations(showAll: boolean): Promise<LocationItem[]> {
             comment: data.client.comment,
           }
         : null,
+        total : data.total,
     };
   });
 
   if (!showAll) {
     return locations.filter((loc) => {
-      const date = new Date(loc.date_sortie);
+      const date = new Date(loc.location_date);
       return date >= today;
     });
   }
@@ -107,7 +108,7 @@ export async function get_one_location(
   const locationData = snapshot.data();
   return {
     id: id_location,
-    date_sortie: new Date(locationData.location_date),
+    location_date: new Date(locationData.location_date),
     costumes: Array.isArray(locationData.costume)
       ? locationData.costume.map((c: any) => ({
           ref: c.ref,
@@ -150,6 +151,7 @@ export async function get_one_location(
           comment: locationData.client.comment,
         }
       : null,
+      total : locationData.total,
   };
 }
 
@@ -174,7 +176,7 @@ export async function get_location_perDate(
     const data = snap.data();
     return {
       id: snap.id,
-      date_sortie: new Date(data.location_date),
+      location_date: new Date(data.location_date),
       costumes: Array.isArray(data.costume)
         ? data.costume.map((c: any) => ({
             ref: c.ref,
@@ -221,6 +223,7 @@ export async function get_location_perDate(
             comment: data.client.comment,
           }
         : null,
+        total : data.total,
     };
   });
   return locations;
