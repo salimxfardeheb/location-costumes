@@ -7,46 +7,13 @@ import Link from "next/link";
 import { useParams } from "next/navigation";
 import { FiCalendar } from "react-icons/fi";
 
-type Costume = {
-  ref: string;
-  model: string;
-  blazer: string;
-  pant: string;
-  image?: string;
-};
+import {Location} from "@/app/functions"
 
-type Chemise = {
-  ref: string;
-  model: string;
-  size: string;
-  image?: string;
-};
 
-type Chaussure = {
-  ref: string;
-  model: string;
-  size: string;
-  image?: string;
-};
-
-type Accessoire = {
-  ref: string;
-  model: string;
-  image?: string;
-};
-
-type LocationItem = {
-  id: string;
-  date_sortie: string;
-  costumes: Costume[];
-  chemise: Chemise | null;
-  chaussure: Chaussure | null;
-  accessories: Accessoire[];
-};
 
 const Page = () => {
   const [currentMonth, setCurrentMonth] = useState(dayjs());
-  const [locations, setLocations] = useState<LocationItem[]>([]);
+  const [locations, setLocations] = useState<Location[]>([]);
   const [loading, setLoading] = useState(true);
   const { nom_boutique } = useParams();
 
@@ -134,7 +101,7 @@ const Page = () => {
               const isToday = dayItem.isSame(dayjs(), "day");
 
               const eventsOfDay = locations.filter((loc) =>
-                dayItem.isSame(dayjs(loc.date_sortie), "day")
+                dayItem.isSame(dayjs(loc.location_date), "day")
               );
 
               return (

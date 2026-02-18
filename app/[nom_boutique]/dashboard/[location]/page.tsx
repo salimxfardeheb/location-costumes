@@ -46,7 +46,7 @@ const Page = async ({ params }: Props): Promise<any> => {
     return diffDays;
   };
 
-  const daysRemaining = getDaysRemaining(result?.date_sortie);
+  const daysRemaining = getDaysRemaining(result?.location_date);
 
   return (
     <div className="w-full min-h-screen bg-gradient-to-br from-gray-50 via-blue-50/30 to-gray-100 p-4 sm:p-6">
@@ -82,12 +82,12 @@ const Page = async ({ params }: Props): Promise<any> => {
               <p className="text-sm font-medium opacity-90">Date de sortie</p>
             </div>
             <p className="text-2xl font-bold mb-1">
-              {result?.date_sortie instanceof Date
-                ? result.date_sortie.toLocaleDateString("fr-FR", {
+              {result?.location_date instanceof Date
+                ? result.location_date.toLocaleDateString("fr-FR", {
                     day: "2-digit",
                     month: "short",
                   })
-                : result?.date_sortie}
+                : result?.location_date}
             </p>
             {daysRemaining !== null && (
               <div className="flex items-center gap-1 mt-2">

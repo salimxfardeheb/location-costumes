@@ -28,7 +28,7 @@ export default async function Dashboard(props: {
 
   const result = await get_locations(showAll);
   const sortLocationsByDate = result.sort(
-    (a, b) => new Date(a.date_sortie).getTime() - new Date(b.date_sortie).getTime(),
+    (a, b) => new Date(a.location_date).getTime() - new Date(b.location_date).getTime(),
   );
 
   return (
@@ -134,13 +134,13 @@ export default async function Dashboard(props: {
                           <div className="px-2 py-4 flex items-center gap-2">
                             <FiCalendar className="text-[#06B9AE]" />
                             <span className="font-medium text-gray-800">
-                              {data.date_sortie instanceof Date
-                                ? data.date_sortie.toLocaleDateString("fr-FR", {
+                              {data.location_date instanceof Date
+                                ? data.location_date.toLocaleDateString("fr-FR", {
                                     day: "2-digit",
                                     month: "short",
                                     year: "numeric",
                                   })
-                                : data.date_sortie}
+                                : data.location_date}
                             </span>
                           </div>
 
