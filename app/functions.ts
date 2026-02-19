@@ -47,6 +47,16 @@ export interface LocationInput {
   total : number
 }
 
+export interface collection_item {
+  type_collection: string; // all
+  model: string; // all
+  image_path: string; // all
+  blazer?: size[]; // costume
+  pant?: size[]; // costume
+  size?: size[]; // shirt & shoe
+  description?: string; // accessoire
+}
+
 export interface size {
   size: string;
   location_date: Date[];
@@ -54,7 +64,7 @@ export interface size {
 
 
 export type Costume = {
-  ref: string;      
+  ref: string | null;      
   model: string;
   blazer: string;
   pant: string;
@@ -62,21 +72,21 @@ export type Costume = {
 };
 
 export type Chemise = {
-  ref: string;
+  ref: string | null;
   model: string;
   size: string;
   image?: string;
 };
 
 export type Chaussure = {
-  ref: string;
+  ref: string | null;
   model: string;
   size: string;
   image?: string;
 };
 
 export type Accessoire = {
-  ref: string;
+  ref: string | null;
   model: string;
   image?: string;
   description? : string

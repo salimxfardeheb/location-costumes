@@ -1,6 +1,5 @@
-"use server";
 import { get_one_location } from "@/app/firebase/getLocations";
-import DeleteLocationButton from "@/app/[nom_boutique]/components/deleteLocationButton"
+import DeleteLocationButton from "@/app/[nom_boutique]/components/deleteLocationButton";
 import Link from "next/link";
 import React from "react";
 import {
@@ -13,7 +12,7 @@ import {
   FiCheckCircle,
   FiAlertCircle,
   FiPackage,
-  FiFileText
+  FiFileText,
 } from "react-icons/fi";
 
 interface Props {
@@ -69,7 +68,10 @@ const Page = async ({ params }: Props): Promise<any> => {
               <FiEdit className="text-lg group-hover:scale-110 transition-transform" />
               <span className="font-semibold">Modifier</span>
             </Link>
-            <DeleteLocationButton nom_boutique={nom_boutique} idLocation={location}/>
+            <DeleteLocationButton
+              nom_boutique={nom_boutique}
+              idLocation={location}
+            />
           </div>
         </div>
 

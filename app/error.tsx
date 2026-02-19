@@ -2,7 +2,6 @@
 import { useEffect } from "react";
 import { motion } from "framer-motion";
 import { FiAlertTriangle, FiRefreshCw, FiHome } from "react-icons/fi";
-import Link from "next/link";
 
 export default function GlobalError({ 
   error, 

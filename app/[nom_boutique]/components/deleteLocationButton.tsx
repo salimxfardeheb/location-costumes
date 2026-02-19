@@ -3,7 +3,7 @@
 import { deleteLocation } from "@/app/firebase/deleteLocation";
 import { useRouter } from "next/navigation";
 import React, { useState } from "react";
-import { FiTrash2, FiX, FiAlertTriangle } from "react-icons/fi";
+import { FiTrash2, FiAlertTriangle } from "react-icons/fi";
 
 interface deleteLocationProps {
   nom_boutique: string;

@@ -4,18 +4,10 @@ import { db } from "@/lib/firebase/connect";
 import { collection, addDoc, doc } from "firebase/firestore";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
-import { categories, size } from "@/app/functions";
+import { categories, collection_item } from "@/app/functions";
 
 
-interface collection_item {
-  type_collection: string; // all
-  model: string; // all
-  image_path: string; // all
-  blazer?: size[]; // costume
-  pant?: size[]; // costume
-  size?: size[]; // shirt & shoe
-  description?: string; // accessoire
-}
+
 
 export async function create_item_cloth(item: collection_item) {
   const session = await getServerSession(authOptions);

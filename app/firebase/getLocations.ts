@@ -11,7 +11,7 @@ import {
 } from "firebase/firestore";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
-import { Location as LocationItem} from "@/app/functions"
+import { Location as LocationItem } from "@/app/functions";
 
 export async function get_locations(showAll: boolean): Promise<LocationItem[]> {
   const session = await getServerSession(authOptions);
@@ -83,7 +83,7 @@ export async function get_locations(showAll: boolean): Promise<LocationItem[]> {
             comment: data.client.comment,
           }
         : null,
-        total : data.total,
+      total: data.total,
     };
   });
 
@@ -108,10 +108,12 @@ export async function get_one_location(
   const locationData = snapshot.data();
   return {
     id: id_location,
-    location_date: new Date(locationData.location_date),
+    location_date: locationData.location_date?.toDate
+      ? locationData.location_date.toDate()
+      : new Date(locationData.location_date),
     costumes: Array.isArray(locationData.costume)
       ? locationData.costume.map((c: any) => ({
-          ref: c.ref,
+          ref: c.ref?.path ?? null,
           model: c.model,
           blazer: c.blazer,
           pant: c.pant,
@@ -120,7 +122,7 @@ export async function get_one_location(
       : [],
     chemise: locationData.chemise
       ? {
-          ref: locationData.chemise.ref,
+          ref: locationData.chemise.ref.path ?? null,
           model: locationData.chemise.model,
           size: locationData.chemise.size,
           image: locationData.chemise.image,
@@ -128,7 +130,7 @@ export async function get_one_location(
       : null,
     chaussure: locationData.chaussure
       ? {
-          ref: locationData.chaussure.ref,
+          ref: locationData.chaussure.ref.path ?? null,
           model: locationData.chaussure.model,
           size: locationData.chaussure.size,
           image: locationData.chaussure.image,
@@ -139,7 +141,7 @@ export async function get_one_location(
           ref: a.ref,
           model: a.model,
           image: a.image,
-          description : a.description,
+          description: a.description,
         }))
       : [],
     client: locationData.client
@@ -151,7 +153,7 @@ export async function get_one_location(
           comment: locationData.client.comment,
         }
       : null,
-      total : locationData.total,
+    total: locationData.total,
   };
 }
 
@@ -223,7 +225,7 @@ export async function get_location_perDate(
             comment: data.client.comment,
           }
         : null,
-        total : data.total,
+      total: data.total,
     };
   });
   return locations;
