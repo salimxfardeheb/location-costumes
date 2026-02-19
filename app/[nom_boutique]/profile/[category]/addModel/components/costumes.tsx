@@ -2,10 +2,30 @@
 import { create_item_cloth } from "@/app/firebase/createCategoryCloth";
 import { handleUpload } from "@/app/functions";
 import React, { useState } from "react";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
+import { size } from "@/app/functions";
+import {
+  FiUpload,
+  FiCheck,
+  FiX,
+  FiImage,
+} from "react-icons/fi";
+import SizePicker from "./SizePicker";
 
-
-import { size } from "@/app/firebase/createCategoryCloth";
+const ALL_SIZES: size[] = [
+  { size: "44", location_date: [] },
+  { size: "46", location_date: [] },
+  { size: "48", location_date: [] },
+  { size: "50", location_date: [] },
+  { size: "52", location_date: [] },
+  { size: "54", location_date: [] },
+  { size: "56", location_date: [] },
+  { size: "58", location_date: [] },
+  { size: "60", location_date: [] },
+  { size: "62", location_date: [] },
+  { size: "64", location_date: [] },
+  { size: "66", location_date: [] },
+];
 
 const Costumes = () => {
   const [model, setModel] = useState("");
@@ -13,184 +33,166 @@ const Costumes = () => {
   const [pants, setPants] = useState<size[]>([]);
   const [preview, setPreview] = useState<string | null>(null);
   const [uploadedUrl, setUploadedUrl] = useState<string | null>(null);
-  const [contentMessage, setContentMessage] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showSuccess, setShowSuccess] = useState(false);
 
-      const { nom_boutique } = useParams();
-
-  const sizes: size[] = [
-    { size: "44" , location_date : [] },
-    { size: "46" , location_date : [] },
-    { size: "48" , location_date : [] },
-    { size: "50" , location_date : [] },
-    { size: "52" , location_date : [] },
-    { size: "54" , location_date : [] },
-    { size: "56" , location_date : [] },
-    { size: "58" , location_date : [] },
-    { size: "60" , location_date : [] },
-    { size: "62" , location_date : [] },
-    { size: "64" , location_date : [] },
-    { size: "66" , location_date : [] },
-  ];
+  const { nom_boutique } = useParams();
+  const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!uploadedUrl) return;
-
+    setIsSubmitting(true);
     const item = {
       type_collection: "costume",
-      model: model,
+      model,
       blazerSize: blazer,
       pantSize: pants,
       image_path: uploadedUrl,
     };
-
     await create_item_cloth(item);
-
-    setContentMessage("✅ Modèle créé avec succès !");
+    setShowSuccess(true);
     setModel("");
     setBlazer([]);
     setPants([]);
     setPreview(null);
     setUploadedUrl(null);
-
-    setTimeout(() => setContentMessage(""), 3000);
+    setIsSubmitting(false);
+    setTimeout(() => {
+      setShowSuccess(false);
+      router.push(`/${nom_boutique}/profile/costume`);
+    }, 2000);
   };
 
-  const toggleSelectAllBlazers = () => {
-    if (blazer.length === sizes.length) {
-      setBlazer([]);
-    } else {
-      setBlazer(sizes);
-    }
-  };
-  const toggleSelectpants = () => {
-    if (pants.length === sizes.length) {
-      setPants([]);
-    } else {
-      setPants(sizes);
-    }
-  };
+  const isFormValid =
+    model && blazer.length > 0 && pants.length > 0 && uploadedUrl;
 
   return (
-    <div>
-      {contentMessage && (
-        <span className="text-green-600 font-semibold mt-4 block mx-auto w-fit mb-5">
-          {contentMessage}
-        </span>
-      )}
-      <form
-        onSubmit={handleSubmit}
-        className="flex flex-col justify-center items-center space-y-8"
-      >
-        <label className="flex justify-start items-center gap-4">
-          <span className="text-xl">Model :</span>
-          <input
-            type="text"
-            placeholder="N° Model"
-            className="bg-[#B6FFF6] px-5 py-2 rounded-xl border-2 border-[#36CBC1] placeholder:text-gray-600 focus-within:placeholder:text-[#36CBC1] focus-within:outline-0"
-            value={model}
-            onChange={(e) => setModel(e.target.value)} required
-          />
-        </label>
-
-        <div className="flex flex-col gap-4 w-2/5">
-          <div className="flex justify-between items-center">
-            <span className="text-xl">Tailles des blazers :</span>
-            <button
-              type="button"
-              onClick={toggleSelectAllBlazers}
-              className="bg-[#36CBC1] text-white px-3 py-1 rounded-md hover:opacity-85"
-            >
-              {blazer.length === sizes.length
-                ? "Tout désélectionner"
-                : "Tout sélectionner"}
-            </button>
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-blue-50/30 to-gray-100 p-6">
+      <div className="max-w-5xl mx-auto">
+        {showSuccess && (
+          <div className="bg-green-500 text-white rounded-xl p-4 mb-6 flex items-center gap-3 shadow-lg">
+            <FiCheck className="text-2xl" />
+            <span className="font-semibold">Modèle créé avec succès !</span>
           </div>
-          <ul className="flex gap-7 flex-wrap">
-            {sizes.map((size) => (
-              <li key={size.size}>
-                <label className="flex items-center gap-1">
-                  <input
-                    type="checkbox"
-                    checked={blazer.some((s) => s.size === size.size)}
-                    value={size.size}
-                    onChange={(e) =>
-                      setBlazer((prev) =>
-                        e.target.checked
-                          ? [...prev, size]
-                          : prev.filter((s) => s.size !== size.size)
-                      )
-                    }
-                  />
-                  {size.size}
-                </label>
-              </li>
-            ))}
-          </ul>
-        </div>
+        )}
 
-        <label className="flex flex-col gap-10 justify-between w-2/5">
-          <div className="flex justify-between items-center">
-            <span className="text-xl">Tailles des pantallons :</span>
-            <button
-              type="button"
-              onClick={toggleSelectpants}
-              className="bg-[#36CBC1] text-white px-3 py-1 rounded-md hover:opacity-85"
-            >
-              {pants.length === sizes.length
-                ? "Tout désélectionner"
-                : "Tout sélectionner"}
-            </button>
+        <form onSubmit={handleSubmit} className="space-y-6">
+          {/* Modèle */}
+          <div className="bg-white rounded-2xl shadow-lg border border-gray-200 p-6">
+            <label className="block">
+              <span className="text-lg font-semibold text-gray-800 mb-3 block">
+                Numéro de modèle *
+              </span>
+              <input
+                type="text"
+                placeholder="Ex: C2024-001"
+                className="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:border-[#000c79] focus:ring-4 focus:ring-blue-100 transition-all outline-none text-lg"
+                value={model}
+                onChange={(e) => setModel(e.target.value)}
+                required
+              />
+            </label>
           </div>
 
-          <ul className="flex gap-7 flex-wrap">
-            {sizes.map((size) => (
-              <li key={size.size}>
-                <label className="flex items-center gap-1">
-                  <input
-                    type="checkbox"
-                    checked={pants.some((s) => s.size === size.size)}
-                    value={size.size}
-                    onChange={(e) =>
-                      setPants((prev) =>
-                        e.target.checked
-                          ? [...prev, size]
-                          : prev.filter((s) => s.size !== size.size)
-                      )
-                    }
-                  />
-                  {size.size}
-                </label>
-              </li>
-            ))}
-          </ul>
-        </label>
-
-        <label className="flex flex-col items-start gap-2 cursor-pointer">
-          <span className="text-gray-700 font-medium">Insérez une image :</span>
-          <input
-            type="file"
-            className="block w-full text-sm text-gray-500 
-               file:mr-4 file:py-2 file:px-4
-               file:rounded-lg file:border-0
-               file:text-sm file:font-semibold
-               file:bg-[#06B9AE] file:text-white
-               hover:file:bg-[#059e95]
-               cursor-pointer"
-            onChange={(e) => {
-              handleUpload(e, setPreview, setUploadedUrl, typeof nom_boutique === "string" ? nom_boutique : "");
-            }}
+          {/* Blazer sizes */}
+          <SizePicker
+            label="Tailles des blazers *"
+            selected={blazer}
+            onChange={setBlazer}
+            availableSizes={ALL_SIZES}
           />
-          {preview && <img src={preview} alt="preview" width={200} />}
-        </label>
 
-        <button
-          type="submit"
-          className="bg-[#F39C12] text-white px-8 py-1.5 rounded-lg hover:opacity-85 cursor-pointer"
-        >
-          Ajouter le model
-        </button>
-      </form>
+          {/* Pants sizes */}
+          <SizePicker
+            label="Tailles des pantalons *"
+            selected={pants}
+            onChange={setPants}
+            availableSizes={ALL_SIZES}
+          />
+
+          {/* Upload Image */}
+          <div className="bg-white rounded-2xl shadow-lg border border-gray-200 p-6">
+            <span className="text-lg font-semibold text-gray-800 mb-3 block">
+              Image du modèle *
+            </span>
+            <div className="border-2 border-dashed border-gray-300 rounded-xl p-8 hover:border-[#000c79] transition-all">
+              <input
+                type="file"
+                className="hidden"
+                id="file-upload"
+                accept="image/*"
+                onChange={(e) =>
+                  handleUpload(
+                    e,
+                    setPreview,
+                    setUploadedUrl,
+                    typeof nom_boutique === "string" ? nom_boutique : "",
+                  )
+                }
+              />
+              <label htmlFor="file-upload" className="cursor-pointer block">
+                {preview ? (
+                  <div className="flex flex-col items-center gap-4">
+                    <img
+                      src={preview}
+                      alt="preview"
+                      className="w-64 h-80 object-cover rounded-xl shadow-md"
+                    />
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        setPreview(null);
+                        setUploadedUrl(null);
+                      }}
+                      className="flex items-center gap-2 px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-all"
+                    >
+                      <FiX /> Supprimer l'image
+                    </button>
+                  </div>
+                ) : (
+                  <div className="flex flex-col items-center gap-3 text-gray-500">
+                    <FiImage className="text-6xl text-gray-400" />
+                    <p className="text-lg font-medium">
+                      Cliquez pour sélectionner une image
+                    </p>
+                    <p className="text-sm">PNG, JPG jusqu'à 10MB</p>
+                  </div>
+                )}
+              </label>
+            </div>
+          </div>
+
+          {/* Actions */}
+          <div className="flex gap-4">
+            <button
+              type="button"
+              onClick={() => router.back()}
+              className="flex-1 px-6 py-4 bg-gray-200 text-gray-700 rounded-xl hover:bg-gray-300 transition-all font-semibold text-lg"
+            >
+              Annuler
+            </button>
+            <button
+              type="submit"
+              disabled={!isFormValid || isSubmitting}
+              className="flex-1 px-6 py-4 bg-gradient-to-r from-[#000c79] to-[#000a35] text-white rounded-xl hover:from-[#000a35] hover:to-[#000c79] transition-all font-semibold text-lg shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+            >
+              {isSubmitting ? (
+                <>
+                  <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                  Création en cours...
+                </>
+              ) : (
+                <>
+                  <FiUpload className="text-xl" />
+                  Ajouter le modèle
+                </>
+              )}
+            </button>
+          </div>
+        </form>
+      </div>
     </div>
   );
 };
