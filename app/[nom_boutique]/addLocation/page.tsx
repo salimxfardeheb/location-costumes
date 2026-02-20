@@ -13,10 +13,10 @@ import { FaRegUser } from "react-icons/fa";
 import { MdNavigateNext, MdNavigateBefore } from "react-icons/md";
 
 interface AvailableModels {
-  costumes: { model: string; image: string | null }[];
-  chemises: { model: string; image: string | null }[];
-  chaussures: { model: string; image: string | null }[];
-  accessoires: { model: string; image: string | null }[];
+  costumes: { model: string }[];
+  chemises: { model: string }[];
+  chaussures: { model: string }[];
+  accessoires: { model: string }[];
 }
 
 const Page = () => {
@@ -610,6 +610,7 @@ const Page = () => {
                 </div>
 
                 {/* Accessoires Section */}
+                {/* Accessoires Section */}
                 <div className="categoryContainer">
                   <div className="flex items-center gap-2 mb-4">
                     <IoIosBowtie className="iconLocation" />
@@ -617,31 +618,64 @@ const Page = () => {
                       Accessoires
                     </h3>
                   </div>
-                  <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                    {accessory.map((acc) => (
-                      <label
-                        key={acc}
-                        className="flex items-center gap-3 p-3 border-2 border-blue-500/25 rounded-xl hover:bg-blue-200/15 cursor-pointer transition-colors"
+                  {loadingModels ? (
+                    <p className="text-sm text-[#000c79] flex items-center gap-2">
+                      <svg
+                        className="animate-spin h-4 w-4"
+                        fill="none"
+                        viewBox="0 0 24 24"
                       >
-                        <input
-                          type="checkbox"
-                          value={acc}
-                          checked={accessories.includes(acc)}
-                          onChange={(e) =>
-                            setAccessories((prev) =>
-                              e.target.checked
-                                ? [...prev, acc]
-                                : prev.filter((s) => s !== acc),
-                            )
-                          }
-                          className="w-5 h-5 text-[#000c79] border-[#000c79] rounded focus:ring-[#000c79] focus:ring-2"
+                        <circle
+                          className="opacity-25"
+                          cx="12"
+                          cy="12"
+                          r="10"
+                          stroke="currentColor"
+                          strokeWidth="4"
                         />
-                        <span className="text-sm font-medium text-gray-700">
-                          {acc}
-                        </span>
-                      </label>
-                    ))}
-                  </div>
+                        <path
+                          className="opacity-75"
+                          fill="currentColor"
+                          d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                        />
+                      </svg>
+                      Chargement des accessoires...
+                    </p>
+                  ) : availableModels.accessoires.length === 0 ? (
+                    <p className="text-sm text-gray-400 italic">
+                      Aucun accessoire disponible
+                    </p>
+                  ) : (
+                    <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                      {[
+                        ...new Map(
+                          availableModels.accessoires.map((a) => [a.model, a]),
+                        ).values(),
+                      ].map((acc) => (
+                        <label
+                          key={acc.model}
+                          className="flex items-center gap-3 p-3 border-2 border-blue-500/25 rounded-xl hover:bg-blue-200/15 cursor-pointer transition-colors"
+                        >
+                          <input
+                            type="checkbox"
+                            value={acc.model}
+                            checked={accessories.includes(acc.model)}
+                            onChange={(e) =>
+                              setAccessories((prev) =>
+                                e.target.checked
+                                  ? [...prev, acc.model]
+                                  : prev.filter((s) => s !== acc.model),
+                              )
+                            }
+                            className="w-5 h-5 text-[#000c79] border-[#000c79] rounded focus:ring-[#000c79] focus:ring-2"
+                          />
+                          <span className="text-sm font-medium text-gray-700">
+                            {acc.model}
+                          </span>
+                        </label>
+                      ))}
+                    </div>
+                  )}
                 </div>
               </div>
             )}
