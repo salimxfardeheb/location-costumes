@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
@@ -13,11 +13,14 @@ import {
   FiFileText,
   FiPlus,
   FiTrash2,
-  FiPackage,
   FiX,
   FiEdit,
 } from "react-icons/fi";
 import { MdOutlineCancel } from "react-icons/md";
+import { TbHanger } from "react-icons/tb";
+import { RiShirtLine } from "react-icons/ri";
+import { LiaShoePrintsSolid } from "react-icons/lia";
+import { IoIosBowtie } from "react-icons/io";
 
 import {
   Location,
@@ -26,26 +29,43 @@ import {
   Chaussure,
   Accessoire,
   Client,
+  categories,
 } from "@/app/functions";
+import { get_all_category_cloth } from "@/app/firebase/getCategoryCloth";
 
-interface locationProps {
+interface AvailableModels {
+  costumes: { model: string }[];
+  chemises: { model: string }[];
+  chaussures: { model: string }[];
+  accessoires: { model: string }[];
+}
+
+interface LocationProps {
   initialData: Location;
   locationId: string;
   nomBoutique: string;
 }
 
-const EditLocationForm: React.FC<locationProps> = ({
+const EditLocationForm: React.FC<LocationProps> = ({
   initialData,
   locationId,
   nomBoutique,
 }) => {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
+  const [loadingModels, setLoadingModels] = useState(false);
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
-
+  const [error, setError] = useState<string | null>(null);
   const [editDate, setEditDate] = useState(false);
 
-  // data
+  const [availableModels, setAvailableModels] = useState<AvailableModels>({
+    costumes: [],
+    chemises: [],
+    chaussures: [],
+    accessoires: [],
+  });
+
+  // ─── Data states ────────────────────────────────────────────────────────────
   const [clientData, setClientData] = useState<Client>({
     name: initialData.client?.name || "",
     phone: initialData.client?.phone || "",
@@ -54,6 +74,8 @@ const EditLocationForm: React.FC<locationProps> = ({
     comment: initialData.client?.comment || "",
   });
 
+  const [prixTotal, setPrixTotal] = useState<number>(initialData.total || 0);
+
   const [location_date, setDateSortie] = useState<string>(
     initialData.location_date instanceof Date
       ? initialData.location_date.toISOString().split("T")[0]
@@ -61,7 +83,9 @@ const EditLocationForm: React.FC<locationProps> = ({
   );
 
   const [costumes, setCostumes] = useState<Costume[]>(
-    initialData.costumes || [{ ref: "", model: "", blazer: "", pant: "" }],
+    initialData.costumes?.length
+      ? initialData.costumes
+      : [{ ref: "", model: "", blazer: "", pant: "" }],
   );
 
   const [chemise, setChemise] = useState<Chemise | null>(
@@ -71,32 +95,64 @@ const EditLocationForm: React.FC<locationProps> = ({
   const [chaussure, setChaussure] = useState<Chaussure | null>(
     initialData.chaussure || null,
   );
+
   const [accessories, setAccessories] = useState<Accessoire[]>(
     initialData.accessories || [],
   );
 
-  // handlers
+  // ─── Fetch available models ──────────────────────────────────────────────────
+  useEffect(() => {
+    const fetchModels = async () => {
+      setLoadingModels(true);
+      try {
+        const [costumesData, chemisesData, chaussuresData, accessoiresData] =
+          await Promise.all([
+            get_all_category_cloth(categories[0]),
+            get_all_category_cloth(categories[1]),
+            get_all_category_cloth(categories[2]),
+            get_all_category_cloth(categories[3]),
+          ]);
+
+        const sortByModel = (a: { model: string }, b: { model: string }) =>
+          a.model.toLowerCase().localeCompare(b.model.toLowerCase());
+
+        setAvailableModels({
+          costumes: costumesData.sort(sortByModel),
+          chemises: chemisesData.sort(sortByModel),
+          chaussures: chaussuresData.sort(sortByModel),
+          accessoires: [
+            ...new Map(accessoiresData.map((a) => [a.model, a])).values(),
+          ].sort(sortByModel),
+        });
+      } catch (err) {
+        console.error("Erreur lors du chargement des modèles:", err);
+      } finally {
+        setLoadingModels(false);
+      }
+    };
+
+    fetchModels();
+  }, []);
+
+  // ─── Handlers ────────────────────────────────────────────────────────────────
   const handleClientChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
   ) => {
     const { name, value } = e.target;
-
     setClientData((prev) => ({
       ...prev,
       [name]: name === "vers" || name === "rest" ? Number(value) : value,
     }));
   };
 
+  // Costumes
   const handleCostumeChange = (
     index: number,
     field: keyof Costume,
     value: string,
   ) => {
     const updated = [...costumes];
-    updated[index] = {
-      ...updated[index],
-      [field]: value,
-    };
+    updated[index] = { ...updated[index], [field]: value };
     setCostumes(updated);
   };
 
@@ -108,17 +164,82 @@ const EditLocationForm: React.FC<locationProps> = ({
     setCostumes((prev) => prev.filter((_, i) => i !== index));
   };
 
+  // Chemise
+  const addChemise = () => setChemise({ ref: null, model: "", size: "" });
+  const removeChemise = () => setChemise(null);
+  const handleChemiseChange = (field: keyof Chemise, value: string) => {
+    setChemise((prev) => (prev ? { ...prev, [field]: value } : null));
+  };
+
+  // Chaussure
+  const addChaussure = () => setChaussure({ ref: null, model: "", size: "" });
+  const removeChaussure = () => setChaussure(null);
+  const handleChaussureChange = (field: keyof Chaussure, value: string) => {
+    setChaussure((prev) => (prev ? { ...prev, [field]: value } : null));
+  };
+
+  // Accessories
+  const toggleAccessory = (model: string, checked: boolean) => {
+    setAccessories((prev) =>
+      checked
+        ? [...prev, { ref: null, model: "", description: "" }]
+        : prev.filter((a) => a.model !== model),
+    );
+  };
+
+  const removeAccessory = (model: string) => {
+    setAccessories((prev) => prev.filter((a) => a.model !== model));
+  };
+
+  // ─── Submit ───────────────────────────────────────────────────────────────────
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
+    setError(null);
 
     try {
-    } catch (error) {
-      console.error("Erreur modification :", error);
+      const updatedRest =
+        clientData.vers < prixTotal ? prixTotal - clientData.vers : 0;
+
+      const payload = {
+        locationId,
+        location_date: new Date(location_date),
+        costume: costumes,
+        chemise,
+        chaussure,
+        accessoire: accessories,
+        client: { ...clientData, rest: updatedRest },
+        total: prixTotal,
+      };
+
+      const res = await fetch(`/api/editLocation`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Erreur API");
+
+      setShowSuccessMessage(true);
+      setTimeout(() => {
+        router.push(`/${nomBoutique}/dashboard/${locationId}`);
+      }, 1500);
+    } catch (err: any) {
+      setError(
+        err.message || "❌ Une erreur est survenue lors de la modification",
+      );
     } finally {
       setLoading(false);
     }
   };
+
+  // ─── Helpers ──────────────────────────────────────────────────────────────────
+  const selectClass =
+    "w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all outline-none bg-white disabled:opacity-50 disabled:cursor-not-allowed";
+
+  const inputClass =
+    "w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all outline-none";
 
   return (
     <div className="w-full min-h-screen bg-gradient-to-br from-gray-50 via-blue-50/30 to-gray-100 p-4 sm:p-6 animate-fadeIn">
@@ -132,21 +253,54 @@ const EditLocationForm: React.FC<locationProps> = ({
             <FiArrowLeft className="text-lg" />
             <span className="font-semibold">Retour</span>
           </Link>
-
           <h1 className="text-2xl sm:text-3xl font-bold text-gray-800">
             Modifier la location
           </h1>
         </div>
 
-        {/* Message de succès */}
+        {/* Success */}
         {showSuccessMessage && (
           <div className="mb-6 p-4 bg-green-100 border border-green-400 text-green-700 rounded-xl animate-fadeIn">
             ✓ Modifications enregistrées avec succès !
           </div>
         )}
 
-        <form className="space-y-6">
-          {/* Informations Client */}
+        {/* Error */}
+        {error && (
+          <div className="mb-6 p-4 bg-red-100 border border-red-400 text-red-700 rounded-xl animate-fadeIn flex items-center gap-2">
+            <FiX />
+            {error}
+          </div>
+        )}
+
+        {/* Loading models banner */}
+        {loadingModels && (
+          <div className="mb-4 px-4 py-2 bg-blue-50 border border-blue-200 text-blue-600 rounded-xl text-sm flex items-center gap-2">
+            <svg
+              className="animate-spin h-4 w-4"
+              fill="none"
+              viewBox="0 0 24 24"
+            >
+              <circle
+                className="opacity-25"
+                cx="12"
+                cy="12"
+                r="10"
+                stroke="currentColor"
+                strokeWidth="4"
+              />
+              <path
+                className="opacity-75"
+                fill="currentColor"
+                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+              />
+            </svg>
+            Chargement des modèles disponibles...
+          </div>
+        )}
+
+        <form onSubmit={handleSubmit} className="space-y-6">
+          {/* ── Informations Client ─────────────────────────────────────────── */}
           <div className="bg-white rounded-3xl shadow-xl border border-gray-200 p-6 sm:p-8">
             <div className="flex items-center gap-3 mb-6">
               <div className="bg-blue-600/10 p-3 rounded-xl">
@@ -156,10 +310,11 @@ const EditLocationForm: React.FC<locationProps> = ({
                 Informations Client
               </h2>
             </div>
+
             {/* Date de sortie */}
-            <div className="py-6">
+            <div className="py-6 border-b border-gray-100 mb-6">
               {!editDate ? (
-                <div className="flex justify-between items-end ">
+                <div className="flex justify-between items-end">
                   <div className="flex items-center gap-4">
                     <div className="p-3 bg-white rounded-xl shadow-sm">
                       <FiCalendar className="text-2xl text-blue-600" />
@@ -169,20 +324,39 @@ const EditLocationForm: React.FC<locationProps> = ({
                         Date de sortie
                       </p>
                       <p className="text-2xl font-bold text-gray-800">
-                        {initialData?.location_date instanceof Date
-                          ? initialData.location_date.toLocaleDateString(
-                              "fr-FR",
-                              {
-                                day: "2-digit",
-                                month: "short",
-                                year: "numeric",
-                              },
-                            )
-                          : initialData?.location_date}
+                        {(() => {
+                          const d = initialData?.location_date;
+                          if (!d) return "—";
+                          // Firestore Timestamp { seconds, nanoseconds }
+                          if (typeof d === "object" && "seconds" in d) {
+                            return new Date(
+                              (d as any).seconds * 1000,
+                            ).toLocaleDateString("fr-FR", {
+                              day: "2-digit",
+                              month: "short",
+                              year: "numeric",
+                            });
+                          }
+                          // Date native
+                          if (d instanceof Date) {
+                            return d.toLocaleDateString("fr-FR", {
+                              day: "2-digit",
+                              month: "short",
+                              year: "numeric",
+                            });
+                          }
+                          // String ISO ("2026-03-03T00:00:00.000Z")
+                          return new Date(d).toLocaleDateString("fr-FR", {
+                            day: "2-digit",
+                            month: "short",
+                            year: "numeric",
+                          });
+                        })()}
                       </p>
                     </div>
                   </div>
                   <button
+                    type="button"
                     onClick={() => setEditDate(true)}
                     className="flex items-center gap-2 px-5 py-2.5 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-all shadow-md hover:shadow-lg active:scale-95 font-medium"
                   >
@@ -191,8 +365,8 @@ const EditLocationForm: React.FC<locationProps> = ({
                   </button>
                 </div>
               ) : (
-                <div className="space-y-4 flex items-end gap-4">
-                  <div className="w-full">
+                <div className="flex items-end gap-4">
+                  <div className="flex-1">
                     <label className="flex items-center gap-2 text-sm font-semibold text-gray-700 mb-3">
                       <FiCalendar className="text-blue-600" />
                       Nouvelle date
@@ -201,24 +375,23 @@ const EditLocationForm: React.FC<locationProps> = ({
                       type="date"
                       value={location_date}
                       onChange={(e) => setDateSortie(e.target.value)}
-                      className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all outline-none"
+                      className={inputClass}
                       required
                     />
                   </div>
-                  <div className="flex gap-3 my-5">
-                    <button
-                      onClick={() => setEditDate(false)}
-                      className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 bg-red-100 text-gray-700 rounded-xl hover:bg-red-200 transition-all font-medium active:scale-95"
-                    >
-                      <FiX className="text-lg" />
-                      Annuler
-                    </button>
-                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setEditDate(false)}
+                    className="flex items-center justify-center gap-2 px-4 py-3 bg-red-100 text-red-600 rounded-xl hover:bg-red-200 transition-all font-medium active:scale-95"
+                  >
+                    <FiX className="text-lg" />
+                    Annuler
+                  </button>
                 </div>
               )}
             </div>
+
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {/* Nom */}
               <div>
                 <label className="block text-sm font-semibold text-gray-700 mb-2">
                   <FiUser className="inline mr-2" />
@@ -229,13 +402,12 @@ const EditLocationForm: React.FC<locationProps> = ({
                   name="name"
                   value={clientData.name}
                   onChange={handleClientChange}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                  className={inputClass}
                   placeholder="Entrez le nom"
                   required
                 />
               </div>
 
-              {/* Téléphone */}
               <div>
                 <label className="block text-sm font-semibold text-gray-700 mb-2">
                   <FiPhone className="inline mr-2" />
@@ -246,30 +418,47 @@ const EditLocationForm: React.FC<locationProps> = ({
                   name="phone"
                   value={clientData.phone}
                   onChange={handleClientChange}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                  className={inputClass}
                   placeholder="0555 00 00 00"
                   required
                 />
               </div>
-              {/* Versement */}
+
               <div>
                 <label className="block text-sm font-semibold text-gray-700 mb-2">
                   <FiDollarSign className="inline mr-2" />
-                  Prix total
+                  Prix total (DA)
                 </label>
                 <input
                   type="number"
-                  name="vers"
-                  value={initialData.total}
-                  onChange={handleClientChange}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all"
+                  value={prixTotal}
+                  onChange={(e) =>
+                    setPrixTotal(parseFloat(e.target.value) || 0)
+                  }
+                  className={inputClass}
                   placeholder="0"
                   min="0"
                   required
                 />
               </div>
 
-              {/* Reste */}
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  <FiDollarSign className="inline mr-2" />
+                  Versement (DA)
+                </label>
+                <input
+                  type="number"
+                  name="vers"
+                  value={clientData.vers}
+                  onChange={handleClientChange}
+                  className={inputClass}
+                  placeholder="0"
+                  min="0"
+                  required
+                />
+              </div>
+
               <div>
                 <label className="block text-sm font-semibold text-gray-700 mb-2">
                   <FiDollarSign className="inline mr-2" />
@@ -277,16 +466,16 @@ const EditLocationForm: React.FC<locationProps> = ({
                 </label>
                 <input
                   type="number"
-                  name="rest"
-                  value={clientData.rest}
-                  onChange={handleClientChange}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all"
-                  placeholder="0"
-                  min="0"
-                  required
+                  readOnly
+                  value={
+                    clientData.vers < prixTotal
+                      ? prixTotal - clientData.vers
+                      : 0
+                  }
+                  className={`${inputClass} bg-orange-50 border-orange-200 text-orange-700 font-semibold cursor-not-allowed`}
                 />
               </div>
-              {/* Commentaire */}
+
               <div className="md:col-span-2">
                 <label className="block text-sm font-semibold text-gray-700 mb-2">
                   <FiFileText className="inline mr-2" />
@@ -296,7 +485,7 @@ const EditLocationForm: React.FC<locationProps> = ({
                   name="comment"
                   value={clientData.comment}
                   onChange={handleClientChange}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all resize-none"
+                  className={inputClass}
                   placeholder="Notes ou commentaires..."
                   rows={3}
                 />
@@ -304,19 +493,19 @@ const EditLocationForm: React.FC<locationProps> = ({
             </div>
           </div>
 
-          {/* Costumes */}
+          {/* ── Costumes ────────────────────────────────────────────────────── */}
           <div className="bg-white rounded-3xl shadow-xl border border-gray-200 p-6 sm:p-8">
             <div className="flex items-center justify-between mb-6">
               <div className="flex items-center gap-3">
                 <div className="bg-blue-600/10 p-3 rounded-xl">
-                  <FiPackage className="text-blue-600 text-2xl" />
+                  <TbHanger className="text-blue-600 text-2xl" />
                 </div>
                 <h2 className="text-2xl font-bold text-gray-800">Costumes</h2>
               </div>
               <button
                 type="button"
-                className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-all shadow-md hover:shadow-lg active:scale-95"
                 onClick={addCostume}
+                className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-all shadow-md hover:shadow-lg active:scale-95"
               >
                 <FiPlus className="text-lg" />
                 Ajouter
@@ -334,20 +523,26 @@ const EditLocationForm: React.FC<locationProps> = ({
                     key={index}
                     className="flex justify-between items-end p-4 bg-blue-50 rounded-xl border border-blue-200"
                   >
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pr-12 w-full">
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pr-4 w-full">
                       <div>
                         <label className="block text-sm font-semibold text-gray-700 mb-2">
                           Modèle
                         </label>
-                        <input
-                          type="text"
+                        <select
                           value={costume.model}
                           onChange={(e) =>
                             handleCostumeChange(index, "model", e.target.value)
                           }
-                          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-                          placeholder="Ex: C001"
-                        />
+                          className={selectClass}
+                          disabled={loadingModels}
+                        >
+                          <option value="">Sélectionner un modèle</option>
+                          {availableModels.costumes.map((m) => (
+                            <option key={m.model} value={m.model}>
+                              {m.model}
+                            </option>
+                          ))}
+                        </select>
                       </div>
                       <div>
                         <label className="block text-sm font-semibold text-gray-700 mb-2">
@@ -357,9 +552,9 @@ const EditLocationForm: React.FC<locationProps> = ({
                           type="text"
                           value={costume.blazer}
                           onChange={(e) =>
-                            handleCostumeChange(index, "model", e.target.value)
+                            handleCostumeChange(index, "blazer", e.target.value)
                           }
-                          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                          className={inputClass}
                           placeholder="Ex: 48"
                         />
                       </div>
@@ -371,18 +566,18 @@ const EditLocationForm: React.FC<locationProps> = ({
                           type="text"
                           value={costume.pant}
                           onChange={(e) =>
-                            handleCostumeChange(index, "model", e.target.value)
+                            handleCostumeChange(index, "pant", e.target.value)
                           }
-                          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                          className={inputClass}
                           placeholder="Ex: 44"
                         />
                       </div>
                     </div>
                     <button
                       type="button"
-                      className="text-red-500 hover:text-red-700 max-h-12 hover:bg-red-50 p-2 rounded-lg transition-colors"
-                      title="Supprimer ce costume"
                       onClick={() => removeCostume(index)}
+                      className="text-red-500 hover:text-red-700 hover:bg-red-50 p-2 rounded-lg transition-colors ml-2 flex-shrink-0"
+                      title="Supprimer ce costume"
                     >
                       <MdOutlineCancel className="text-2xl" />
                     </button>
@@ -392,13 +587,19 @@ const EditLocationForm: React.FC<locationProps> = ({
             )}
           </div>
 
-          {/* Chemise */}
+          {/* ── Chemise ──────────────────────────────────────────────────────── */}
           <div className="bg-white rounded-3xl shadow-xl border border-gray-200 p-6 sm:p-8">
             <div className="flex items-center justify-between mb-6">
-              <h2 className="text-2xl font-bold text-gray-800">Chemise</h2>
+              <div className="flex items-center gap-3">
+                <div className="bg-purple-600/10 p-3 rounded-xl">
+                  <RiShirtLine className="text-purple-600 text-2xl" />
+                </div>
+                <h2 className="text-2xl font-bold text-gray-800">Chemise</h2>
+              </div>
               {!chemise ? (
                 <button
                   type="button"
+                  onClick={addChemise}
                   className="flex items-center gap-2 px-4 py-2 bg-purple-600 text-white rounded-xl hover:bg-purple-700 transition-all shadow-md hover:shadow-lg active:scale-95"
                 >
                   <FiPlus className="text-lg" />
@@ -407,6 +608,7 @@ const EditLocationForm: React.FC<locationProps> = ({
               ) : (
                 <button
                   type="button"
+                  onClick={removeChemise}
                   className="flex items-center gap-2 px-4 py-2 bg-red-600 text-white rounded-xl hover:bg-red-700 transition-all shadow-md hover:shadow-lg active:scale-95"
                 >
                   <FiTrash2 className="text-lg" />
@@ -416,19 +618,27 @@ const EditLocationForm: React.FC<locationProps> = ({
             </div>
 
             {chemise ? (
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-semibold text-gray-700 mb-2">
                     Modèle
                   </label>
-                  <input
-                    type="text"
+                  <select
                     value={chemise.model}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-                    placeholder="Ex: CH001"
-                  />
+                    onChange={(e) =>
+                      handleChemiseChange("model", e.target.value)
+                    }
+                    className={selectClass}
+                    disabled={loadingModels}
+                  >
+                    <option value="">Sélectionner un modèle</option>
+                    {availableModels.chemises.map((m) => (
+                      <option key={m.model} value={m.model}>
+                        {m.model}
+                      </option>
+                    ))}
+                  </select>
                 </div>
-
                 <div>
                   <label className="block text-sm font-semibold text-gray-700 mb-2">
                     Taille
@@ -436,8 +646,11 @@ const EditLocationForm: React.FC<locationProps> = ({
                   <input
                     type="text"
                     value={chemise.size}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-                    placeholder="Ex: M"
+                    onChange={(e) =>
+                      handleChemiseChange("size", e.target.value)
+                    }
+                    className={inputClass}
+                    placeholder="Ex: S, M, L, XL"
                   />
                 </div>
               </div>
@@ -448,13 +661,19 @@ const EditLocationForm: React.FC<locationProps> = ({
             )}
           </div>
 
-          {/* Chaussures */}
+          {/* ── Chaussures ───────────────────────────────────────────────────── */}
           <div className="bg-white rounded-3xl shadow-xl border border-gray-200 p-6 sm:p-8">
             <div className="flex items-center justify-between mb-6">
-              <h2 className="text-2xl font-bold text-gray-800">Chaussures</h2>
+              <div className="flex items-center gap-3">
+                <div className="bg-amber-600/10 p-3 rounded-xl">
+                  <LiaShoePrintsSolid className="text-amber-600 text-2xl" />
+                </div>
+                <h2 className="text-2xl font-bold text-gray-800">Chaussures</h2>
+              </div>
               {!chaussure ? (
                 <button
                   type="button"
+                  onClick={addChaussure}
                   className="flex items-center gap-2 px-4 py-2 bg-amber-600 text-white rounded-xl hover:bg-amber-700 transition-all shadow-md hover:shadow-lg active:scale-95"
                 >
                   <FiPlus className="text-lg" />
@@ -463,6 +682,7 @@ const EditLocationForm: React.FC<locationProps> = ({
               ) : (
                 <button
                   type="button"
+                  onClick={removeChaussure}
                   className="flex items-center gap-2 px-4 py-2 bg-red-600 text-white rounded-xl hover:bg-red-700 transition-all shadow-md hover:shadow-lg active:scale-95"
                 >
                   <FiTrash2 className="text-lg" />
@@ -472,19 +692,27 @@ const EditLocationForm: React.FC<locationProps> = ({
             </div>
 
             {chaussure ? (
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-semibold text-gray-700 mb-2">
                     Modèle
                   </label>
-                  <input
-                    type="text"
+                  <select
                     value={chaussure.model}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500"
-                    placeholder="Ex: SH001"
-                  />
+                    onChange={(e) =>
+                      handleChaussureChange("model", e.target.value)
+                    }
+                    className={selectClass}
+                    disabled={loadingModels}
+                  >
+                    <option value="">Sélectionner un modèle</option>
+                    {availableModels.chaussures.map((m) => (
+                      <option key={m.model} value={m.model}>
+                        {m.model}
+                      </option>
+                    ))}
+                  </select>
                 </div>
-
                 <div>
                   <label className="block text-sm font-semibold text-gray-700 mb-2">
                     Pointure
@@ -492,8 +720,11 @@ const EditLocationForm: React.FC<locationProps> = ({
                   <input
                     type="text"
                     value={chaussure.size}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500"
-                    placeholder="Ex: 42"
+                    onChange={(e) =>
+                      handleChaussureChange("size", e.target.value)
+                    }
+                    className={inputClass}
+                    placeholder="Ex: 40, 41, 42"
                   />
                 </div>
               </div>
@@ -504,70 +735,103 @@ const EditLocationForm: React.FC<locationProps> = ({
             )}
           </div>
 
-          {/* Accessoires */}
+          {/* ── Accessoires ──────────────────────────────────────────────────── */}
           <div className="bg-white rounded-3xl shadow-xl border border-gray-200 p-6 sm:p-8">
-            <div className="flex items-center justify-between mb-6">
+            <div className="flex items-center gap-3 mb-6">
+              <div className="bg-blue-600/10 p-3 rounded-xl">
+                <IoIosBowtie className="text-blue-600 text-2xl" />
+              </div>
               <h2 className="text-2xl font-bold text-gray-800">Accessoires</h2>
-              <button
-                type="button"
-                className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-all shadow-md hover:shadow-lg active:scale-95"
-              >
-                <FiPlus className="text-lg" />
-                Ajouter
-              </button>
             </div>
 
-            {accessories.length === 0 ? (
-              <p className="text-gray-500 text-center py-8">
-                Aucun accessoire ajouté
+            {loadingModels ? (
+              <p className="text-sm text-blue-600 flex items-center gap-2 py-4">
+                <svg
+                  className="animate-spin h-4 w-4"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                >
+                  <circle
+                    className="opacity-25"
+                    cx="12"
+                    cy="12"
+                    r="10"
+                    stroke="currentColor"
+                    strokeWidth="4"
+                  />
+                  <path
+                    className="opacity-75"
+                    fill="currentColor"
+                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                  />
+                </svg>
+                Chargement des accessoires...
+              </p>
+            ) : availableModels.accessoires.length === 0 ? (
+              <p className="text-gray-400 text-center py-8 italic">
+                Aucun accessoire disponible
               </p>
             ) : (
-              <div className="space-y-4">
-                {accessories.map((accessory, index) => (
-                  <div
-                    key={index}
-                    className="p-4 flex justify-between items-end bg-blue-50 rounded-xl border border-blue-200"
-                  >
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pr-12 w-full">
-                      <div>
-                        <label className="block text-sm font-semibold text-gray-700 mb-2">
-                          Modèle
-                        </label>
-                        <input
-                          type="text"
-                          value={accessory.model}
-                          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-                          placeholder="Ex: ACC001"
-                        />
-                      </div>
-
-                      <div>
-                        <label className="block text-sm font-semibold text-gray-700 mb-2">
-                          Description
-                        </label>
-                        <input
-                          type="text"
-                          value={accessory.description}
-                          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-                          placeholder="Ex: Cravate bleue"
-                        />
-                      </div>
-                    </div>
-                    <button
-                      type="button"
-                      className="text-red-500 hover:text-red-700 max-h-12 hover:bg-red-50 p-2 rounded-lg transition-colors"
-                      title="Supprimer ce costume"
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                {availableModels.accessoires.map((acc) => {
+                  const isChecked = accessories.some(
+                    (a) => a.model === acc.model,
+                  );
+                  return (
+                    <label
+                      key={acc.model}
+                      className={`flex items-center gap-3 p-3 border-2 rounded-xl cursor-pointer transition-all ${
+                        isChecked
+                          ? "border-blue-500 bg-blue-50"
+                          : "border-blue-200/50 hover:bg-blue-50/50"
+                      }`}
                     >
-                      <MdOutlineCancel className="text-2xl" />
-                    </button>
-                  </div>
-                ))}
+                      <input
+                        type="checkbox"
+                        checked={isChecked}
+                        onChange={(e) =>
+                          toggleAccessory(acc.model, e.target.checked)
+                        }
+                        className="w-5 h-5 text-blue-600 border-blue-400 rounded focus:ring-blue-500 focus:ring-2"
+                      />
+                      <span className="text-sm font-medium text-gray-700">
+                        {acc.model}
+                      </span>
+                    </label>
+                  );
+                })}
+              </div>
+            )}
+
+            {/* Show currently selected accessories (from initialData that may not be in available list) */}
+            {accessories.length > 0 && (
+              <div className="mt-4 pt-4 border-t border-gray-100">
+                <p className="text-sm font-semibold text-gray-600 mb-2">
+                  Accessoires sélectionnés :
+                </p>
+                <div className="flex flex-wrap gap-2">
+                  {accessories.map((acc) => (
+                    <span
+                      key={acc.model}
+                      className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-blue-100 text-blue-700 rounded-full text-sm font-medium"
+                    >
+                      {acc.model}
+                      <button
+                        type="button"
+                        onClick={() => removeAccessory(acc.model)}
+                        className="hover:text-blue-900 transition-colors"
+                      >
+                        <FiX className="text-xs" />
+                      </button>
+                    </span>
+                  ))}
+                </div>
               </div>
             )}
           </div>
 
-          {/* Boutons d'action */}
-          <div className="flex flex-col sm:flex-row gap-4 justify-end">
+          {/* ── Boutons d'action ─────────────────────────────────────────────── */}
+          <div className="flex flex-col sm:flex-row gap-4 justify-end pb-8">
             <Link
               href={`/${nomBoutique}/dashboard/${locationId}`}
               className="px-6 py-3 bg-gray-200 text-gray-700 rounded-xl hover:bg-gray-300 transition-all font-semibold text-center"
@@ -581,7 +845,7 @@ const EditLocationForm: React.FC<locationProps> = ({
             >
               {loading ? (
                 <>
-                  <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+                  <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white" />
                   Enregistrement...
                 </>
               ) : (

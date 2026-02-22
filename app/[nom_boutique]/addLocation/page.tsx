@@ -56,14 +56,6 @@ const Page = () => {
   const [success, setSuccess] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
-  const accessory = [
-    "Cravate",
-    "Papillon",
-    "Ceinture",
-    "Boutons manchettes",
-    "Montre",
-  ];
-
   const rentDate = new Date(locationDate);
 
   useEffect(() => {

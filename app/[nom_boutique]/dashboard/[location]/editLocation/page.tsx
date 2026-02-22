@@ -24,9 +24,9 @@ const Page = async ({ params }: Props) => {
 const initialData = JSON.parse(JSON.stringify({
   ...rawData,
   date_sortie:
-    rawData.date_sortie && typeof rawData.date_sortie === 'object' && 'toDate' in rawData.date_sortie
-      ? (rawData.date_sortie as any).toDate().toISOString()
-      : rawData.date_sortie,
+    rawData.location_date && typeof rawData.location_date === 'object' && 'toDate' in rawData.location_date
+      ? (rawData.location_date as any).toDate().toISOString()
+      : rawData.location_date,
 }));
 
   return (
