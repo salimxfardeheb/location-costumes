@@ -2,18 +2,23 @@
 
 import { useState, useEffect } from "react";
 import dayjs from "dayjs";
+import "dayjs/locale/fr";
+dayjs.locale("fr");
 import { MdOutlineNavigateNext, MdOutlineNavigateBefore } from "react-icons/md";
 import Link from "next/link";
 import { useParams } from "next/navigation";
-import { FiCalendar } from "react-icons/fi";
+import { TbHanger } from "react-icons/tb";
+import { RiShirtLine } from "react-icons/ri";
+import { LiaShoePrintsSolid } from "react-icons/lia";
+import { IoIosBowtie } from "react-icons/io";
 
-import {Location} from "@/app/functions"
+import { LocationItem } from "@/app/functions";
 
-
+const WEEKDAYS = ["Lun", "Mar", "Mer", "Jeu", "Ven", "Sam", "Dim"];
 
 const Page = () => {
   const [currentMonth, setCurrentMonth] = useState(dayjs());
-  const [locations, setLocations] = useState<Location[]>([]);
+  const [locations, setLocations] = useState<LocationItem[]>([]);
   const [loading, setLoading] = useState(true);
   const { nom_boutique } = useParams();
 
@@ -22,9 +27,7 @@ const Page = () => {
       try {
         const res = await fetch("/api/calendar");
         const data = await res.json();
-        if (data.success) {
-          setLocations(data.data);
-        }
+        if (data.success) setLocations(data.data);
       } catch (err) {
         console.error("Erreur fetch locations:", err);
       } finally {
@@ -34,10 +37,11 @@ const Page = () => {
     fetchData();
   }, []);
 
+  // Monday-first week
   const startOfMonth = currentMonth.startOf("month");
   const endOfMonth = currentMonth.endOf("month");
-  const startDate = startOfMonth.startOf("week");
-  const endDate = endOfMonth.endOf("week");
+  const startDate = startOfMonth.startOf("week").add(1, "day"); // Mon
+  const endDate = endOfMonth.endOf("week").add(1, "day");
 
   const days: dayjs.Dayjs[] = [];
   let day = startDate.clone();
@@ -46,141 +50,161 @@ const Page = () => {
     day = day.add(1, "day");
   }
 
-  const nextMonth = () => setCurrentMonth(currentMonth.add(1, "month"));
-  const prevMonth = () => setCurrentMonth(currentMonth.subtract(1, "month"));
+  const nextMonth = () => setCurrentMonth((m) => m.add(1, "month"));
+  const prevMonth = () => setCurrentMonth((m) => m.subtract(1, "month"));
+
+  const totalLocationsThisMonth = locations.filter((loc) =>
+    dayjs(loc.location_date).month() === currentMonth.month() &&
+    dayjs(loc.location_date).year() === currentMonth.year()
+  ).length;
 
   return (
-    <div className="w-full min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 p-6">
-      <div className="max-w-7xl mx-auto">
-        {/* Card Container */}
-        <div className="bg-white rounded-3xl shadow-xl border border-gray-200 overflow-hidden animate-fadeIn">
-          {/* Header */}
-          <div className="px-8 py-6 bg-gradient-to-r from-[#000c79] via-[#000a35] to-[#000c79]">
-            <div className="flex justify-between items-center">
-              <button
-                onClick={prevMonth}
-                className="bg-white/20 hover:bg-white/30 backdrop-blur-sm p-3 rounded-xl transition-all active:scale-95"
-              >
-                <MdOutlineNavigateBefore className="text-white text-2xl" />
-              </button>
+    <div className="w-full min-h-screen bg-gray-50 p-4 md:p-8">
+      <div className="max-w-7xl mx-auto space-y-5">
 
-              <div className="flex items-center gap-3">
-                <div className="bg-white/20 backdrop-blur-sm p-2 rounded-xl">
-                  <FiCalendar className="text-white text-2xl" />
-                </div>
-                <h2 className="text-3xl font-bold text-white capitalize">
-                  {currentMonth.format("MMMM YYYY")}
-                </h2>
-              </div>
-
-              <button
-                onClick={nextMonth}
-                className="bg-white/20 hover:bg-white/30 backdrop-blur-sm p-3 rounded-xl transition-all active:scale-95"
-              >
-                <MdOutlineNavigateNext className="text-white text-2xl" />
-              </button>
-            </div>
+        {/* Header */}
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+          <div>
+            <h1 className="text-2xl md:text-3xl font-bold text-gray-900 tracking-tight capitalize">
+              {currentMonth.format("MMMM YYYY")}
+            </h1>
+            <p className="text-gray-500 text-sm mt-1">
+              {totalLocationsThisMonth} location{totalLocationsThisMonth > 1 ? "s" : ""} ce mois
+            </p>
           </div>
 
-          {/* Days of week */}
-          <div className="grid grid-cols-7 bg-gray-50 border-b border-gray-200">
-            {["Dim", "Lun", "Mar", "Mer", "Jeu", "Ven", "Sam"].map((d) => (
-              <div
-                key={d}
-                className="p-4 text-center font-semibold text-sm text-gray-600 uppercase tracking-wide"
-              >
-                {d}
+          <div className="flex items-center gap-2">
+            <button
+              onClick={prevMonth}
+              className="p-2.5 bg-white border border-gray-200 rounded-xl text-gray-600 hover:bg-gray-50 hover:border-gray-300 transition-all active:scale-95 shadow-sm"
+            >
+              <MdOutlineNavigateBefore className="text-xl" />
+            </button>
+            <button
+              onClick={() => setCurrentMonth(dayjs())}
+              className="px-4 py-2 bg-white border border-gray-200 rounded-xl text-sm font-semibold text-gray-600 hover:bg-gray-50 transition-all active:scale-95 shadow-sm"
+            >
+              Aujourd'hui
+            </button>
+            <button
+              onClick={nextMonth}
+              className="p-2.5 bg-white border border-gray-200 rounded-xl text-gray-600 hover:bg-gray-50 hover:border-gray-300 transition-all active:scale-95 shadow-sm"
+            >
+              <MdOutlineNavigateNext className="text-xl" />
+            </button>
+          </div>
+        </div>
+
+        {/* Calendar */}
+        <div className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
+
+          {/* Weekday headers */}
+          <div className="grid grid-cols-7 border-b border-gray-100">
+            {WEEKDAYS.map((d) => (
+              <div key={d} className="py-3 text-center text-xs font-semibold text-gray-400 uppercase tracking-widest">
+                <span className="hidden sm:inline">{d}</span>
+                <span className="sm:hidden">{d[0]}</span>
               </div>
             ))}
           </div>
 
-          {/* Calendar Grid */}
-          <div className="grid grid-cols-7 gap-px bg-gray-200 p-px">
+          {/* Grid */}
+          <div className="grid grid-cols-7 divide-x divide-y divide-gray-100">
             {days.map((dayItem) => {
               const isCurrentMonth = dayItem.month() === currentMonth.month();
               const isToday = dayItem.isSame(dayjs(), "day");
-
               const eventsOfDay = locations.filter((loc) =>
                 dayItem.isSame(dayjs(loc.location_date), "day")
               );
+              const hasEvents = eventsOfDay.length > 0;
 
               return (
                 <div
                   key={dayItem.toString()}
-                  className={`bg-white min-h-[140px] p-3 flex flex-col transition-all duration-200
-                    ${!isCurrentMonth ? "opacity-40" : "hover:shadow-lg"}
-                    ${isToday ? "ring-2 ring-orange-400 ring-inset" : ""}
+                  className={`min-h-[120px] md:min-h-[150px] p-2 md:p-3 flex flex-col transition-colors
+                    ${!isCurrentMonth ? "bg-gray-50/60" : "bg-white hover:bg-blue-50/20"}
                   `}
                 >
-                  <div className="flex justify-between items-start mb-2">
+                  {/* Day number */}
+                  <div className="flex items-center justify-between mb-2">
                     <span
-                      className={`text-sm font-semibold
-                        ${isToday ? "bg-gradient-to-r from-yellow-500 to-orange-600 text-white px-2 py-1 rounded-full" : "text-gray-700"}
+                      className={`w-7 h-7 flex items-center justify-center rounded-full text-sm font-semibold transition-colors
+                        ${isToday
+                          ? "bg-[#000c79] text-white"
+                          : isCurrentMonth
+                            ? "text-gray-800 hover:bg-gray-100"
+                            : "text-gray-300"
+                        }
                       `}
                     >
                       {dayItem.date()}
                     </span>
-                    {eventsOfDay.length > 0 && (
-                      <span className="bg-blue-100 text-blue-700 text-xs px-2 py-0.5 rounded-full font-semibold">
+                    {hasEvents && isCurrentMonth && (
+                      <span className="bg-[#000c79]/10 text-[#000c79] text-[10px] font-bold px-1.5 py-0.5 rounded-full">
                         {eventsOfDay.length}
                       </span>
                     )}
                   </div>
 
-                  {loading && (
-                    <span className="text-xs text-gray-400">Chargement...</span>
+                  {/* Events */}
+                  {loading && isCurrentMonth && (
+                    <div className="flex gap-1 mt-1">
+                      <div className="h-5 bg-gray-100 rounded animate-pulse flex-1" />
+                    </div>
                   )}
 
-                  <div className="flex flex-col gap-1 overflow-y-auto flex-1 pr-1 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent">
+                  <div className="flex flex-col gap-1 overflow-y-auto flex-1">
                     {eventsOfDay.map((loc) => (
                       <Link
                         href={`/${nom_boutique}/dashboard/${loc.id}`}
                         key={loc.id}
-                        className="group bg-gradient-to-r from-blue-50 to-transparent border border-blue-700/30 rounded-lg px-2 py-1.5 hover:border-blue-700 hover:shadow-md transition-all duration-200 cursor-pointer"
+                        className="group block"
                       >
-                        <div className="text-xs space-y-0.5">
-                          {loc.costumes.length > 0 && (
-                            <div className="flex flex-wrap gap-1 items-center">
-                              <span className="font-semibold text-gray-600">Costume:</span>
-                              <span className="text-blue-700 font-medium">
-                                {loc.costumes.map((c) => c.model).join(", ")}
-                              </span>
-                              <span className="text-gray-500 text-[10px]">
-                                B: {loc.costumes.map((c) => c.blazer).join(", ")} |
-                                P: {loc.costumes.map((c) => c.pant).join(", ")}
-                              </span>
-                            </div>
+                        {/* Mobile: compact dot */}
+                        <div className="md:hidden flex items-center gap-1.5 px-2 py-1 bg-[#000c79]/8 border border-[#000c79]/20 rounded-lg hover:bg-[#000c79]/15 transition-colors">
+                          <div className="w-1.5 h-1.5 rounded-full bg-[#000c79] shrink-0" />
+                          <span className="text-[10px] font-semibold text-[#000c79] truncate">
+                            {loc.client?.name || loc.costumes?.[0]?.model || "Location"}
+                          </span>
+                        </div>
+
+                        {/* Desktop: detailed card */}
+                        <div className="hidden md:block px-2 py-1.5 bg-[#000c79]/5 border border-[#000c79]/15 rounded-lg hover:bg-[#000c79]/10 hover:border-[#000c79]/30 transition-all">
+                          {/* Client name if exists */}
+                          {loc.client?.name && (
+                            <p className="text-[11px] font-bold text-gray-700 mb-1 truncate">
+                              {loc.client.name}
+                            </p>
                           )}
-                          {loc.chemise && (
-                            <div className="flex gap-1 items-center">
-                              <span className="font-semibold text-gray-600">Chemise:</span>
-                              <span className="text-blue-700 font-medium">
-                                {loc.chemise.model}
-                              </span>
-                              <span className="text-gray-500 text-[10px]">
-                                (T: {loc.chemise.size})
-                              </span>
-                            </div>
-                          )}
-                          {loc.chaussure && (
-                            <div className="flex gap-1 items-center">
-                              <span className="font-semibold text-gray-600">Chaussure:</span>
-                              <span className="text-blue-700 font-medium">
-                                {loc.chaussure.model}
-                              </span>
-                              <span className="text-gray-500 text-[10px]">
-                                (T: {loc.chaussure.size})
-                              </span>
-                            </div>
-                          )}
-                          {loc.accessories.length > 0 && (
-                            <div className="flex gap-1 items-center">
-                              <span className="font-semibold text-gray-600">Acc:</span>
-                              <span className="text-blue-700 font-medium">
-                                {loc.accessories.map((a) => a.model).join(", ")}
-                              </span>
-                            </div>
-                          )}
+                          <div className="space-y-0.5">
+                            {loc.costumes?.length > 0 && (
+                              <EventRow
+                                icon={<TbHanger className="text-[#000c79]" />}
+                                label={loc.costumes.map((c) => c.model).join(", ")}
+                                detail={`B:${loc.costumes.map((c) => c.blazer).join(",")} P:${loc.costumes.map((c) => c.pant).join(",")}`}
+                              />
+                            )}
+                            {loc.chemise && (
+                              <EventRow
+                                icon={<RiShirtLine className="text-purple-500" />}
+                                label={loc.chemise.model}
+                                detail={`T:${loc.chemise.size}`}
+                              />
+                            )}
+                            {loc.chaussure && (
+                              <EventRow
+                                icon={<LiaShoePrintsSolid className="text-amber-500" />}
+                                label={loc.chaussure.model}
+                                detail={`P:${loc.chaussure.size}`}
+                              />
+                            )}
+                            {loc.accessories?.length > 0 && (
+                              <EventRow
+                                icon={<IoIosBowtie className="text-pink-500" />}
+                                label={loc.accessories.map((a) => a.model).join(", ")}
+                              />
+                            )}
+                          </div>
                         </div>
                       </Link>
                     ))}
@@ -190,9 +214,53 @@ const Page = () => {
             })}
           </div>
         </div>
+
+        {/* Legend */}
+        <div className="flex flex-wrap items-center gap-4 text-xs text-gray-500 pb-2">
+          <div className="flex items-center gap-1.5">
+            <div className="w-6 h-6 rounded-full bg-[#000c79] flex items-center justify-center text-white text-[10px] font-bold">7</div>
+            <span>Aujourd'hui</span>
+          </div>
+          <div className="flex items-center gap-1.5">
+            <TbHanger className="text-[#000c79]" />
+            <span>Costume</span>
+          </div>
+          <div className="flex items-center gap-1.5">
+            <RiShirtLine className="text-purple-500" />
+            <span>Chemise</span>
+          </div>
+          <div className="flex items-center gap-1.5">
+            <LiaShoePrintsSolid className="text-amber-500" />
+            <span>Chaussure</span>
+          </div>
+          <div className="flex items-center gap-1.5">
+            <IoIosBowtie className="text-pink-500" />
+            <span>Accessoire</span>
+          </div>
+        </div>
       </div>
     </div>
   );
 };
+
+function EventRow({
+  icon,
+  label,
+  detail,
+}: {
+  icon: React.ReactNode;
+  label: string;
+  detail?: string;
+}) {
+  return (
+    <div className="flex items-center gap-1 min-w-0">
+      <span className="shrink-0 text-[11px]">{icon}</span>
+      <span className="text-[10px] font-semibold text-gray-700 truncate">{label}</span>
+      {detail && (
+        <span className="text-[9px] text-gray-400 shrink-0 ml-auto">{detail}</span>
+      )}
+    </div>
+  );
+}
 
 export default Page;
