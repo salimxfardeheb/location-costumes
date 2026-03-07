@@ -18,7 +18,6 @@ const Page = async ({ params }: Props) => {
 
   const data = await get_all_category_cloth(category);
   
-  // Tri alphabétique par modèle (insensible à la casse)
   const result = data.sort((a, b) => 
     a.model.toLowerCase().localeCompare(b.model.toLowerCase())
   );

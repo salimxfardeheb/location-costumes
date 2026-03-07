@@ -7,6 +7,7 @@ import { TbLayoutDashboardFilled } from "react-icons/tb";
 import { IoMdAddCircle } from "react-icons/io";
 import { FaCalendarAlt } from "react-icons/fa";
 import { CgProfile } from "react-icons/cg";
+import { HiSearch } from "react-icons/hi";
 
 import Logout from "./logout";
 
@@ -21,6 +22,7 @@ const Panel: React.FC<PanelProps> = ({ panelIsOpen, setPanelIsOpen }) => {
   const shop_name_upperCase = nom_boutique?.toLocaleString().toUpperCase();
 
   const menuItems = [
+    { label: "Rechercher", path: "search", icon: HiSearch },
     { label: "Dashboard", path: "dashboard", icon: TbLayoutDashboardFilled },
     { label: "Ajouter une location", path: "addLocation", icon: IoMdAddCircle },
     { label: "Calendrier", path: "calendar", icon: FaCalendarAlt },
@@ -94,7 +96,7 @@ const Panel: React.FC<PanelProps> = ({ panelIsOpen, setPanelIsOpen }) => {
                 {isActive && (
                   <div className="absolute left-0 top-0 bottom-0 w-1 bg-[#000c79] rounded-r-full" />
                 )}
-                
+
                 <div className={`${panelIsOpen ? "" : "mx-auto"}`}>
                   <Icon
                     className={`text-2xl transition-transform duration-200 ${
@@ -102,13 +104,13 @@ const Panel: React.FC<PanelProps> = ({ panelIsOpen, setPanelIsOpen }) => {
                     }`}
                   />
                 </div>
-                
+
                 {panelIsOpen && (
                   <span className="font-medium text-sm whitespace-nowrap">
                     {label}
                   </span>
                 )}
-                
+
                 {/* Hover effect */}
                 {!isActive && (
                   <div className="absolute inset-0 bg-white/0 group-hover:bg-white/5 transition-all duration-200 rounded-xl" />
@@ -120,13 +122,7 @@ const Panel: React.FC<PanelProps> = ({ panelIsOpen, setPanelIsOpen }) => {
       </div>
 
       {/* Footer Section */}
-      <div className="p-3">
-        {panelIsOpen && (
-          <div className="bg-white/10 backdrop-blur-sm rounded-xl p-1">
-            <Logout />
-          </div>
-        )}
-      </div>
+      <div className="p-3">{panelIsOpen && <Logout />}</div>
     </nav>
   );
 };

@@ -100,7 +100,7 @@ export type Client = {
   comment : string;
 };
 
-export type Location = {
+export type LocationItem  = {
   id: string;
   location_date: Date;
   costumes: Costume[];

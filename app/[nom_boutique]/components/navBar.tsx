@@ -51,7 +51,7 @@ const NavBar = () => {
           </Link>
           
           <Link 
-            href={`/${nom_boutique}/dashboard/searchModel`} 
+            href={`/${nom_boutique}/search`} 
             className="bg-white text-[#000c79] border-2 border-[#000c79] font-semibold px-5 py-2.5 rounded-xl shadow-md hover:bg-[#000c79] hover:text-white active:scale-95 transition-all duration-200 flex items-center gap-2 group"
           >
             <HiSearch className="text-xl group-hover:scale-110 transition-transform duration-200" />
